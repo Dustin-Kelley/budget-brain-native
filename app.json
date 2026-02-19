@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "budget-brain-native",
-    "slug": "budget-brain-native",
+    "slug": "budget-brain",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.budgetbrain.budgetbrain",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -43,6 +47,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "bb1ccf1b-f4c2-4573-8425-50f5d85e6220"
+      }
+    },
+    "owner": "budget-brain"
   }
 }
