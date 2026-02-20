@@ -1,27 +1,20 @@
-import { supabase } from "@/lib/supabase";
-import type { HouseholdRow } from "@/types";
+import { supabase } from '@/lib/supabase';
 
-export type GetHouseholdResult = {
-  household: HouseholdRow | null;
-  householdError: Error | null;
-};
-
-export async function getHousehold(
-  householdId: string | null
-): Promise<GetHouseholdResult> {
+export async function getHousehold(householdId: string | null) {
   if (!householdId) {
-    return { household: null, householdError: null };
+    return { household: null, error: null };
   }
 
   const { data, error } = await supabase
-    .from("household")
-    .select("*")
-    .eq("id", householdId)
+    .from('household')
+    .select('*')
+    .eq('id', householdId)
     .maybeSingle();
 
   if (error) {
-    return { household: null, householdError: error as Error };
+    console.error(error);
+    return { household: null, error };
   }
 
-  return { household: data, householdError: null };
+  return { household: data, error: null };
 }

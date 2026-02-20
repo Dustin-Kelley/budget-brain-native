@@ -37,6 +37,15 @@ export type Database = {
           updated_at?: string | null;
           year?: number | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: "line_items_category_id_fkey";
+            columns: ["id"];
+            isOneToOne: false;
+            referencedRelation: "line_items";
+            referencedColumns: ["category_id"];
+          },
+        ];
       };
       household: {
         Row: {
@@ -54,6 +63,7 @@ export type Database = {
           id?: string;
           name?: string | null;
         };
+        Relationships: [];
       };
       income: {
         Row: {
@@ -89,6 +99,7 @@ export type Database = {
           updated_at?: string | null;
           year?: number | null;
         };
+        Relationships: [];
       };
       line_items: {
         Row: {
@@ -124,6 +135,15 @@ export type Database = {
           updated_at?: string | null;
           year?: number | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: "line_items_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       transactions: {
         Row: {
@@ -168,6 +188,7 @@ export type Database = {
           updated_at?: string | null;
           year?: number | null;
         };
+        Relationships: [];
       };
       users: {
         Row: {
@@ -194,6 +215,7 @@ export type Database = {
           id?: string;
           last_name?: string | null;
         };
+        Relationships: [];
       };
     };
     Views: {

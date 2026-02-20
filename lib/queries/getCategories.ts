@@ -25,5 +25,8 @@ export async function getCategories({
   if (error) {
     return { categories: null, error: error as Error };
   }
-  return { categories: (data as CategoryWithLineItems[]) ?? null, error: null };
+  return {
+    categories: (data as unknown as CategoryWithLineItems[]) ?? null,
+    error: null,
+  };
 }

@@ -1,22 +1,14 @@
-import { supabase } from "@/lib/supabase";
-import type { UserRow } from "@/types";
+import { supabase } from '@/lib/supabase';
 
-type GetCurrentUserResult = {
-  currentUser: UserRow | null;
-  error: Error | null;
-};
-
-export async function getCurrentUser(
-  authUserId: string
-): Promise<GetCurrentUserResult> {
+export async function getCurrentUser(authUserId: string) {
   const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUserId)
+    .from('users')
+    .select('*')
+    .eq('id', authUserId)
     .single();
 
   if (error) {
-    return { currentUser: null, error: error as Error };
+    return { currentUser: null, error };
   }
 
   return { currentUser: data, error: null };
