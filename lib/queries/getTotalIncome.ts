@@ -9,7 +9,11 @@ export async function getTotalIncome({
   date: string | undefined;
   householdId: string | null;
   userId: string;
-}): Promise<{ income: { amount: number }[]; totalIncome: number; error: Error | null }> {
+}): Promise<{
+  income: { id: string; name: string | null; amount: number }[];
+  totalIncome: number;
+  error: Error | null;
+}> {
   if (!householdId) {
     return { income: [], totalIncome: 0, error: null };
   }
@@ -18,7 +22,7 @@ export async function getTotalIncome({
 
   const { data, error } = await supabase
     .from("income")
-    .select("amount")
+    .select("id, name, amount")
     .eq("household_id", householdId)
     .eq("created_by", userId)
     .eq("year", yearNumber)
@@ -28,7 +32,7 @@ export async function getTotalIncome({
     return { income: [], totalIncome: 0, error: error as Error };
   }
 
-  const income = (data ?? []) as { amount: number }[];
+  const income = (data ?? []) as { id: string; name: string | null; amount: number }[];
   const totalIncome = income.reduce((sum, row) => sum + (row.amount ?? 0), 0);
   return { income, totalIncome, error: null };
 }
