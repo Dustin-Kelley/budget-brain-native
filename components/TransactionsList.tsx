@@ -1,17 +1,27 @@
+import { EditTransactionForm } from "@/components/EditTransactionForm";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { View } from "react-native";
+import type { CategoryWithLineItems } from "@/types";
+import { useState } from "react";
+import { Pressable, View } from "react-native";
 
 type TransactionItem = {
   id?: string;
   amount: number | null;
   date: string | null;
   description: string | null;
+  line_item_id?: string | null;
   line_items?: { name?: string | null } | null;
 };
 
 type TransactionsListProps = {
   groupedTransactions: Record<string, TransactionItem[]>;
   sortedDates: string[];
+  categories: CategoryWithLineItems[] | null;
+  householdId?: string;
+  userId?: string;
+  monthKey?: string;
+  onRefetch?: () => void;
   error?: string | null;
 };
 
@@ -41,23 +51,30 @@ function formatDate(dateStr: string): string {
 export function TransactionsList({
   groupedTransactions,
   sortedDates,
+  categories,
+  householdId,
+  userId,
+  monthKey,
+  onRefetch,
   error,
 }: TransactionsListProps) {
+  const [editingTransaction, setEditingTransaction] =
+    useState<TransactionItem | null>(null);
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="font-semibold text-gray-900">Transactions</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading transactions</Text>
-      </View>
+      </Card>
     );
   }
 
   if (sortedDates.length === 0) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="font-semibold text-gray-900">Recent Transactions</Text>
         <Text className="mt-2 text-sm text-gray-500">No transactions found.</Text>
-      </View>
+      </Card>
     );
   }
 
@@ -68,9 +85,9 @@ export function TransactionsList({
         Your latest spending activities
       </Text>
       {sortedDates.map((dateKey) => (
-        <View
+        <Card
           key={dateKey}
-          className="rounded-xl border border-gray-200 bg-white overflow-hidden"
+          className="gap-0 overflow-hidden py-0"
         >
           <View className="border-b border-gray-100 bg-gray-50 px-4 py-2">
             <Text className="text-sm font-medium text-gray-600">
@@ -78,9 +95,16 @@ export function TransactionsList({
             </Text>
           </View>
           {(groupedTransactions[dateKey] ?? []).map((tx) => (
-            <View
+            <Pressable
               key={tx.id ?? `${dateKey}-${tx.date}-${tx.amount}`}
-              className="flex-row items-center justify-between border-b border-gray-50 px-4 py-3 last:border-b-0"
+              onPress={() =>
+                householdId &&
+                userId &&
+                monthKey &&
+                onRefetch &&
+                setEditingTransaction(tx)
+              }
+              className="flex-row items-center justify-between border-b border-gray-50 px-4 py-3 last:border-b-0 active:bg-gray-50"
             >
               <View className="flex-1">
                 <Text className="font-medium text-gray-900" numberOfLines={1}>
@@ -98,10 +122,29 @@ export function TransactionsList({
               <Text className="ml-2 font-medium text-gray-900">
                 {formatCurrency(tx.amount ?? 0)}
               </Text>
-            </View>
+            </Pressable>
           ))}
-        </View>
+        </Card>
       ))}
+      {editingTransaction &&
+        householdId &&
+        userId &&
+        monthKey &&
+        onRefetch && (
+          <EditTransactionForm
+            transaction={editingTransaction}
+            categories={categories}
+            householdId={householdId}
+            userId={userId}
+            monthKey={monthKey}
+            visible
+            onClose={() => setEditingTransaction(null)}
+            onSuccess={() => {
+              onRefetch();
+              setEditingTransaction(null);
+            }}
+          />
+        )}
     </View>
   );
 }

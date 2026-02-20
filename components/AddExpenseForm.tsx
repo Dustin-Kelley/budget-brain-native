@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { addTransaction } from "@/lib/mutations/addTransaction";
 import type { CategoryWithLineItems, LineItem } from "@/types";
@@ -9,9 +11,9 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 
 type AddExpenseFormProps = {
@@ -41,6 +43,7 @@ export function AddExpenseForm({
   monthKey,
   onSuccess,
 }: AddExpenseFormProps) {
+  const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -136,14 +139,11 @@ export function AddExpenseForm({
 
             <ScrollView className="max-h-96 px-4 py-4">
               <View className="gap-4">
-                <View>
-                  <Text className="mb-1 text-sm font-medium text-gray-700">
-                    Amount *
-                  </Text>
-                  <TextInput
-                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-base"
+                <View className="gap-2">
+                  <Label>Amount *</Label>
+                  <Input
+                    className="rounded-lg px-4 py-3"
                     placeholder="0.00"
-                    placeholderTextColor="#9ca3af"
                     value={amount}
                     onChangeText={setAmount}
                     keyboardType="decimal-pad"
@@ -151,24 +151,19 @@ export function AddExpenseForm({
                   />
                 </View>
 
-                <View>
-                  <Text className="mb-1 text-sm font-medium text-gray-700">
-                    Description
-                  </Text>
-                  <TextInput
-                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-base"
+                <View className="gap-2">
+                  <Label>Description</Label>
+                  <Input
+                    className="rounded-lg px-4 py-3"
                     placeholder="Optional"
-                    placeholderTextColor="#9ca3af"
                     value={description}
                     onChangeText={setDescription}
                     editable={!isSubmitting}
                   />
                 </View>
 
-                <View>
-                  <Text className="mb-1 text-sm font-medium text-gray-700">
-                    Budget Item *
-                  </Text>
+                <View className="gap-2">
+                  <Label>Budget Item *</Label>
                   <Pressable
                     onPress={() =>
                       setShowLineItemPicker((prev) => !prev)
@@ -219,14 +214,11 @@ export function AddExpenseForm({
                   )}
                 </View>
 
-                <View>
-                  <Text className="mb-1 text-sm font-medium text-gray-700">
-                    Date *
-                  </Text>
-                  <TextInput
-                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-base"
+                <View className="gap-2">
+                  <Label>Date *</Label>
+                  <Input
+                    className="rounded-lg px-4 py-3"
                     placeholder="YYYY-MM-DD"
-                    placeholderTextColor="#9ca3af"
                     value={date}
                     onChangeText={setDate}
                     editable={!isSubmitting}
@@ -235,7 +227,10 @@ export function AddExpenseForm({
               </View>
             </ScrollView>
 
-            <View className="border-t border-gray-200 px-4 py-4">
+            <View
+              className="border-t border-gray-200 px-4 pt-4"
+              style={{ paddingBottom: 16 + insets.bottom }}
+            >
               <Button
                 onPress={handleSubmit}
                 disabled={isSubmitting}

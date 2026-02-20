@@ -1,4 +1,5 @@
 import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
@@ -22,30 +23,30 @@ export function CategorySpendingList({
 }: CategorySpendingListProps) {
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="text-base font-semibold text-gray-900">
           Spending by Category
         </Text>
         <Text className="mt-2 text-sm text-red-600">Error loading categories</Text>
-      </View>
+      </Card>
     );
   }
 
   if (categorySpent.length === 0) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="text-base font-semibold text-gray-900">
           Spending by Category
         </Text>
         <Text className="mt-2 text-sm text-gray-500">
           No spending recorded for this month.
         </Text>
-      </View>
+      </Card>
     );
   }
 
   return (
-    <View className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <Card className="gap-0 overflow-hidden py-0">
       <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
         <Text className="text-base font-semibold text-gray-900">
           Spending by Category
@@ -64,6 +65,6 @@ export function CategorySpendingList({
           </Text>
         </View>
       ))}
-    </View>
+    </Card>
   );
 }

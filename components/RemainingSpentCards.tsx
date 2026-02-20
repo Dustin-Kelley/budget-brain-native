@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 import type { CategoryWithLineItems } from "@/types";
@@ -31,21 +32,21 @@ export function RemainingSpentCards({
 }: RemainingSpentCardsProps) {
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="font-semibold text-gray-900">Remaining</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading data</Text>
-      </View>
+      </Card>
     );
   }
 
   if (!categories || categories.length === 0) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="font-semibold text-gray-900">Remaining</Text>
         <Text className="mt-2 text-sm text-gray-500">
           No categories for this month.
         </Text>
-      </View>
+      </Card>
     );
   }
 
@@ -67,9 +68,9 @@ export function RemainingSpentCards({
           planned > 0 ? Math.round((remaining / planned) * 100) : 0;
 
         return (
-          <View
+          <Card
             key={category.id}
-            className="rounded-xl border border-gray-200 bg-white overflow-hidden"
+            className="gap-0 overflow-hidden py-0"
           >
             <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
               <Text className="font-semibold text-gray-900" numberOfLines={1}>
@@ -110,7 +111,7 @@ export function RemainingSpentCards({
                 </View>
               );
             })}
-          </View>
+          </Card>
         );
       })}
     </View>

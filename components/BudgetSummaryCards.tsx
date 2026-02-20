@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
@@ -27,12 +28,12 @@ export function BudgetSummaryCards({
 }: BudgetSummaryCardsProps) {
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="text-base font-semibold text-gray-900">
           Budget Summary
         </Text>
         <Text className="mt-2 text-sm text-red-600">Error loading summary</Text>
-      </View>
+      </Card>
     );
   }
 
@@ -42,7 +43,7 @@ export function BudgetSummaryCards({
         Budget Summary
       </Text>
       <View className="flex-row gap-3">
-        <View className="flex-1 rounded-xl border border-gray-200 bg-white p-4">
+        <Card className="flex-1 gap-0 p-4">
           <Text className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Planned
           </Text>
@@ -52,8 +53,8 @@ export function BudgetSummaryCards({
           <Text className="mt-0.5 text-xs text-gray-500">
             Total budget for this month
           </Text>
-        </View>
-        <View className="flex-1 rounded-xl border border-gray-200 bg-white p-4">
+        </Card>
+        <Card className="flex-1 gap-0 p-4">
           <Text className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Spent
           </Text>
@@ -63,8 +64,8 @@ export function BudgetSummaryCards({
           <Text className="mt-0.5 text-xs text-gray-500">
             {percentSpent}% of budget used
           </Text>
-        </View>
-        <View className="flex-1 rounded-xl border border-gray-200 bg-white p-4">
+        </Card>
+        <Card className="flex-1 gap-0 p-4">
           <Text className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Remaining
           </Text>
@@ -74,7 +75,7 @@ export function BudgetSummaryCards({
           <Text className="mt-0.5 text-xs text-gray-500">
             {100 - percentSpent}% left
           </Text>
-        </View>
+        </Card>
       </View>
     </View>
   );

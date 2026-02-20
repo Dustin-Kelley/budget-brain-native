@@ -4,6 +4,7 @@ import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
 import { MonthSelector } from "@/components/MonthSelector";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -40,7 +41,7 @@ export default function OverviewScreen() {
     return (
       <View className="flex-1  p-6">
         <MonthSelector />
-        <View className="mt-8 rounded-xl border border-gray-200 bg-white p-6">
+        <Card className="gap-0 p-6">
           <Text className="text-center text-lg font-semibold text-gray-900">
             No household set up
           </Text>
@@ -55,7 +56,7 @@ export default function OverviewScreen() {
           >
             <Text>Retry</Text>
           </Button>
-        </View>
+        </Card>
       </View>
     );
   }
@@ -100,7 +101,7 @@ export default function OverviewScreen() {
         />
 
         {totalPlanned === 0 && !error && (
-          <View className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <Card className="border-amber-200 bg-amber-50 gap-0 p-4">
             <Text className="font-semibold text-amber-900">
               Plan your budget
             </Text>
@@ -113,7 +114,7 @@ export default function OverviewScreen() {
                 <Text>Go to Plan</Text>
               </Button>
             </Link>
-          </View>
+          </Card>
         )}
         </View>
       </ScrollView>

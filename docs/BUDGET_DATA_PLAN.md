@@ -144,12 +144,12 @@ All budget queries use `household_id` from the current user.
 
 ## Phase 6: Plan Screen – Create/Edit (Future)
 
-- [ ] Add income
-- [ ] Add category
-- [ ] Add line item
-- [ ] Edit line item (planned amount)
-- [ ] Add expense from Plan
-- [ ] Edit/delete transaction
+- [x] Add income
+- [x] Add category
+- [x] Add line item
+- [x] Edit line item (planned amount)
+- [x] Add expense from Plan
+- [x] Edit/delete transaction
 
 ---
 

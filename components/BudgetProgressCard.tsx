@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
@@ -25,19 +26,19 @@ export function BudgetProgressCard({
 }: BudgetProgressCardProps) {
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="text-base font-semibold text-gray-900">
           Overall Budget Progress
         </Text>
         <Text className="mt-2 text-sm text-red-600">Error loading progress</Text>
-      </View>
+      </Card>
     );
   }
 
   const progressWidth = Math.min(percentSpent, 100);
 
   return (
-    <View className="rounded-xl border border-gray-200 bg-white p-4">
+    <Card className="gap-0 p-4">
       <Text className="text-base font-semibold text-gray-900">
         Overall Budget Progress
       </Text>
@@ -60,6 +61,6 @@ export function BudgetProgressCard({
           </Text>
         </View>
       </View>
-    </View>
+    </Card>
   );
 }

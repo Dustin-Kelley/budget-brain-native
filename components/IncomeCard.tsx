@@ -1,3 +1,5 @@
+import { AddIncomeForm } from "@/components/AddIncomeForm";
+import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
@@ -7,6 +9,10 @@ type IncomeCardProps = {
   totalPlanned: number;
   monthLabel: string;
   error?: string | null;
+  householdId?: string;
+  userId?: string;
+  monthKey?: string;
+  onRefetch?: () => void;
 };
 
 function formatCurrency(value: number) {
@@ -24,27 +30,41 @@ export function IncomeCard({
   totalPlanned,
   monthLabel,
   error,
+  householdId,
+  userId,
+  monthKey,
+  onRefetch,
 }: IncomeCardProps) {
   if (error) {
     return (
-      <View className="rounded-xl border border-gray-200 bg-white p-4">
+      <Card className="gap-0 p-4">
         <Text className="font-semibold text-gray-900">Income</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading income</Text>
-      </View>
+      </Card>
     );
   }
 
   const remaining = totalIncome - totalPlanned;
 
   return (
-    <View className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
-        <Text className="text-sm font-medium text-gray-500">
-          Total Income for: {monthLabel}
-        </Text>
-        <Text className="mt-1 text-2xl font-bold text-gray-900">
-          {formatCurrency(totalIncome)}
-        </Text>
+    <Card className="gap-0 overflow-hidden py-0">
+      <View className="flex-row items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
+        <View>
+          <Text className="text-sm font-medium text-gray-500">
+            Total Income for: {monthLabel}
+          </Text>
+          <Text className="mt-1 text-2xl font-bold text-gray-900">
+            {formatCurrency(totalIncome)}
+          </Text>
+        </View>
+        {householdId && userId && monthKey && onRefetch && (
+          <AddIncomeForm
+            householdId={householdId}
+            userId={userId}
+            monthKey={monthKey}
+            onSuccess={onRefetch}
+          />
+        )}
       </View>
       {income.length > 0 && (
         <View className="border-b border-gray-100 px-4 py-3">
@@ -72,6 +92,6 @@ export function IncomeCard({
           {remaining < 0 ? "over budget" : "left to budget"}
         </Text>
       </View>
-    </View>
+    </Card>
   );
 }
