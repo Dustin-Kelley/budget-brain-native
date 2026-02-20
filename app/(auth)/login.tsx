@@ -1,17 +1,18 @@
+import { Logo } from "@/components/Logo";
+import { useAuth } from "@/contexts/auth-context";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { Link, router } from "expo-router";
-import { useAuth } from "@/contexts/auth-context";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -43,6 +44,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.content}>
+        <Logo />
         <Text style={styles.title}>Budget Brain</Text>
         <Text style={styles.subtitle}>Welcome back</Text>
 
