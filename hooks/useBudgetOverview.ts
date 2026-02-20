@@ -1,44 +1,42 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMonth } from "@/contexts/month-context";
+import { useHousehold } from "@/hooks/useHousehold";
 import { getCategories } from "@/lib/queries/getCategories";
 import { getSpentAmount } from "@/lib/queries/getSpentAmount";
 import { getSpentByCategory } from "@/lib/queries/getSpentByCategory";
-import { useCurrentUser } from "@/contexts/user-context";
-import { useMonth } from "@/contexts/month-context";
+import { useQuery } from "@tanstack/react-query";
 
 /** Total planned = sum of all line_items.planned_amount for the month. */
 function totalPlannedFromCategories(
-  categories: { line_items?: { planned_amount: number | null }[] }[] | null
+  categories: { line_items?: { planned_amount: number | null }[] }[] | null,
 ): number {
   if (!categories) return 0;
   return categories.reduce((sum, category) => {
     const lineTotal = (category.line_items ?? []).reduce(
       (lineSum, item) => lineSum + (item.planned_amount ?? 0),
-      0
+      0,
     );
     return sum + lineTotal;
   }, 0);
 }
 
 export function useBudgetOverview() {
-  const { currentUser } = useCurrentUser();
+  const { householdId } = useHousehold();
   const { monthKey } = useMonth();
-  const householdId = currentUser?.household_id ?? null;
-  const userId = currentUser?.id ?? "";
 
   const categoriesQuery = useQuery({
-    queryKey: ["categories", householdId, monthKey],
+    queryKey: ['categories', householdId, monthKey],
     queryFn: () => getCategories({ date: monthKey, householdId }),
     enabled: !!householdId,
   });
 
   const spentQuery = useQuery({
-    queryKey: ["spentAmount", householdId, monthKey],
+    queryKey: ['spentAmount', householdId, monthKey],
     queryFn: () => getSpentAmount({ date: monthKey, householdId }),
     enabled: !!householdId,
   });
 
   const spentByCategoryQuery = useQuery({
-    queryKey: ["spentByCategory", householdId, monthKey],
+    queryKey: ['spentByCategory', householdId, monthKey],
     queryFn: () => getSpentByCategory({ date: monthKey, householdId }),
     enabled: !!householdId,
   });

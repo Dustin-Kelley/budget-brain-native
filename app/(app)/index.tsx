@@ -2,15 +2,15 @@ import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
 import { MonthSelector } from "@/components/MonthSelector";
+import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
-import { useCurrentUser } from "@/contexts/user-context";
+import { useHousehold } from "@/hooks/useHousehold";
 import { Link } from "expo-router";
-import { View, ActivityIndicator, ScrollView } from "react-native";
-import { Button } from "@/components/ui/button";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 
 export default function OverviewScreen() {
-  const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const { householdId, isLoading: userLoading } = useHousehold();
   const {
     totalPlanned,
     spentAmount,
@@ -30,7 +30,7 @@ export default function OverviewScreen() {
     );
   }
 
-  if (!currentUser?.household_id) {
+  if (!householdId) {
     return (
       <View className="flex-1 bg-gray-50 p-6">
         <MonthSelector />
