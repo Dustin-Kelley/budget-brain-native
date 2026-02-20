@@ -1,5 +1,6 @@
 import type { Database } from "@/types/supabase";
 
+export type UserRow = Database["public"]["Tables"]["users"]["Row"];
 export type Transaction =
   Database["public"]["Tables"]["transactions"]["Row"];
 export type LineItem = Database["public"]["Tables"]["line_items"]["Row"];
