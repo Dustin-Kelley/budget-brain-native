@@ -24,7 +24,7 @@ export default function OverviewScreen() {
 
   if (userLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -32,7 +32,7 @@ export default function OverviewScreen() {
 
   if (!householdId) {
     return (
-      <View className="flex-1 bg-gray-50 p-6">
+      <View className="flex-1  p-6">
         <MonthSelector />
         <View className="mt-8 rounded-xl border border-gray-200 bg-white p-6">
           <Text className="text-center text-lg font-semibold text-gray-900">
@@ -56,7 +56,7 @@ export default function OverviewScreen() {
 
   if (budgetLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -64,7 +64,7 @@ export default function OverviewScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      className="flex-1 "
       contentContainerStyle={{ paddingBottom: 32 }}
     >
       <View className="px-4 pt-2">

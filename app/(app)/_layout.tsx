@@ -1,8 +1,10 @@
 import { useAuth } from "@/contexts/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppLayout() {
+  const insets = useSafeAreaInsets();
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -17,8 +19,8 @@ export default function AppLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#111827",
         tabBarInactiveTintColor: "#9ca3af",
-        headerShown: true,
-        headerTitle: "Budget Brain",
+        headerShown: false,
+        sceneStyle: { paddingTop: insets.top },
       }}
     >
       <Tabs.Screen
