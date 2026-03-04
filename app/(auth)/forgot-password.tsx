@@ -1,6 +1,5 @@
-import { Logo } from "@/components/Logo";
-import { useAuth } from "@/contexts/auth-context";
-import { Link, router } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import { Link } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -14,28 +13,30 @@ import {
   View,
 } from "react-native";
 
-export default function LoginScreen() {
-  const { signIn } = useAuth();
+export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter email and password");
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) {
+      Alert.alert("Error", "Please enter your email address.");
       return;
     }
 
     setIsSubmitting(true);
-    const { error } = await signIn(email, password);
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmed);
     setIsSubmitting(false);
 
     if (error) {
-      Alert.alert("Login failed", "Invalid credentials. Please try again.");
+      Alert.alert("Error", error.message);
       return;
     }
 
-    router.replace("/(app)");
+    Alert.alert(
+      "Check your email",
+      "If an account exists with that email, you'll receive a password reset link."
+    );
   };
 
   return (
@@ -44,9 +45,10 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.content}>
-        <Logo />
-        <Text style={styles.title}>Budget Brain</Text>
-        <Text style={styles.subtitle}>Welcome back</Text>
+        <Text style={styles.title}>Reset Password</Text>
+        <Text style={styles.subtitle}>
+          Enter your email and we&apos;ll send you a reset link
+        </Text>
 
         <TextInput
           style={styles.input}
@@ -60,17 +62,6 @@ export default function LoginScreen() {
           editable={!isSubmitting}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#9ca3af"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="password"
-          editable={!isSubmitting}
-        />
-
         <TouchableOpacity
           style={[styles.button, isSubmitting && styles.buttonDisabled]}
           onPress={handleSubmit}
@@ -79,23 +70,14 @@ export default function LoginScreen() {
           {isSubmitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>Send Reset Link</Text>
           )}
         </TouchableOpacity>
 
-        <View style={styles.forgotRow}>
-          <Link href="/(auth)/forgot-password" asChild>
-            <TouchableOpacity>
-              <Text style={styles.link}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
-
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don&apos;t have an account? </Text>
-          <Link href="/(auth)/sign-up" asChild>
+          <Link href="/(auth)/login" asChild>
             <TouchableOpacity>
-              <Text style={styles.link}>Sign up</Text>
+              <Text style={styles.link}>Back to Login</Text>
             </TouchableOpacity>
           </Link>
         </View>
@@ -123,7 +105,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#6b7280",
     marginBottom: 32,
     textAlign: "center",
@@ -152,18 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  forgotRow: {
-    alignItems: "center",
-    marginTop: 16,
-  },
   footer: {
-    flexDirection: "row",
-    justifyContent: "center",
+    alignItems: "center",
     marginTop: 24,
-  },
-  footerText: {
-    color: "#6b7280",
-    fontSize: 14,
   },
   link: {
     color: "#111827",

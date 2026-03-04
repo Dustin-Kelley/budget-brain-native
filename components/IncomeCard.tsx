@@ -1,7 +1,9 @@
 import { AddIncomeForm } from "@/components/AddIncomeForm";
+import { EditIncomeForm } from "@/components/EditIncomeForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { View } from "react-native";
+import { useState } from "react";
+import { Pressable, View } from "react-native";
 
 type IncomeCardProps = {
   income: { id: string; name: string | null; amount: number }[];
@@ -35,6 +37,12 @@ export function IncomeCard({
   monthKey,
   onRefetch,
 }: IncomeCardProps) {
+  const [editingIncome, setEditingIncome] = useState<{
+    id: string;
+    name: string | null;
+    amount: number;
+  } | null>(null);
+
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -69,9 +77,10 @@ export function IncomeCard({
       {income.length > 0 && (
         <View className="border-b border-gray-100 px-4 py-3">
           {income.map((entry) => (
-            <View
+            <Pressable
               key={entry.id}
-              className="flex-row justify-between py-2"
+              onPress={() => onRefetch && setEditingIncome(entry)}
+              className="flex-row justify-between py-2 active:bg-gray-50"
             >
               <Text className="text-gray-700" numberOfLines={1}>
                 {entry.name ?? "Income"}
@@ -79,7 +88,7 @@ export function IncomeCard({
               <Text className="font-medium text-gray-900">
                 {formatCurrency(entry.amount)}
               </Text>
-            </View>
+            </Pressable>
           ))}
         </View>
       )}
@@ -92,6 +101,17 @@ export function IncomeCard({
           {remaining < 0 ? "over budget" : "left to budget"}
         </Text>
       </View>
+      {editingIncome && onRefetch && (
+        <EditIncomeForm
+          income={editingIncome}
+          visible
+          onClose={() => setEditingIncome(null)}
+          onSuccess={() => {
+            onRefetch();
+            setEditingIncome(null);
+          }}
+        />
+      )}
     </Card>
   );
 }
