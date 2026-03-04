@@ -10,14 +10,20 @@ import { Text } from "@/components/ui/text";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { useMonth } from "@/contexts/month-context";
 import { Link } from "expo-router";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function OverviewScreen() {
   const { householdId, isLoading: userLoading } = useHousehold();
   const { currentUser } = useCurrentUser();
   const { monthKey } = useMonth();
+  const { top } = useSafeAreaInsets();
+  const { scrollHandler, headerAnimatedStyle, headerHeight } =
+    useCollapsibleHeader();
   const {
     categories,
     totalPlanned,
@@ -47,7 +53,7 @@ export default function OverviewScreen() {
             No household set up
           </Text>
           <Text className="mt-2 text-center text-sm text-gray-500">
-            Your account isn’t linked to a household yet. Use the web app to
+            Your account isn't linked to a household yet. Use the web app to
             create or join a household, then open Budget Brain again.
           </Text>
           <Button
@@ -70,55 +76,66 @@ export default function OverviewScreen() {
     );
   }
 
+  // Approximate header height for initial padding (status bar + content + padding)
+  const headerPaddingTop = top + 52;
+
   return (
     <View className="flex-1 bg-cyan-400">
-      <ScrollView
+      <AppHeader
+        animatedStyle={headerAnimatedStyle}
+        headerHeight={headerHeight}
+      />
+
+      <Animated.ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 96 }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingTop: headerPaddingTop,
+          paddingBottom: 96,
+        }}
       >
-        <AppHeader />
-
         <View className="mt-4 gap-6 px-4 flex-1 min-h-full bg-gray-50 rounded-t-2xl">
-        <BudgetProgressCard
-          totalPlanned={totalPlanned}
-          spentAmount={spentAmount}
-          percentSpent={percentSpent}
-          error={error?.message}
-        />
+          <BudgetProgressCard
+            totalPlanned={totalPlanned}
+            spentAmount={spentAmount}
+            percentSpent={percentSpent}
+            error={error?.message}
+          />
 
-        <BudgetSummaryCards
-          totalPlanned={totalPlanned}
-          spentAmount={spentAmount}
-          remaining={remaining}
-          percentSpent={percentSpent}
-          error={error?.message}
-        />
+          <BudgetSummaryCards
+            totalPlanned={totalPlanned}
+            spentAmount={spentAmount}
+            remaining={remaining}
+            percentSpent={percentSpent}
+            error={error?.message}
+          />
 
-        <CategoryPieChart categorySpent={categorySpent} />
+          <CategoryPieChart categorySpent={categorySpent} />
 
-        <CategorySpendingList
-          categorySpent={categorySpent}
-          error={error?.message}
-        />
+          <CategorySpendingList
+            categorySpent={categorySpent}
+            error={error?.message}
+          />
 
-        {totalPlanned === 0 && !error && (
-          <Card className="border-amber-200 bg-amber-50 gap-0 p-4">
-            <Text className="font-semibold text-amber-900">
-              Plan your budget
-            </Text>
-            <Text className="mt-1 text-sm text-amber-800">
-              You haven’t set a budget for this month. Open the Plan tab to add
-              income and categories.
-            </Text>
-            <Link href="/(app)/plan" asChild>
-              <Button variant="outline" className="mt-3">
-                <Text>Go to Plan</Text>
-              </Button>
-            </Link>
-          </Card>
-        )}
+          {totalPlanned === 0 && !error && (
+            <Card className="border-amber-200 bg-amber-50 gap-0 p-4">
+              <Text className="font-semibold text-amber-900">
+                Plan your budget
+              </Text>
+              <Text className="mt-1 text-sm text-amber-800">
+                You haven't set a budget for this month. Open the Plan tab to
+                add income and categories.
+              </Text>
+              <Link href="/(app)/plan" asChild>
+                <Button variant="outline" className="mt-3">
+                  <Text>Go to Plan</Text>
+                </Button>
+              </Link>
+            </Card>
+          )}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {householdId && currentUser && (
         <AddExpenseForm
