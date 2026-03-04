@@ -13,8 +13,8 @@ export function AppHeader({ animatedStyle, headerHeight }: AppHeaderProps) {
 
   const handleLayout = (e: LayoutChangeEvent) => {
     if (headerHeight) {
-      // Store content height (below status bar) so the hook knows how far to translate
-      headerHeight.value = e.nativeEvent.layout.height - top;
+      // Use full header height so it translates completely off screen
+      headerHeight.value = e.nativeEvent.layout.height;
     }
   };
 

@@ -1,17 +1,17 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
+import { AppHeader } from "@/components/AppHeader";
 import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategoryPieChart } from "@/components/CategoryPieChart";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
-import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { useMonth } from "@/contexts/month-context";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { useMonth } from "@/contexts/month-context";
 import { Link } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -53,7 +53,7 @@ export default function OverviewScreen() {
             No household set up
           </Text>
           <Text className="mt-2 text-center text-sm text-gray-500">
-            Your account isn't linked to a household yet. Use the web app to
+            Your account isn&apos;t linked to a household yet. Use the web app to
             create or join a household, then open Budget Brain again.
           </Text>
           <Button
@@ -80,7 +80,7 @@ export default function OverviewScreen() {
   const headerPaddingTop = top + 52;
 
   return (
-    <View className="flex-1 bg-cyan-400">
+    <View className="flex-1 bg-white">
       <AppHeader
         animatedStyle={headerAnimatedStyle}
         headerHeight={headerHeight}
@@ -117,6 +117,18 @@ export default function OverviewScreen() {
             categorySpent={categorySpent}
             error={error?.message}
           />
+          <CategorySpendingList
+            categorySpent={categorySpent}
+            error={error?.message}
+          />
+          <CategorySpendingList
+            categorySpent={categorySpent}
+            error={error?.message}
+          />
+          <CategorySpendingList
+            categorySpent={categorySpent}
+            error={error?.message}
+          />
 
           {totalPlanned === 0 && !error && (
             <Card className="border-amber-200 bg-amber-50 gap-0 p-4">
@@ -124,7 +136,7 @@ export default function OverviewScreen() {
                 Plan your budget
               </Text>
               <Text className="mt-1 text-sm text-amber-800">
-                You haven't set a budget for this month. Open the Plan tab to
+                You haven&apos;t set a budget for this month. Open the Plan tab to
                 add income and categories.
               </Text>
               <Link href="/(app)/plan" asChild>
