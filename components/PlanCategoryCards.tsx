@@ -1,11 +1,13 @@
 import { AddCategoryForm } from "@/components/AddCategoryForm";
 import { AddLineItemForm } from "@/components/AddLineItemForm";
+import { EditCategoryForm } from "@/components/EditCategoryForm";
 import { EditLineItemForm } from "@/components/EditLineItemForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import type { CategoryWithLineItems, LineItem } from "@/types";
+import { deleteCategory } from "@/lib/mutations/deleteCategory";
+import type { Category, CategoryWithLineItems, LineItem } from "@/types";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 
 type PlanCategoryCardsProps = {
   categories: CategoryWithLineItems[] | null;
@@ -39,6 +41,46 @@ export function PlanCategoryCards({
     item: LineItem;
     categoryId: string;
   } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const handleCategoryPress = (category: Category) => {
+    Alert.alert(
+      category.name ?? "Category",
+      undefined,
+      [
+        {
+          text: "Edit Name",
+          onPress: () => setEditingCategory(category),
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              "Delete category?",
+              "This will also delete all budget items in this category. This cannot be undone.",
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: async () => {
+                    const { error } = await deleteCategory({ categoryId: category.id });
+                    if (error) {
+                      Alert.alert("Error", error.message);
+                      return;
+                    }
+                    onRefetch?.();
+                  },
+                },
+              ]
+            );
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+  };
 
   if (error) {
     return (
@@ -97,14 +139,17 @@ export function PlanCategoryCards({
             key={category.id}
             className="gap-0 overflow-hidden py-0"
           >
-            <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
+            <Pressable
+              onPress={() => handleCategoryPress(category)}
+              className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3 active:bg-gray-50"
+            >
               <Text className="font-semibold text-gray-900" numberOfLines={1}>
                 {category.name ?? "Category"}
               </Text>
               <Text className="text-gray-600">
                 {formatCurrency(categoryPlanned)} ({percent}%)
               </Text>
-            </View>
+            </Pressable>
             {(category.line_items ?? []).map((item) => (
               <Pressable
                 key={item.id}
@@ -147,6 +192,17 @@ export function PlanCategoryCards({
           onSuccess={() => {
             onRefetch();
             setEditingLineItem(null);
+          }}
+        />
+      )}
+      {editingCategory && onRefetch && (
+        <EditCategoryForm
+          category={editingCategory}
+          visible
+          onClose={() => setEditingCategory(null)}
+          onSuccess={() => {
+            onRefetch();
+            setEditingCategory(null);
           }}
         />
       )}

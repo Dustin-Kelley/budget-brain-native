@@ -1,6 +1,7 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
+import { CategoryPieChart } from "@/components/CategoryPieChart";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
 import { MonthSelector } from "@/components/MonthSelector";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,8 @@ export default function OverviewScreen() {
           percentSpent={percentSpent}
           error={error?.message}
         />
+
+        <CategoryPieChart categorySpent={categorySpent} />
 
         <CategorySpendingList
           categorySpent={categorySpent}

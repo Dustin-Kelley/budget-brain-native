@@ -2,9 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
-import { deleteLineItem } from "@/lib/mutations/deleteLineItem";
-import { updateLineItem } from "@/lib/mutations/updateLineItem";
-import type { LineItem } from "@/types";
+import { updateIncome } from "@/lib/mutations/updateIncome";
+import { deleteIncome } from "@/lib/mutations/deleteIncome";
 import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
@@ -17,31 +16,27 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 
-type EditLineItemFormProps = {
-  lineItem: LineItem;
-  categoryId: string;
+type EditIncomeFormProps = {
+  income: { id: string; name: string | null; amount: number };
   visible: boolean;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export function EditLineItemForm({
-  lineItem,
-  categoryId,
+export function EditIncomeForm({
+  income,
   visible,
   onClose,
   onSuccess,
-}: EditLineItemFormProps) {
+}: EditIncomeFormProps) {
   const insets = useSafeAreaInsets();
-  const [lineItemName, setLineItemName] = useState(lineItem.name ?? "");
-  const [plannedAmount, setPlannedAmount] = useState(
-    String(lineItem.planned_amount ?? 0)
-  );
+  const [name, setName] = useState(income.name ?? "");
+  const [amount, setAmount] = useState(String(income.amount ?? 0));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
-    setLineItemName(lineItem.name ?? "");
-    setPlannedAmount(String(lineItem.planned_amount ?? 0));
+    setName(income.name ?? "");
+    setAmount(String(income.amount ?? 0));
   };
 
   const handleClose = () => {
@@ -49,9 +44,38 @@ export function EditLineItemForm({
     resetForm();
   };
 
+  const handleSubmit = async () => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      Alert.alert("Name required", "Please enter an income name.");
+      return;
+    }
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      Alert.alert("Invalid amount", "Please enter a positive amount.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error } = await updateIncome({
+      incomeId: income.id,
+      name: trimmed,
+      amount: amountNum,
+    });
+    setIsSubmitting(false);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
+    }
+
+    onSuccess();
+    handleClose();
+  };
+
   const handleDelete = () => {
     Alert.alert(
-      "Delete budget item?",
+      "Delete income?",
       "This cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
@@ -60,7 +84,7 @@ export function EditLineItemForm({
           style: "destructive",
           onPress: async () => {
             setIsSubmitting(true);
-            const { error } = await deleteLineItem({ lineItemId: lineItem.id });
+            const { error } = await deleteIncome({ incomeId: income.id });
             setIsSubmitting(false);
             if (error) {
               Alert.alert("Error", error.message);
@@ -72,36 +96,6 @@ export function EditLineItemForm({
         },
       ]
     );
-  };
-
-  const handleSubmit = async () => {
-    const name = lineItemName.trim();
-    if (!name) {
-      Alert.alert("Name required", "Please enter an item name.");
-      return;
-    }
-    const amountNum = parseFloat(plannedAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive planned amount.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    const { error } = await updateLineItem({
-      lineItemId: lineItem.id,
-      lineItemName: name,
-      categoryId,
-      plannedAmount: amountNum,
-    });
-    setIsSubmitting(false);
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
-    }
-
-    onSuccess();
-    handleClose();
   };
 
   return (
@@ -116,7 +110,7 @@ export function EditLineItemForm({
           <View className="border-b border-gray-200 px-4 py-3">
             <View className="flex-row items-center justify-between">
               <Text className="text-lg font-semibold text-gray-900">
-                Edit Budget Item
+                Edit Income
               </Text>
               <Pressable onPress={handleClose} hitSlop={12}>
                 <Ionicons name="close" size={24} color="#374151" />
@@ -130,21 +124,21 @@ export function EditLineItemForm({
                 <Label>Name *</Label>
                 <Input
                   className="rounded-lg px-4 py-3"
-                  placeholder="Item name"
-                  value={lineItemName}
-                  onChangeText={setLineItemName}
+                  placeholder="Income name"
+                  value={name}
+                  onChangeText={setName}
                   editable={!isSubmitting}
                   autoCapitalize="words"
                 />
               </View>
 
               <View className="gap-2">
-                <Label>Planned Amount *</Label>
+                <Label>Amount *</Label>
                 <Input
                   className="rounded-lg px-4 py-3"
                   placeholder="0"
-                  value={plannedAmount}
-                  onChangeText={setPlannedAmount}
+                  value={amount}
+                  onChangeText={setAmount}
                   keyboardType="decimal-pad"
                   editable={!isSubmitting}
                 />
@@ -168,7 +162,7 @@ export function EditLineItemForm({
               onPress={handleDelete}
               disabled={isSubmitting}
             >
-              <Text>Delete Budget Item</Text>
+              <Text>Delete Income</Text>
             </Button>
           </View>
         </View>

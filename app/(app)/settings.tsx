@@ -1,9 +1,32 @@
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { router } from "expo-router";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import { HouseholdMembers } from "@/components/HouseholdMembers";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { useMonth } from "@/contexts/month-context";
+import { useTheme } from "@/contexts/theme-context";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useHousehold } from "@/hooks/useHousehold";
+import { resetBudget } from "@/lib/mutations/resetBudget";
+import { rolloverBudget } from "@/lib/mutations/rolloverBudget";
+import {
+  formatMonthYearForDisplay,
+  getMonthAndYearNumberFromDate,
+  getMonthYearString,
+} from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Alert, ScrollView, Switch, View } from "react-native";
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
+  const { currentUser } = useCurrentUser();
+  const { householdId } = useHousehold();
+  const { monthKey } = useMonth();
+  const { isDark, toggleTheme } = useTheme();
+  const queryClient = useQueryClient();
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert("Sign out", "Are you sure you want to sign out?", [
@@ -19,47 +42,125 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleResetBudget = () => {
+    if (!householdId) return;
+    const display = formatMonthYearForDisplay(monthKey);
+    Alert.alert(
+      "Reset Budget",
+      `This will delete all categories, budget items, and income for ${display}. This cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          style: "destructive",
+          onPress: async () => {
+            const { error } = await resetBudget({ householdId, monthKey });
+            if (error) {
+              Alert.alert("Error", error.message);
+              return;
+            }
+            queryClient.invalidateQueries();
+            Alert.alert("Done", `Budget for ${display} has been reset.`);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleRolloverBudget = () => {
+    if (!householdId || !currentUser) return;
+    const { monthNumber, yearNumber } = getMonthAndYearNumberFromDate(monthKey);
+    const nextMonth = monthNumber === 12 ? 1 : monthNumber + 1;
+    const nextYear = monthNumber === 12 ? yearNumber + 1 : yearNumber;
+    const toMonthKey = getMonthYearString(nextMonth, nextYear);
+    const fromDisplay = formatMonthYearForDisplay(monthKey);
+    const toDisplay = formatMonthYearForDisplay(toMonthKey);
+
+    Alert.alert(
+      "Rollover Budget",
+      `Copy all categories, budget items, and income from ${fromDisplay} to ${toDisplay}? This will replace any existing data in ${toDisplay}.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Rollover",
+          onPress: async () => {
+            const { error } = await rolloverBudget({
+              householdId,
+              fromMonthKey: monthKey,
+              toMonthKey,
+              userId: currentUser.id,
+            });
+            if (error) {
+              Alert.alert("Error", error.message);
+              return;
+            }
+            queryClient.invalidateQueries();
+            Alert.alert("Done", `Budget rolled over to ${toDisplay}.`);
+          },
+        },
+      ]
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.label}>Email</Text>
-        <Text style={styles.value}>{user?.email ?? "—"}</Text>
+    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
+      <View className="gap-6">
+        {/* Account Section */}
+        <View className="gap-1">
+          <Text className="text-sm text-gray-500">Email</Text>
+          <Text className="text-base font-medium text-gray-900">
+            {user?.email ?? "—"}
+          </Text>
+        </View>
+
+        {/* Dark Mode */}
+        <View className="flex-row items-center justify-between">
+          <Text className="text-base text-gray-900">Dark Mode</Text>
+          <Switch value={isDark} onValueChange={toggleTheme} />
+        </View>
+
+        {/* Budget Operations */}
+        {householdId && (
+          <View className="gap-3">
+            <Text className="text-base font-semibold text-gray-900">
+              Budget for {formatMonthYearForDisplay(monthKey)}
+            </Text>
+            <Button variant="outline" onPress={handleResetBudget}>
+              <Text>Reset Budget</Text>
+            </Button>
+            <Button variant="outline" onPress={handleRolloverBudget}>
+              <Text>Rollover to Next Month</Text>
+            </Button>
+          </View>
+        )}
+
+        {/* Household Members */}
+        {householdId && currentUser && (
+          <HouseholdMembers
+            householdId={householdId}
+            currentUserId={currentUser.id}
+          />
+        )}
+
+        {/* Account Actions */}
+        <View className="gap-3">
+          <Button variant="outline" onPress={() => setShowChangePassword(true)}>
+            <Text>Change Password</Text>
+          </Button>
+
+          <Button
+            variant="destructive"
+            onPress={handleSignOut}
+          >
+            <Text>Sign Out</Text>
+          </Button>
+        </View>
       </View>
 
-      <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-        <Text style={styles.signOutText}>Sign out</Text>
-      </TouchableOpacity>
-    </View>
+      <ChangePasswordForm
+        visible={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+      />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginBottom: 4,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  signOutButton: {
-    marginTop: 24,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: "#fef2f2",
-    alignItems: "center",
-  },
-  signOutText: {
-    color: "#dc2626",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
