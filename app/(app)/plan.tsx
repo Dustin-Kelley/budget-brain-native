@@ -1,6 +1,6 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
+import { AppHeader } from "@/components/AppHeader";
 import { IncomeCard } from "@/components/IncomeCard";
-import { MonthSelector } from "@/components/MonthSelector";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { TransactionsList } from "@/components/TransactionsList";
@@ -38,7 +38,7 @@ export default function PlanScreen() {
 
   if (householdLoading || planLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
+      <View className="flex-1 items-center justify-center bg-cyan-400">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -47,7 +47,7 @@ export default function PlanScreen() {
   if (!householdId) {
     return (
       <View className="flex-1 bg-gray-50 p-6">
-        <MonthSelector />
+        <AppHeader />
         <Card className="gap-0 p-6">
           <Text className="text-center text-lg font-semibold text-gray-900">
             No household set up
@@ -67,11 +67,9 @@ export default function PlanScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <View className="px-4 pt-2">
-          <MonthSelector />
-        </View>
+        <AppHeader />
 
-        <View className="mt-4 gap-6 px-4">
+        <View className="mt-4 gap-6 px-4 flex-1 min-h-full bg-gray-50 rounded-t-2xl">
           <IncomeCard
             income={income}
             totalIncome={totalIncome}

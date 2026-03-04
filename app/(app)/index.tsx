@@ -3,7 +3,7 @@ import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategoryPieChart } from "@/components/CategoryPieChart";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
-import { MonthSelector } from "@/components/MonthSelector";
+import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
@@ -32,7 +32,7 @@ export default function OverviewScreen() {
 
   if (userLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-cyan-400">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -40,8 +40,8 @@ export default function OverviewScreen() {
 
   if (!householdId) {
     return (
-      <View className="flex-1  p-6">
-        <MonthSelector />
+      <View className="flex-1 bg-cyan-400 p-6">
+        <AppHeader />
         <Card className="gap-0 p-6">
           <Text className="text-center text-lg font-semibold text-gray-900">
             No household set up
@@ -64,23 +64,21 @@ export default function OverviewScreen() {
 
   if (budgetLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center bg-cyan-400">
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-cyan-400">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 96 }}
       >
-        <View className="px-4 pt-2">
-          <MonthSelector />
-        </View>
+        <AppHeader />
 
-        <View className="mt-4 gap-6 px-4">
+        <View className="mt-4 gap-6 px-4 flex-1 min-h-full bg-gray-50 rounded-t-2xl">
         <BudgetProgressCard
           totalPlanned={totalPlanned}
           spentAmount={spentAmount}
