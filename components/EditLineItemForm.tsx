@@ -6,6 +6,7 @@ import { deleteLineItem } from "@/lib/mutations/deleteLineItem";
 import { updateLineItem } from "@/lib/mutations/updateLineItem";
 import type { LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +16,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type EditLineItemFormProps = {
   lineItem: LineItem;
@@ -153,16 +153,18 @@ export function EditLineItemForm({
           </ScrollView>
 
           <View
-            className="flex-row gap-3 border-t border-gray-200 px-4 pt-4"
+            className="flex-row items-center gap-3 border-t border-gray-200 px-4 pt-4"
             style={{ paddingBottom: 16 + insets.bottom }}
           >
-            <Pressable
+            <Button
+              variant="destructive"
+              size="icon"
+              className="h-14 w-14"
               onPress={handleDelete}
               disabled={isSubmitting}
-              className="h-10 w-10 items-center justify-center rounded-full bg-red-100 active:bg-red-200"
             >
-              <Ionicons name="trash-outline" size={20} color="#dc2626" />
-            </Pressable>
+              <Ionicons name="trash-outline" size={20} color="#fff" />
+            </Button>
             <Button className="flex-1" onPress={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? (
                 <ActivityIndicator color="white" />
