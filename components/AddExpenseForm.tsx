@@ -147,7 +147,7 @@ export function AddExpenseForm({
                 <View className="gap-2">
                   <Label>Amount *</Label>
                   <Input
-                    className="rounded-lg px-4 py-3"
+                    className="h-auto rounded-lg px-4 py-3"
                     placeholder="0.00"
                     value={amount}
                     onChangeText={setAmount}
@@ -159,7 +159,7 @@ export function AddExpenseForm({
                 <View className="gap-2">
                   <Label>Description</Label>
                   <Input
-                    className="rounded-lg px-4 py-3"
+                    className="h-auto rounded-lg px-4 py-3"
                     placeholder="Optional"
                     value={description}
                     onChangeText={setDescription}
@@ -222,7 +222,7 @@ export function AddExpenseForm({
                 <View className="gap-2">
                   <Label>Date *</Label>
                   <Input
-                    className="rounded-lg px-4 py-3"
+                    className="h-auto rounded-lg px-4 py-3"
                     placeholder="YYYY-MM-DD"
                     value={date}
                     onChangeText={setDate}

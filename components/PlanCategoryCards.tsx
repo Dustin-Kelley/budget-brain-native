@@ -121,7 +121,7 @@ export function PlanCategoryCards({
   }
 
   return (
-    <View className="gap-4">
+    <View className="gap-8">
       <IncomeCard
         income={income}
         totalIncome={totalIncome}
@@ -133,16 +133,6 @@ export function PlanCategoryCards({
         monthKey={monthKey}
         onRefetch={onRefetch}
       />
-      <View className="flex-row items-center justify-between">
-        <Text className="font-semibold text-gray-900">Planned</Text>
-        {householdId && monthKey && onRefetch && (
-          <AddCategoryForm
-            householdId={householdId}
-            monthKey={monthKey}
-            onSuccess={onRefetch}
-          />
-        )}
-      </View>
       {categories.map((category) => {
         const categoryPlanned =
           category.line_items?.reduce(
@@ -222,6 +212,13 @@ export function PlanCategoryCards({
             onRefetch();
             setEditingCategory(null);
           }}
+        />
+      )}
+      {householdId && monthKey && onRefetch && (
+        <AddCategoryForm
+          householdId={householdId}
+          monthKey={monthKey}
+          onSuccess={onRefetch}
         />
       )}
     </View>
