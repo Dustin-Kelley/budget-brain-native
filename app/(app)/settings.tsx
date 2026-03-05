@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { useMonth } from "@/contexts/month-context";
 import { useTheme } from "@/contexts/theme-context";
+import { headerThemes } from "@/lib/themes";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { resetBudget } from "@/lib/mutations/resetBudget";
@@ -15,16 +16,17 @@ import {
   getMonthYearString,
 } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, Switch, View } from "react-native";
+import { Alert, Pressable, ScrollView, Switch, View } from "react-native";
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
   const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
   const { monthKey } = useMonth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, headerTheme, setHeaderTheme } = useTheme();
   const queryClient = useQueryClient();
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -117,6 +119,35 @@ export default function SettingsScreen() {
         <View className="flex-row items-center justify-between">
           <Text className="text-base text-gray-900">Dark Mode</Text>
           <Switch value={isDark} onValueChange={toggleTheme} />
+        </View>
+
+        {/* Header Theme */}
+        <View className="gap-2">
+          <Text className="text-base text-gray-900">Header Theme</Text>
+          <View className="flex-row flex-wrap gap-3">
+            {headerThemes.map((theme) => (
+              <Pressable
+                key={theme.id}
+                onPress={() => setHeaderTheme(theme.id)}
+              >
+                <LinearGradient
+                  colors={theme.colors}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 12,
+                    borderWidth: headerTheme === theme.id ? 3 : 0,
+                    borderColor: isDark ? "#fff" : "#111",
+                  }}
+                />
+                <Text className="mt-1 text-center text-xs text-gray-500">
+                  {theme.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
         {/* Budget Operations */}

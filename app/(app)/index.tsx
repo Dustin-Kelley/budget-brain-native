@@ -82,7 +82,7 @@ export default function OverviewScreen() {
   const headerPaddingTop = top + (62);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 ">
       <AppHeader
         animatedStyle={headerAnimatedStyle}
         headerHeight={headerHeight}

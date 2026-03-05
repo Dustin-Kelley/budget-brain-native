@@ -1,3 +1,4 @@
+import { DEFAULT_HEADER_THEME } from "@/lib/themes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme as useNativeWindColorScheme } from "nativewind";
 import {
@@ -12,15 +13,19 @@ import {
 type ThemeContextValue = {
   isDark: boolean;
   toggleTheme: () => void;
+  headerTheme: string;
+  setHeaderTheme: (id: string) => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const THEME_KEY = "budget-brain-theme";
+const HEADER_THEME_KEY = "budget-brain-header-theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { colorScheme, setColorScheme } = useNativeWindColorScheme();
   const [isDark, setIsDark] = useState(colorScheme === "dark");
+  const [headerTheme, setHeaderThemeState] = useState(DEFAULT_HEADER_THEME);
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_KEY).then((stored) => {
@@ -32,6 +37,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setColorScheme("light");
       }
     });
+    AsyncStorage.getItem(HEADER_THEME_KEY).then((stored) => {
+      if (stored) {
+        setHeaderThemeState(stored);
+      }
+    });
   }, [setColorScheme]);
 
   const toggleTheme = useCallback(() => {
@@ -41,8 +51,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem(THEME_KEY, next ? "dark" : "light");
   }, [isDark, setColorScheme]);
 
+  const setHeaderTheme = useCallback((id: string) => {
+    setHeaderThemeState(id);
+    AsyncStorage.setItem(HEADER_THEME_KEY, id);
+  }, []);
+
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ isDark, toggleTheme, headerTheme, setHeaderTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   );
