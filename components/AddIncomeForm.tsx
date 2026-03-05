@@ -34,7 +34,6 @@ export function AddIncomeForm({
   const insets = useSafeAreaInsets();
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
-  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
   const [visible, setVisible] = useState(false);
   const [incomeName, setIncomeName] = useState("");
   const [incomeAmount, setIncomeAmount] = useState("");
@@ -85,11 +84,12 @@ export function AddIncomeForm({
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="flex-row items-center justify-center gap-2 rounded-lg px-3 py-2 active:opacity-80"
-        style={{ backgroundColor: accentColor }}
+        className="flex-row gap-2 items-center active:opacity-90"
       >
-        <Ionicons name="add" size={18} color="#fff" />
-        <Text className="text-sm font-medium text-white">Add income</Text>
+        <View style={{ backgroundColor: blendHex(theme.colors[0], theme.colors[1]) }} className="items-center justify-center rounded-full">
+          <Ionicons name="add" size={24} color="#fff" />
+        </View>
+        <Text className="text-sm font-semibold">Add income</Text>
       </Pressable>
 
       <Modal

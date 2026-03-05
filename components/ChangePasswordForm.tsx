@@ -76,8 +76,8 @@ export function ChangePasswordForm({
               <Text className="text-lg font-semibold text-gray-900">
                 Change Password
               </Text>
-              <Pressable onPress={handleClose} hitSlop={12}>
-                <Ionicons name="close" size={24} color="#374151" />
+              <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                <Ionicons name="close" size={16} color="#6B7280" />
               </Pressable>
             </View>
           </View>

@@ -112,8 +112,8 @@ export function EditIncomeForm({
               <Text className="text-lg font-semibold text-gray-900">
                 Edit Income
               </Text>
-              <Pressable onPress={handleClose} hitSlop={12}>
-                <Ionicons name="close" size={24} color="#374151" />
+              <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                <Ionicons name="close" size={16} color="#6B7280" />
               </Pressable>
             </View>
           </View>
@@ -147,22 +147,22 @@ export function EditIncomeForm({
           </ScrollView>
 
           <View
-            className="gap-2 border-t border-gray-200 px-4 pt-4"
+            className="flex-row gap-3 border-t border-gray-200 px-4 pt-4"
             style={{ paddingBottom: 16 + insets.bottom }}
           >
-            <Button onPress={handleSubmit} disabled={isSubmitting}>
+            <Pressable
+              onPress={handleDelete}
+              disabled={isSubmitting}
+              className="h-10 w-10 items-center justify-center rounded-full bg-red-100 active:bg-red-200"
+            >
+              <Ionicons name="trash-outline" size={20} color="#dc2626" />
+            </Pressable>
+            <Button className="flex-1" onPress={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Text>Save Changes</Text>
               )}
-            </Button>
-            <Button
-              variant="destructive"
-              onPress={handleDelete}
-              disabled={isSubmitting}
-            >
-              <Text>Delete Income</Text>
             </Button>
           </View>
         </View>
