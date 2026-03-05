@@ -1,56 +1,71 @@
 import { OverviewHeader } from "@/components/OverviewHeader";
+import { PlanHeader } from "@/components/PlanHeader";
+import { PlanTabBar } from "@/components/PlanTabBar";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import type { ReactNode } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
-import type { SharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HEADER_CONTENT_HEIGHT = 62;
 const DEFAULT_CONTENT_PADDING_BOTTOM = 96;
 
-interface CustomHeaderProps {
-  animatedStyle: StyleProp<ViewStyle>;
-  headerHeight: SharedValue<number>;
-}
+export type ScreenHeaderVariant = "overview" | "plan";
 
 interface ScreenWrapperProps {
   children: ReactNode;
   contentPaddingBottom?: number;
   contentContainerStyle?: StyleProp<ViewStyle>;
-  /** When provided, used instead of the default AppHeader (e.g. PlanHeader with tabs). */
-  customHeader?: (props: CustomHeaderProps) => ReactNode;
+  header?: ScreenHeaderVariant;
+  displayName?: string;
+  planTabValue?: string;
+  onPlanTabChange?: (value: string) => void;
 }
 
 /**
- * Wraps a screen with a collapsible header (OverviewHeader by default) and an Animated.ScrollView.
- * Use customHeader for screens that need a different header (e.g. PlanHeader with tabs).
+ * Wraps a screen with a collapsible header and an Animated.ScrollView.
+ * Use header="plan" for the Plan screen (month selector + tabs); otherwise OverviewHeader is used.
  */
 export function ScreenWrapper({
   children,
   contentPaddingBottom = DEFAULT_CONTENT_PADDING_BOTTOM,
   contentContainerStyle,
-  customHeader,
+  header = "overview",
+  displayName,
+  planTabValue = "planned",
+  onPlanTabChange,
 }: ScreenWrapperProps) {
+  const { currentUser } = useCurrentUser();
   const { top } = useSafeAreaInsets();
   const { scrollHandler, headerAnimatedStyle, headerHeight, measuredHeaderHeight } =
     useCollapsibleHeader();
   const headerPaddingTop = top + HEADER_CONTENT_HEIGHT;
   const contentPaddingTop = measuredHeaderHeight > 0 ? measuredHeaderHeight : headerPaddingTop;
 
-  const header = customHeader ? (
-    customHeader({ animatedStyle: headerAnimatedStyle, headerHeight })
-  ) : (
-    <OverviewHeader
-      animatedStyle={headerAnimatedStyle}
-      headerHeight={headerHeight}
-    />
-  );
+  const headerElement =
+    header === "plan" ? (
+      <PlanHeader
+        animatedStyle={headerAnimatedStyle}
+        headerHeight={headerHeight}
+      >
+        <PlanTabBar
+          value={planTabValue}
+          onValueChange={onPlanTabChange ?? (() => { })}
+        />
+      </PlanHeader>
+    ) : (
+      <OverviewHeader
+        displayName={displayName ?? currentUser?.first_name ?? "there"}
+        animatedStyle={headerAnimatedStyle}
+        headerHeight={headerHeight}
+      />
+    );
 
   return (
     <View className="flex-1 p-4">
-      {header}
+      {headerElement}
       <Animated.ScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}

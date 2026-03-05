@@ -1,4 +1,4 @@
-import { MonthSelector } from "@/components/MonthSelector";
+import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getHeaderTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,14 +10,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 interface OverviewHeaderProps {
+  displayName?: string;
   animatedStyle?: StyleProp<ViewStyle>;
   headerHeight?: SharedValue<number>;
 }
 
-/**
- * Header for the Overview (home) screen: gradient and month selector.
- */
 export function OverviewHeader({
+  displayName,
   animatedStyle,
   headerHeight,
 }: OverviewHeaderProps) {
@@ -44,17 +43,17 @@ export function OverviewHeader({
           right: 0,
           zIndex: 10,
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "center",
-          gap: 8,
-          paddingHorizontal: 16,
+          paddingHorizontal: 20,
           paddingBottom: 16,
           paddingTop: top,
         },
         animatedStyle,
       ]}
     >
-      <MonthSelector />
+      <Text variant="h1" className="text-left m-4 font-bold text-white">
+        Hi, {displayName || "there"} 👋
+      </Text>
     </AnimatedLinearGradient>
   );
 }

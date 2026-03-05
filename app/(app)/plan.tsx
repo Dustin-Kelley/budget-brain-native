@@ -1,8 +1,6 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { AppHeader } from "@/components/AppHeader";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
-import { PlanHeader } from "@/components/PlanHeader";
-import { PlanTabBar } from "@/components/PlanTabBar";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { TransactionsList } from "@/components/TransactionsList";
@@ -65,11 +63,9 @@ export default function PlanScreen() {
   return (
     <View className="flex-1">
       <ScreenWrapper
-        customHeader={({ animatedStyle, headerHeight }) => (
-          <PlanHeader animatedStyle={animatedStyle} headerHeight={headerHeight}>
-            <PlanTabBar value={activeTab} onValueChange={setActiveTab} />
-          </PlanHeader>
-        )}
+        header="plan"
+        planTabValue={activeTab}
+        onPlanTabChange={setActiveTab}
       >
         <View className="gap-6">
           {activeTab === "planned" && (
