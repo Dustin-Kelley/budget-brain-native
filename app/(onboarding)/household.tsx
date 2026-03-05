@@ -43,7 +43,6 @@ export default function HouseholdScreen() {
             </Text>
           </View>
           <Input
-            className="h-auto rounded-lg px-4 py-3"
             placeholder="Household name"
             value={name}
             onChangeText={setName}

@@ -1,4 +1,7 @@
 import { Logo } from "@/components/Logo";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { Link, router } from "expo-router";
 import { useState } from "react";
@@ -7,10 +10,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  Pressable,
   View,
 } from "react-native";
 
@@ -40,138 +40,64 @@ export default function SignUpScreen() {
       return;
     }
 
-    Alert.alert(
-      "Check your email",
-      "We sent you a confirmation link. Verify your email to continue.",
-      [{ text: "OK", onPress: () => router.replace("/(auth)/login") }]
-    );
+    router.replace("/(auth)/check-email");
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      className="flex-1 justify-center bg-background px-6"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.content}>
+      <View className="w-full max-w-[400px] self-center">
         <Logo />
-        <Text style={styles.title}>Budget Brain</Text>
-        <Text style={styles.subtitle}>Create an account</Text>
-        <Text style={styles.hint}>Enter your email below to create an account</Text>
+        <Text className="mt-4 text-center text-3xl font-bold">Budget Brain</Text>
+        <Text className="mb-2 text-center text-lg text-muted-foreground">
+          Create an account
+        </Text>
+        <Text className="mb-6 text-center text-sm text-muted-foreground">
+          Enter your email below to create an account
+        </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#9ca3af"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-          editable={!isSubmitting}
-        />
+        <View className="gap-4">
+          <Input
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            editable={!isSubmitting}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password (min 8 characters)"
-          placeholderTextColor="#9ca3af"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="new-password"
-          editable={!isSubmitting}
-        />
+          <Input
+            placeholder="Password (min 8 characters)"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoComplete="new-password"
+            editable={!isSubmitting}
+          />
 
-        <TouchableOpacity
-          style={[styles.button, isSubmitting && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
-          )}
-        </TouchableOpacity>
+          <Button variant="secondary" onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text>Create Account</Text>
+            )}
+          </Button>
+        </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+        <View className="mt-6 flex-row items-center justify-center">
+          <Text className="text-sm text-muted-foreground">
+            Already have an account?{" "}
+          </Text>
           <Link href="/(auth)/login" asChild>
-            <TouchableOpacity>
-              <Text style={styles.link}>Login</Text>
-            </TouchableOpacity>
+            <Pressable>
+              <Text className="text-sm font-semibold">Login</Text>
+            </Pressable>
           </Link>
         </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    padding: 24,
-  },
-  content: {
-    maxWidth: 400,
-    width: "100%",
-    alignSelf: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "#6b7280",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  hint: {
-    fontSize: 14,
-    color: "#9ca3af",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    marginBottom: 16,
-    backgroundColor: "#f9fafb",
-  },
-  button: {
-    backgroundColor: "#111827",
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 24,
-  },
-  footerText: {
-    color: "#6b7280",
-    fontSize: 14,
-  },
-  link: {
-    color: "#111827",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});

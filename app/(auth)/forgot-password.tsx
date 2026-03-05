@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { supabase } from "@/lib/supabase";
 import { Link } from "expo-router";
 import { useState } from "react";
@@ -6,10 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  Pressable,
   View,
 } from "react-native";
 
@@ -41,106 +41,43 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      className="flex-1 justify-center bg-background px-6"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.content}>
-        <Text style={styles.title}>Reset Password</Text>
-        <Text style={styles.subtitle}>
+      <View className="w-full max-w-[400px] self-center">
+        <Text className="text-center text-3xl font-bold">Reset Password</Text>
+        <Text className="mb-8 text-center text-muted-foreground">
           Enter your email and we&apos;ll send you a reset link
         </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#9ca3af"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-          editable={!isSubmitting}
-        />
+        <View className="gap-4">
+          <Input
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            editable={!isSubmitting}
+          />
 
-        <TouchableOpacity
-          style={[styles.button, isSubmitting && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Send Reset Link</Text>
-          )}
-        </TouchableOpacity>
+          <Button onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text>Send Reset Link</Text>
+            )}
+          </Button>
+        </View>
 
-        <View style={styles.footer}>
+        <View className="mt-6 items-center">
           <Link href="/(auth)/login" asChild>
-            <TouchableOpacity>
-              <Text style={styles.link}>Back to Login</Text>
-            </TouchableOpacity>
+            <Pressable>
+              <Text className="text-sm font-semibold">Back to Login</Text>
+            </Pressable>
           </Link>
         </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    padding: 24,
-  },
-  content: {
-    maxWidth: 400,
-    width: "100%",
-    alignSelf: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#6b7280",
-    marginBottom: 32,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    marginBottom: 16,
-    backgroundColor: "#f9fafb",
-  },
-  button: {
-    backgroundColor: "#111827",
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  footer: {
-    alignItems: "center",
-    marginTop: 24,
-  },
-  link: {
-    color: "#111827",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
