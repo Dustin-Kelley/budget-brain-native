@@ -3,39 +3,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   View,
 } from "react-native";
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { sendOtp } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter email and password");
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) {
+      Alert.alert("Error", "Please enter your email address");
       return;
     }
 
     setIsSubmitting(true);
-    const { error } = await signIn(email, password);
+    const { error } = await sendOtp(trimmed);
     setIsSubmitting(false);
 
     if (error) {
-      Alert.alert("Login failed", "Invalid credentials. Please try again.");
+      Alert.alert("Error", error.message);
       return;
     }
 
-    router.replace("/");
+    router.push({ pathname: "/(auth)/verify-otp", params: { email: trimmed } });
   };
 
   return (
@@ -47,7 +46,7 @@ export default function LoginScreen() {
         <Logo />
         <Text className="mt-4 text-center text-3xl font-bold">Budget Brain</Text>
         <Text className="mb-8 text-center text-lg text-muted-foreground">
-          Welcome back
+          Enter your email to get started
         </Text>
 
         <View className="gap-4">
@@ -61,41 +60,13 @@ export default function LoginScreen() {
             editable={!isSubmitting}
           />
 
-          <Input
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoComplete="password"
-            editable={!isSubmitting}
-          />
-
           <Button variant="secondary" onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
             {isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text>Login</Text>
+              <Text>Continue</Text>
             )}
           </Button>
-        </View>
-
-        <View className="mt-4 items-center">
-          <Link href="/(auth)/forgot-password" asChild>
-            <Pressable>
-              <Text className="text-sm font-semibold">Forgot Password?</Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        <View className="mt-6 flex-row items-center justify-center">
-          <Text className="text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-          </Text>
-          <Link href="/(auth)/sign-up" asChild>
-            <Pressable>
-              <Text className="text-sm font-semibold">Sign up</Text>
-            </Pressable>
-          </Link>
         </View>
       </View>
     </KeyboardAvoidingView>
