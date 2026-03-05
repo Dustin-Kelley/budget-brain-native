@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { IncomeCard } from "@/components/IncomeCard";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
+import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { TransactionsList } from "@/components/TransactionsList";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +14,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { formatMonthYearForDisplay } from "@/lib/utils";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
 export default function PlanScreen() {
   const { householdId, isLoading: householdLoading } = useHousehold();
@@ -38,7 +39,7 @@ export default function PlanScreen() {
 
   if (householdLoading || planLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-cyan-400">
+      <View className="flex-1 items-center justify-center bg-gray-50">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -63,13 +64,8 @@ export default function PlanScreen() {
 
   return (
     <View className="flex-1">
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 80 }}
-      >
-        <AppHeader />
-
-        <View className="mt-4 gap-6 px-4 flex-1 min-h-full bg-gray-50 rounded-t-2xl">
+      <ScreenWrapper>
+        <View className="gap-6">
           <IncomeCard
             income={income}
             totalIncome={totalIncome}
@@ -131,7 +127,7 @@ export default function PlanScreen() {
             </Tabs>
           </View>
         </View>
-      </ScrollView>
+      </ScreenWrapper>
       {householdId && currentUser?.id && (
         <AddExpenseForm
           categories={categories}

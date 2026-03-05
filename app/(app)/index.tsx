@@ -4,26 +4,21 @@ import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategoryPieChart } from "@/components/CategoryPieChart";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
+import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { Link } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
-import Animated from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function OverviewScreen() {
   const { householdId, isLoading: userLoading } = useHousehold();
   const { currentUser } = useCurrentUser();
   const { monthKey } = useMonth();
-  const { top } = useSafeAreaInsets();
-  const { scrollHandler, headerAnimatedStyle, headerHeight } =
-    useCollapsibleHeader();
   const {
     categories,
     totalPlanned,
@@ -79,24 +74,10 @@ export default function OverviewScreen() {
     );
   }
 
-  const headerPaddingTop = top + (62);
-
   return (
-    <View className="flex-1 ">
-      <AppHeader
-        animatedStyle={headerAnimatedStyle}
-        headerHeight={headerHeight}
-      />
-
-      <Animated.ScrollView
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingTop: headerPaddingTop,
-          paddingBottom: 96,
-        }}
-      >
-        <View className="gap-6 p-4">
+    <View className="flex-1">
+      <ScreenWrapper>
+        <View className="gap-6">
           <BudgetProgressCard
             totalPlanned={totalPlanned}
             spentAmount={spentAmount}
@@ -148,8 +129,7 @@ export default function OverviewScreen() {
             </Card>
           )}
         </View>
-      </Animated.ScrollView>
-
+      </ScreenWrapper>
       {householdId && currentUser && (
         <AddExpenseForm
           categories={categories}

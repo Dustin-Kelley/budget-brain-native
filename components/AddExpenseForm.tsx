@@ -106,11 +106,16 @@ export function AddExpenseForm({
     handleClose();
   };
 
+  const tabBarHeight = 49;
+  const fabGapAboveTabs = 12;
+  const fabBottom = insets.bottom + tabBarHeight + fabGapAboveTabs;
+
   return (
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="absolute bottom-6 right-4 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg active:bg-gray-800"
+        className="absolute right-4 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg active:bg-gray-800"
+        style={{ bottom: fabBottom }}
       >
         <Ionicons name="add" size={28} color="white" />
       </Pressable>
