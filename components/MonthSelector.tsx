@@ -1,12 +1,12 @@
+import { Text } from "@/components/ui/text";
+import { useMonth } from "@/contexts/month-context";
 import {
   formatMonthYearForDisplay,
   getMonthAndYearNumberFromDate,
   getMonthYearString,
 } from "@/lib/utils";
-import { useMonth } from "@/contexts/month-context";
-import { Text } from "@/components/ui/text";
-import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Pressable, View } from "react-native";
 
 export function MonthSelector() {
   const { monthKey, setMonthKey } = useMonth();
@@ -34,21 +34,23 @@ export function MonthSelector() {
   };
 
   return (
-    <View className="flex-row items-center justify-between py-3 px-1">
+    <View className="m-4 flex-row items-center justify-between gap-4 rounded-full bg-white p-2 shadow-sm shadow-black/10">
       <Pressable
         onPress={goPrevious}
-        className="p-2 rounded-lg active:bg-gray-100"
+        className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
         hitSlop={12}
       >
-        <Ionicons name="chevron-back" size={24} color="#374151" />
+        <Ionicons name="chevron-back" size={20} color="#6B7280" />
       </Pressable>
-      <Text className="text-lg font-semibold text-gray-900">{displayLabel}</Text>
+      <Text className="text-base font-semibold tracking-tight text-gray-900">
+        {displayLabel}
+      </Text>
       <Pressable
         onPress={goNext}
-        className="p-2 rounded-lg active:bg-gray-100"
+        className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
         hitSlop={12}
       >
-        <Ionicons name="chevron-forward" size={24} color="#374151" />
+        <Ionicons name="chevron-forward" size={20} color="#6B7280" />
       </Pressable>
     </View>
   );

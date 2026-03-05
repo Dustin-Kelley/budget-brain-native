@@ -2,10 +2,9 @@ import { MonthSelector } from "@/components/MonthSelector";
 import { useTheme } from "@/contexts/theme-context";
 import { getHeaderTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import type { LayoutChangeEvent } from "react-native";
-import type { StyleProp, ViewStyle } from "react-native";
-import Animated from "react-native-reanimated";
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
@@ -49,7 +48,7 @@ export function OverviewHeader({
           justifyContent: "center",
           gap: 8,
           paddingHorizontal: 16,
-          paddingBottom: 8,
+          paddingBottom: 16,
           paddingTop: top,
         },
         animatedStyle,
