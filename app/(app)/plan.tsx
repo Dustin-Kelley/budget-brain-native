@@ -12,7 +12,8 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { formatMonthYearForDisplay } from "@/lib/utils";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function PlanScreen() {
   const { householdId, isLoading: householdLoading } = useHousehold();
@@ -37,9 +38,7 @@ export default function PlanScreen() {
 
   if (householdLoading || planLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
-        <ActivityIndicator size="large" />
-      </View>
+      <LoadingSpinner />
     );
   }
 

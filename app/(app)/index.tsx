@@ -13,7 +13,8 @@ import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { Link } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function OverviewScreen() {
   const { householdId, isLoading: userLoading } = useHousehold();
@@ -33,9 +34,7 @@ export default function OverviewScreen() {
 
   if (userLoading) {
     return (
-      <View className="flex-1 items-center justify-center ">
-        <ActivityIndicator size="large" />
-      </View>
+      <LoadingSpinner />
     );
   }
 
@@ -68,9 +67,7 @@ export default function OverviewScreen() {
 
   if (budgetLoading) {
     return (
-      <View className="flex-1 items-center justify-center ">
-        <ActivityIndicator size="large" />
-      </View>
+      <LoadingSpinner />
     );
   }
 

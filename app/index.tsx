@@ -1,16 +1,12 @@
-import { Redirect } from "expo-router";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useAuth } from "@/contexts/auth-context";
+import { Redirect } from "expo-router";
 
 export default function Index() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingSpinner />;
   }
 
   if (user) {
@@ -19,11 +15,3 @@ export default function Index() {
 
   return <Redirect href="/(auth)/login" />;
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
