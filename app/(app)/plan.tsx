@@ -86,6 +86,10 @@ export default function PlanScreen() {
               categories={categories}
               spentByLineItem={spentByLineItem}
               error={error?.message}
+              householdId={householdId ?? undefined}
+              userId={currentUser?.id}
+              monthKey={monthKey}
+              onSuccess={refetch}
             />
           )}
           {activeTab === "transactions" && (

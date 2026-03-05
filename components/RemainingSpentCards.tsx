@@ -1,13 +1,31 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { addTransaction } from "@/lib/mutations/addTransaction";
 import { formatCurrency } from "@/lib/utils";
-import { View } from "react-native";
 import type { CategoryWithLineItems } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type RemainingSpentCardsProps = {
   categories: CategoryWithLineItems[] | null;
   spentByLineItem: { line_item_id: string; spent: number }[];
   error?: string | null;
+  householdId?: string;
+  userId?: string;
+  monthKey?: string;
+  onSuccess?: () => void;
 };
 
 function getSpentForLineItem(
@@ -17,11 +35,207 @@ function getSpentForLineItem(
   return spentByLineItem.find((s) => s.line_item_id === lineItemId)?.spent ?? 0;
 }
 
+type QuickAddExpenseModalProps = {
+  category: CategoryWithLineItems;
+  householdId: string;
+  userId: string;
+  monthKey: string;
+  onClose: () => void;
+  onSuccess: () => void;
+};
+
+function QuickAddExpenseModal({
+  category,
+  householdId,
+  userId,
+  monthKey,
+  onClose,
+  onSuccess,
+}: QuickAddExpenseModalProps) {
+  const insets = useSafeAreaInsets();
+  const lineItems = category.line_items ?? [];
+  const firstLineItemId = lineItems[0]?.id ?? null;
+
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [lineItemId, setLineItemId] = useState<string | null>(firstLineItemId);
+  const [date, setDate] = useState(() =>
+    new Date().toISOString().split("T")[0]
+  );
+  const [showLineItemPicker, setShowLineItemPicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const selectedLineItem = lineItems.find((item) => item.id === lineItemId);
+
+  const handleSubmit = async () => {
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      Alert.alert("Invalid amount", "Please enter a positive number.");
+      return;
+    }
+    if (!lineItemId) {
+      Alert.alert("Budget item required", "Please select a budget item.");
+      return;
+    }
+    if (!date.trim()) {
+      Alert.alert("Date required", "Please enter the date.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error } = await addTransaction({
+      amount: amountNum,
+      description: description.trim() || undefined,
+      lineItemId,
+      dateOfTransaction: date.trim(),
+      householdId,
+      userId,
+      monthKey,
+    });
+    setIsSubmitting(false);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
+    }
+
+    onSuccess();
+    onClose();
+  };
+
+  return (
+    <>
+      <View className="border-b border-gray-200 px-4 py-3">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-lg font-semibold text-gray-900">
+            Add expense — {category.name ?? "Category"}
+          </Text>
+          <Pressable
+            onPress={onClose}
+            hitSlop={8}
+            className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+          >
+            <Ionicons name="close" size={16} color="#6B7280" />
+          </Pressable>
+        </View>
+        <Text className="mt-1 text-sm text-gray-500">
+          Enter the transaction for this category.
+        </Text>
+      </View>
+
+      <ScrollView className="flex-1 px-4 py-4">
+          <View className="gap-4">
+            <View className="gap-2">
+              <Label>Amount *</Label>
+              <Input
+                className="h-auto rounded-lg px-4 py-3"
+                placeholder="0.00"
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
+            </View>
+
+            <View className="gap-2">
+              <Label>Description</Label>
+              <Input
+                className="h-auto rounded-lg px-4 py-3"
+                placeholder="Optional"
+                value={description}
+                onChangeText={setDescription}
+                editable={!isSubmitting}
+              />
+            </View>
+
+            {lineItems.length > 1 && (
+              <View className="gap-2">
+                <Label>Budget item *</Label>
+                <Pressable
+                  onPress={() => setShowLineItemPicker((prev) => !prev)}
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+                >
+                  <Text
+                    className={
+                      selectedLineItem ? "text-gray-900" : "text-gray-400"
+                    }
+                  >
+                    {selectedLineItem?.name ?? "Select budget item"}
+                  </Text>
+                </Pressable>
+                {showLineItemPicker && (
+                  <View className="mt-2 max-h-40 rounded-lg border border-gray-200 bg-gray-50">
+                    <ScrollView className="max-h-40">
+                      {lineItems.map((item) => (
+                        <Pressable
+                          key={item.id}
+                          onPress={() => {
+                            setLineItemId(item.id);
+                            setShowLineItemPicker(false);
+                          }}
+                          className="border-b border-gray-100 px-4 py-3 last:border-b-0"
+                        >
+                          <Text className="font-medium text-gray-900">
+                            {item.name ?? "Item"}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+            )}
+
+            <View className="gap-2">
+              <Label>Date *</Label>
+              <Input
+                className="h-auto rounded-lg px-4 py-3"
+                placeholder="YYYY-MM-DD"
+                value={date}
+                onChangeText={setDate}
+                editable={!isSubmitting}
+              />
+            </View>
+          </View>
+      </ScrollView>
+
+      <View
+        className="border-t border-gray-200 px-4 pt-4"
+        style={{ paddingBottom: 16 + insets.bottom }}
+      >
+        <Button onPress={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text>Save expense</Text>
+          )}
+        </Button>
+      </View>
+    </>
+  );
+}
+
 export function RemainingSpentCards({
   categories,
   spentByLineItem,
   error,
+  householdId,
+  userId,
+  monthKey,
+  onSuccess,
 }: RemainingSpentCardsProps) {
+  const [categoryForModal, setCategoryForModal] =
+    useState<CategoryWithLineItems | null>(null);
+
+  const canAddExpense =
+    householdId && userId && monthKey && onSuccess;
+
+  const handleQuickAddClose = () => setCategoryForModal(null);
+  const handleQuickAddSuccess = () => {
+    onSuccess?.();
+    setCategoryForModal(null);
+  };
+
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -103,9 +317,49 @@ export function RemainingSpentCards({
                 </View>
               );
             })}
+            {canAddExpense && (category.line_items?.length ?? 0) > 0 && (
+              <View className="border-t border-gray-50 px-4 py-2">
+                <Pressable
+                  onPress={() => setCategoryForModal(category)}
+                  className="flex-row items-center gap-2 active:opacity-90"
+                >
+                  <View className="items-center justify-center rounded-full bg-[#36454F]">
+                    <Ionicons name="add" size={20} color="#fff" />
+                  </View>
+                  <Text className="text-sm font-semibold">Add expense</Text>
+                </Pressable>
+              </View>
+            )}
           </Card>
         );
       })}
+
+      {categoryForModal && householdId && userId && monthKey && (
+        <Modal
+          visible
+          animationType="slide"
+          transparent
+          onRequestClose={handleQuickAddClose}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <Pressable
+              className="flex-1"
+              onPress={handleQuickAddClose}
+            />
+            <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
+              <QuickAddExpenseModal
+                key={categoryForModal.id}
+                category={categoryForModal}
+                householdId={householdId}
+                userId={userId}
+                monthKey={monthKey}
+                onClose={handleQuickAddClose}
+                onSuccess={handleQuickAddSuccess}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
