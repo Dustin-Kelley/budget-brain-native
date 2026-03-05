@@ -5,6 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Format a number as USD. Defaults to whole dollars (0 decimals); pass fractionDigits for cents. */
+export function formatCurrency(
+  value: number,
+  options?: { fractionDigits?: number }
+): string {
+  const fractionDigits = options?.fractionDigits ?? 0;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
+}
+
 /** Convert hex color (e.g. "#0ea5e9") to rgba string with given alpha (0–1). */
 export function hexToRgba(hex: string, alpha: number): string {
   const red = parseInt(hex.slice(1, 3), 16);

@@ -1,6 +1,6 @@
 import { MonthSelector } from "@/components/MonthSelector";
 import { useTheme } from "@/contexts/theme-context";
-import { getHeaderTheme } from "@/lib/themes";
+import { getAppTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import type { LayoutChangeEvent } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
@@ -26,8 +26,8 @@ export function PlanHeader({
   children,
 }: PlanHeaderProps) {
   const { top } = useSafeAreaInsets();
-  const { headerTheme } = useTheme();
-  const theme = getHeaderTheme(headerTheme);
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     if (headerHeight) {

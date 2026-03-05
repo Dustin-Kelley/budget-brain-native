@@ -1,10 +1,10 @@
-export type HeaderTheme = {
+export type AppTheme = {
   id: string;
   label: string;
   colors: [string, string];
 };
 
-export const headerThemes: HeaderTheme[] = [
+export const appThemes: AppTheme[] = [
   { id: "ocean", label: "Ocean", colors: ["#0ea5e9", "#6366f1"] },
   { id: "sunset", label: "Sunset", colors: ["#f97316", "#ec4899"] },
   { id: "forest", label: "Forest", colors: ["#22c55e", "#14b8a6"] },
@@ -13,11 +13,11 @@ export const headerThemes: HeaderTheme[] = [
   { id: "coral", label: "Coral", colors: ["#f43f5e", "#fb923c"] },
 ];
 
-export const DEFAULT_HEADER_THEME = "ocean";
+export const DEFAULT_APP_THEME = "ocean";
 
-export function getHeaderTheme(id: string): HeaderTheme {
+export function getAppTheme(id: string): AppTheme {
   return (
-    headerThemes.find((t) => t.id === id) ??
-    headerThemes.find((t) => t.id === DEFAULT_HEADER_THEME)!
+    appThemes.find((t) => t.id === id) ??
+    appThemes.find((t) => t.id === DEFAULT_APP_THEME)!
   );
 }

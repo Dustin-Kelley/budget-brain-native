@@ -5,7 +5,7 @@ import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { useMonth } from "@/contexts/month-context";
 import { useTheme } from "@/contexts/theme-context";
-import { headerThemes } from "@/lib/themes";
+import { appThemes } from "@/lib/themes";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { resetBudget } from "@/lib/mutations/resetBudget";
@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
   const { monthKey } = useMonth();
-  const { isDark, toggleTheme, headerTheme, setHeaderTheme } = useTheme();
+  const { isDark, toggleTheme, appTheme, setAppTheme } = useTheme();
   const queryClient = useQueryClient();
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -125,10 +125,10 @@ export default function SettingsScreen() {
         <View className="gap-2">
           <Text className="text-base text-gray-900">Header Theme</Text>
           <View className="flex-row flex-wrap gap-3">
-            {headerThemes.map((theme) => (
+            {appThemes.map((theme) => (
               <Pressable
                 key={theme.id}
-                onPress={() => setHeaderTheme(theme.id)}
+                onPress={() => setAppTheme(theme.id)}
               >
                 <LinearGradient
                   colors={theme.colors}
@@ -138,7 +138,7 @@ export default function SettingsScreen() {
                     width: 48,
                     height: 48,
                     borderRadius: 12,
-                    borderWidth: headerTheme === theme.id ? 3 : 0,
+                    borderWidth: appTheme === theme.id ? 3 : 0,
                     borderColor: isDark ? "#fff" : "#111",
                   }}
                 />

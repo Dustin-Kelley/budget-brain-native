@@ -1,6 +1,6 @@
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
-import { getHeaderTheme } from "@/lib/themes";
+import { getAppTheme } from "@/lib/themes";
 import { cn, hexToRgba } from "@/lib/utils";
 import { Pressable, View } from "react-native";
 
@@ -25,8 +25,8 @@ export function PlanTabBar({
   onValueChange,
   className,
 }: PlanTabBarProps) {
-  const { headerTheme } = useTheme();
-  const theme = getHeaderTheme(headerTheme);
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
   const trackBackground = hexToRgba(theme.colors[0], 0.4);
   const selectedBackground = hexToRgba(theme.colors[1], 0.85);
 

@@ -2,6 +2,7 @@ import { EditTransactionForm } from "@/components/EditTransactionForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import type { CategoryWithLineItems } from "@/types";
+import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 
@@ -24,15 +25,6 @@ type TransactionsListProps = {
   onRefetch?: () => void;
   error?: string | null;
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
 
 function formatDate(dateStr: string): string {
   if (dateStr === "Unknown Date") return "Unknown Date";
@@ -120,7 +112,7 @@ export function TransactionsList({
                 )}
               </View>
               <Text className="ml-2 font-medium text-gray-900">
-                {formatCurrency(tx.amount ?? 0)}
+                {formatCurrency(tx.amount ?? 0, { fractionDigits: 2 })}
               </Text>
             </Pressable>
           ))}

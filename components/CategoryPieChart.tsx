@@ -1,6 +1,7 @@
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
 import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
+import { formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 import Svg, { Circle, G, Path } from "react-native-svg";
 
@@ -20,15 +21,6 @@ const COLORS = [
 type CategoryPieChartProps = {
   categorySpent: CategorySpent[];
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function describeArc(
   cx: number,

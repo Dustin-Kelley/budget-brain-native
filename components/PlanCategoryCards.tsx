@@ -5,6 +5,7 @@ import { EditLineItemForm } from "@/components/EditLineItemForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { deleteCategory } from "@/lib/mutations/deleteCategory";
+import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
@@ -22,15 +23,6 @@ type PlanCategoryCardsProps = {
   monthKey?: string;
   onRefetch?: () => void;
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 export function PlanCategoryCards({
   categories,

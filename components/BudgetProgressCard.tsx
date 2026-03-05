@@ -1,5 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
+import { formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 
 type BudgetProgressCardProps = {
@@ -8,15 +11,6 @@ type BudgetProgressCardProps = {
   percentSpent: number;
   error?: string | null;
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 export function BudgetProgressCard({
   totalPlanned,
@@ -35,6 +29,8 @@ export function BudgetProgressCard({
     );
   }
 
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
   const progressWidth = Math.min(percentSpent, 100);
 
   return (
@@ -48,8 +44,8 @@ export function BudgetProgressCard({
       <View className="mt-4">
         <View className="h-3 w-full overflow-hidden rounded-full bg-gray-100">
           <View
-            className="h-full rounded-full bg-gray-800"
-            style={{ width: `${progressWidth}%` }}
+            className="h-full rounded-full"
+            style={{ width: `${progressWidth}%`, backgroundColor: theme.colors[0] }}
           />
         </View>
         <View className="mt-2 flex-row justify-between">

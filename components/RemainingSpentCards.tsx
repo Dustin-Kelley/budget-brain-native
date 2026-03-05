@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 import type { CategoryWithLineItems } from "@/types";
 
@@ -8,15 +9,6 @@ type RemainingSpentCardsProps = {
   spentByLineItem: { line_item_id: string; spent: number }[];
   error?: string | null;
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function getSpentForLineItem(
   lineItemId: string,

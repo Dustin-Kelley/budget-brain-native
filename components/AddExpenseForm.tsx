@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
 import { addTransaction } from "@/lib/mutations/addTransaction";
+import { getAppTheme } from "@/lib/themes";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -44,6 +46,8 @@ export function AddExpenseForm({
   onSuccess,
 }: AddExpenseFormProps) {
   const insets = useSafeAreaInsets();
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
   const [visible, setVisible] = useState(false);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -114,8 +118,8 @@ export function AddExpenseForm({
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="absolute right-4 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg active:bg-gray-800"
-        style={{ bottom: fabBottom }}
+        className="absolute right-4 h-14 w-14 items-center justify-center rounded-full shadow-lg"
+        style={{ bottom: fabBottom, backgroundColor: theme.colors[0] }}
       >
         <Ionicons name="add" size={28} color="white" />
       </Pressable>

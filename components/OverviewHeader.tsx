@@ -1,6 +1,6 @@
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
-import { getHeaderTheme } from "@/lib/themes";
+import { getAppTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
@@ -21,8 +21,8 @@ export function OverviewHeader({
   headerHeight,
 }: OverviewHeaderProps) {
   const { top } = useSafeAreaInsets();
-  const { headerTheme } = useTheme();
-  const theme = getHeaderTheme(headerTheme);
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     if (headerHeight) {

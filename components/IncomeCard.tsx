@@ -2,6 +2,7 @@ import { AddIncomeForm } from "@/components/AddIncomeForm";
 import { EditIncomeForm } from "@/components/EditIncomeForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 
@@ -16,15 +17,6 @@ type IncomeCardProps = {
   monthKey?: string;
   onRefetch?: () => void;
 };
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
 
 export function IncomeCard({
   income,
@@ -62,7 +54,7 @@ export function IncomeCard({
             Total Income for: {monthLabel}
           </Text>
           <Text className="mt-1 text-2xl font-bold text-gray-900">
-            {formatCurrency(totalIncome)}
+            {formatCurrency(totalIncome, { fractionDigits: 2 })}
           </Text>
         </View>
         {householdId && userId && monthKey && onRefetch && (
@@ -86,7 +78,7 @@ export function IncomeCard({
                 {entry.name ?? "Income"}
               </Text>
               <Text className="font-medium text-gray-900">
-                {formatCurrency(entry.amount)}
+                {formatCurrency(entry.amount, { fractionDigits: 2 })}
               </Text>
             </Pressable>
           ))}
@@ -97,7 +89,7 @@ export function IncomeCard({
           className={`text-sm font-medium ${remaining < 0 ? "text-red-600" : "text-green-600"}`}
         >
           {remaining < 0 ? "-" : ""}
-          {formatCurrency(Math.abs(remaining))}{" "}
+          {formatCurrency(Math.abs(remaining), { fractionDigits: 2 })}{" "}
           {remaining < 0 ? "over budget" : "left to budget"}
         </Text>
       </View>

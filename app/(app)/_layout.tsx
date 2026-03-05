@@ -1,4 +1,6 @@
 import { useAuth } from "@/contexts/auth-context";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Redirect } from "expo-router";
 import {
@@ -13,6 +15,8 @@ const isIOS = Platform.OS === "ios";
 
 export default function AppLayout() {
   const { user, isLoading } = useAuth();
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
 
   if (isLoading) {
     return null;
@@ -23,7 +27,7 @@ export default function AppLayout() {
   }
 
   return (
-    <NativeTabs>
+    <NativeTabs tintColor={theme.colors[0]}>
       <NativeTabs.Trigger name="index">
         <Label>Overview</Label>
         {isIOS ? (
