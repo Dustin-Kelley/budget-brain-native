@@ -32,8 +32,8 @@ const buttonVariants = cva(
           })
         ),
         secondary: cn(
-          'bg-secondary active:bg-secondary/80 shadow-sm shadow-black/5',
-          Platform.select({ web: 'hover:bg-secondary/80' })
+          'bg-[#36454F] active:opacity-90 shadow-sm shadow-black/5',
+          Platform.select({ web: 'hover:opacity-90' })
         ),
         ghost: cn(
           'active:bg-accent dark:active:bg-accent/50',
@@ -69,7 +69,7 @@ const buttonTextVariants = cva(
           'group-active:text-accent-foreground',
           Platform.select({ web: 'group-hover:text-accent-foreground' })
         ),
-        secondary: 'text-secondary-foreground',
+        secondary: 'text-white',
         ghost: 'group-active:text-accent-foreground',
         link: cn(
           'text-primary group-active:underline',
@@ -99,9 +99,8 @@ function Button({ className, variant, size, style, ...props }: ButtonProps) {
   const theme = getAppTheme(appTheme);
   const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
-  const themeStyle = variant === 'default' || !variant
-    ? { backgroundColor: accentColor }
-    : undefined;
+  const themeStyle =
+    variant === 'default' || !variant ? { backgroundColor: accentColor } : undefined;
 
   return (
     <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>

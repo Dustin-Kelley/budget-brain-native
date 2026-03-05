@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { addLineItem } from "@/lib/mutations/addLineItem";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +14,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type AddLineItemFormProps = {
   categoryId: string;
@@ -81,10 +81,14 @@ export function AddLineItemForm({
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="flex-row items-center gap-1 py-1"
+        className="flex-row items-center gap-2 active:opacity-90"
       >
-        <Ionicons name="add-circle-outline" size={18} color="#6b7280" />
-        <Text className="text-sm text-gray-600">Add item to {categoryName}</Text>
+        <View className="items-center justify-center rounded-full bg-[#36454F]">
+          <Ionicons name="add" size={20} color="#fff" />
+        </View>
+        <Text className="text-sm font-semibold">
+          Add item to {categoryName}
+        </Text>
       </Pressable>
 
       <Modal

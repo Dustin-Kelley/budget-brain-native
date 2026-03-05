@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { addCategory } from "@/lib/mutations/addCategory";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +14,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type AddCategoryFormProps = {
   householdId: string;
@@ -68,10 +68,12 @@ export function AddCategoryForm({
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="flex-row items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 active:bg-gray-50"
+        className="flex-row items-center gap-2 active:opacity-90"
       >
-        <Ionicons name="add" size={18} color="#374151" />
-        <Text className="text-sm font-medium text-gray-700">Add category</Text>
+        <View className="items-center justify-center rounded-full bg-[#36454F]">
+          <Ionicons name="add" size={20} color="#fff" />
+        </View>
+        <Text className="text-sm font-semibold">Add category</Text>
       </Pressable>
 
       <Modal

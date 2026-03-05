@@ -2,10 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
-import { useTheme } from "@/contexts/theme-context";
 import { addIncome } from "@/lib/mutations/addIncome";
-import { getAppTheme } from "@/lib/themes";
-import { blendHex } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -32,8 +29,6 @@ export function AddIncomeForm({
   onSuccess,
 }: AddIncomeFormProps) {
   const insets = useSafeAreaInsets();
-  const { appTheme } = useTheme();
-  const theme = getAppTheme(appTheme);
   const [visible, setVisible] = useState(false);
   const [incomeName, setIncomeName] = useState("");
   const [incomeAmount, setIncomeAmount] = useState("");
@@ -86,8 +81,8 @@ export function AddIncomeForm({
         onPress={() => setVisible(true)}
         className="flex-row gap-2 items-center active:opacity-90"
       >
-        <View style={{ backgroundColor: blendHex(theme.colors[0], theme.colors[1]) }} className="items-center justify-center rounded-full">
-          <Ionicons name="add" size={24} color="#fff" />
+        <View className="items-center justify-center rounded-full bg-[#36454F]">
+          <Ionicons name="add" size={20} color="#fff" />
         </View>
         <Text className="text-sm font-semibold">Add income</Text>
       </Pressable>
