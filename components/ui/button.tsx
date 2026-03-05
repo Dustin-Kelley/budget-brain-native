@@ -1,11 +1,13 @@
 import { TextClassContext } from '@/components/ui/text';
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/contexts/theme-context';
+import { getAppTheme } from '@/lib/themes';
+import { blendHex, cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Platform, Pressable } from 'react-native';
 
 const buttonVariants = cva(
   cn(
-    'group shrink-0 flex-row items-center justify-center gap-2 rounded-md shadow-none',
+    'group shrink-0 flex-row items-center justify-center gap-2 rounded-full shadow-none',
     Platform.select({
       web: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap outline-none transition-all focus-visible:ring-[3px] disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
     })
@@ -92,12 +94,21 @@ type ButtonProps = React.ComponentProps<typeof Pressable> &
   React.RefAttributes<typeof Pressable> &
   VariantProps<typeof buttonVariants>;
 
-function Button({ className, variant, size, ...props }: ButtonProps) {
+function Button({ className, variant, size, style, ...props }: ButtonProps) {
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
+
+  const themeStyle = variant === 'default' || !variant
+    ? { backgroundColor: accentColor }
+    : undefined;
+
   return (
     <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
       <Pressable
         className={cn(props.disabled && 'opacity-50', buttonVariants({ variant, size }), className)}
         role="button"
+        style={[themeStyle, typeof style === 'object' ? style : undefined]}
         {...props}
       />
     </TextClassContext.Provider>
@@ -106,3 +117,4 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
 
 export { Button, buttonTextVariants, buttonVariants };
 export type { ButtonProps };
+

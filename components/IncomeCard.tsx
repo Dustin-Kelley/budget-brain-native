@@ -48,23 +48,13 @@ export function IncomeCard({
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
-      <View className="flex-row items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-3">
-        <View>
-          <Text className="text-sm font-medium text-gray-500">
-            Total Income for: {monthLabel}
-          </Text>
-          <Text className="mt-1 text-2xl font-bold text-gray-900">
-            {formatCurrency(totalIncome, { fractionDigits: 2 })}
-          </Text>
-        </View>
-        {householdId && userId && monthKey && onRefetch && (
-          <AddIncomeForm
-            householdId={householdId}
-            userId={userId}
-            monthKey={monthKey}
-            onSuccess={onRefetch}
-          />
-        )}
+      <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
+        <Text className="text-sm font-medium text-gray-500">
+          Total Income for: {monthLabel}
+        </Text>
+        <Text className="mt-1 text-2xl font-bold text-gray-900">
+          {formatCurrency(totalIncome, { fractionDigits: 2 })}
+        </Text>
       </View>
       {income.length > 0 && (
         <View className="border-b border-gray-100 px-4 py-3">
@@ -82,6 +72,16 @@ export function IncomeCard({
               </Text>
             </Pressable>
           ))}
+        </View>
+      )}
+      {householdId && userId && monthKey && onRefetch && (
+        <View className="border-b border-gray-100 px-4 py-2">
+          <AddIncomeForm
+            householdId={householdId}
+            userId={userId}
+            monthKey={monthKey}
+            onSuccess={onRefetch}
+          />
         </View>
       )}
       <View className="px-4 py-3">

@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
 import { addIncome } from "@/lib/mutations/addIncome";
+import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +17,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type AddIncomeFormProps = {
   householdId: string;
@@ -29,6 +32,9 @@ export function AddIncomeForm({
   onSuccess,
 }: AddIncomeFormProps) {
   const insets = useSafeAreaInsets();
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
   const [visible, setVisible] = useState(false);
   const [incomeName, setIncomeName] = useState("");
   const [incomeAmount, setIncomeAmount] = useState("");
@@ -79,10 +85,11 @@ export function AddIncomeForm({
     <>
       <Pressable
         onPress={() => setVisible(true)}
-        className="flex-row items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 active:bg-gray-50"
+        className="flex-row items-center justify-center gap-2 rounded-lg px-3 py-2 active:opacity-80"
+        style={{ backgroundColor: accentColor }}
       >
-        <Ionicons name="add" size={18} color="#374151" />
-        <Text className="text-sm font-medium text-gray-700">Add income</Text>
+        <Ionicons name="add" size={18} color="#fff" />
+        <Text className="text-sm font-medium text-white">Add income</Text>
       </Pressable>
 
       <Modal
