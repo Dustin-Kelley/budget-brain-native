@@ -1,7 +1,8 @@
 import { Text } from "@/components/ui/text";
-import { cn } from "@/lib/utils";
-import { View } from "react-native";
-import { Pressable } from "react-native";
+import { useTheme } from "@/contexts/theme-context";
+import { getHeaderTheme } from "@/lib/themes";
+import { cn, hexToRgba } from "@/lib/utils";
+import { Pressable, View } from "react-native";
 
 const PLAN_TABS = [
   { value: "planned" as const, label: "Planned" },
@@ -16,40 +17,34 @@ interface PlanTabBarProps {
 }
 
 /**
- * Tab bar for the Plan screen. State-driven (no Tabs context) so it can live
- * in the header while content is rendered by the screen.
+ * Tab bar for the Plan screen. Uses the selected header theme for styling.
+ * State-driven (no Tabs context) so it can live in the header while content is rendered by the screen.
  */
 export function PlanTabBar({
   value,
   onValueChange,
   className,
 }: PlanTabBarProps) {
+  const { headerTheme } = useTheme();
+  const theme = getHeaderTheme(headerTheme);
+  const trackBackground = hexToRgba(theme.colors[0], 0.4);
+  const selectedBackground = hexToRgba(theme.colors[1], 0.85);
+
   return (
     <View
-      className={cn(
-        "mt-1 w-full flex-row rounded-lg bg-muted p-[3px]",
-        className
-      )}
+      className={cn("mt-1 w-full flex-row rounded-lg p-[3px]", className)}
+      style={{ backgroundColor: trackBackground }}
     >
       {PLAN_TABS.map((tab) => {
         const isActive = value === tab.value;
         return (
           <Pressable
             key={tab.value}
-            className={cn(
-              "flex-1 items-center justify-center rounded-md py-1.5",
-              isActive && "bg-background dark:border-foreground/10 dark:bg-input/30"
-            )}
+            className="flex-1 items-center justify-center rounded-md py-1.5"
+            style={isActive ? { backgroundColor: selectedBackground } : undefined}
             onPress={() => onValueChange(tab.value)}
           >
-            <Text
-              className={cn(
-                "text-sm font-medium",
-                isActive
-                  ? "text-foreground"
-                  : "text-muted-foreground dark:text-muted-foreground"
-              )}
-            >
+            <Text className="text-sm font-medium" style={{ color: "#fff" }}>
               {tab.label}
             </Text>
           </Pressable>

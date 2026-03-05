@@ -122,18 +122,18 @@ export function PlanCategoryCards({
 
   return (
     <View className="gap-4">
-      <View className="flex-col items-center justify-between">
-        <IncomeCard
-          income={income}
-          totalIncome={totalIncome}
-          totalPlanned={totalPlanned}
-          monthLabel={monthLabel}
-          error={error}
-          householdId={householdId}
-          userId={userId}
-          monthKey={monthKey}
-          onRefetch={onRefetch}
-        />
+      <IncomeCard
+        income={income}
+        totalIncome={totalIncome}
+        totalPlanned={totalPlanned}
+        monthLabel={monthLabel}
+        error={error}
+        householdId={householdId}
+        userId={userId}
+        monthKey={monthKey}
+        onRefetch={onRefetch}
+      />
+      <View className="flex-row items-center justify-between">
         <Text className="font-semibold text-gray-900">Planned</Text>
         {householdId && monthKey && onRefetch && (
           <AddCategoryForm
