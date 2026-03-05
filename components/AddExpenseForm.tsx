@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { addTransaction } from "@/lib/mutations/addTransaction";
 import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -119,7 +120,7 @@ export function AddExpenseForm({
       <Pressable
         onPress={() => setVisible(true)}
         className="absolute right-4 h-14 w-14 items-center justify-center rounded-full shadow-lg"
-        style={{ bottom: fabBottom, backgroundColor: theme.colors[0] }}
+        style={{ bottom: fabBottom, backgroundColor: blendHex(theme.colors[0], theme.colors[1]) }}
       >
         <Ionicons name="add" size={28} color="white" />
       </Pressable>

@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Redirect } from "expo-router";
 import {
@@ -27,7 +28,7 @@ export default function AppLayout() {
   }
 
   return (
-    <NativeTabs tintColor={theme.colors[0]}>
+    <NativeTabs tintColor={blendHex(theme.colors[0], theme.colors[1])}>
       <NativeTabs.Trigger name="index">
         <Label>Overview</Label>
         {isIOS ? (

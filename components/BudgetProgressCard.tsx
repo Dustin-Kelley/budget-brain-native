@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 
@@ -45,7 +46,7 @@ export function BudgetProgressCard({
         <View className="h-3 w-full overflow-hidden rounded-full bg-gray-100">
           <View
             className="h-full rounded-full"
-            style={{ width: `${progressWidth}%`, backgroundColor: theme.colors[0] }}
+            style={{ width: `${progressWidth}%`, backgroundColor: blendHex(theme.colors[0], theme.colors[1]) }}
           />
         </View>
         <View className="mt-2 flex-row justify-between">

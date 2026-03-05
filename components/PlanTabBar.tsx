@@ -1,7 +1,7 @@
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
-import { cn, hexToRgba } from "@/lib/utils";
+import { blendHex, cn, hexToRgba } from "@/lib/utils";
 import { Pressable, View } from "react-native";
 
 const PLAN_TABS = [
@@ -28,7 +28,7 @@ export function PlanTabBar({
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
   const trackBackground = hexToRgba(theme.colors[0], 0.4);
-  const selectedBackground = hexToRgba(theme.colors[1], 0.85);
+  const selectedBackground = "white";
 
   return (
     <View
@@ -44,7 +44,10 @@ export function PlanTabBar({
             style={isActive ? { backgroundColor: selectedBackground } : undefined}
             onPress={() => onValueChange(tab.value)}
           >
-            <Text className="text-sm font-medium" style={{ color: "#fff" }}>
+            <Text
+              className="text-sm font-bold"
+              style={{ color: isActive ? blendHex(theme.colors[0], theme.colors[1]) : "#fff" }}
+            >
               {tab.label}
             </Text>
           </Pressable>
