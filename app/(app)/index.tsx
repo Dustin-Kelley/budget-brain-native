@@ -38,7 +38,7 @@ export default function OverviewScreen() {
 
   if (userLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-cyan-400">
+      <View className="flex-1 items-center justify-center ">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -46,38 +46,40 @@ export default function OverviewScreen() {
 
   if (!householdId) {
     return (
-      <View className="flex-1 bg-cyan-400 p-6">
+      <View className="flex-1 p-6">
         <AppHeader />
-        <Card className="gap-0 p-6">
-          <Text className="text-center text-lg font-semibold text-gray-900">
-            No household set up
-          </Text>
-          <Text className="mt-2 text-center text-sm text-gray-500">
-            Your account isn&apos;t linked to a household yet. Use the web app to
-            create or join a household, then open Budget Brain again.
-          </Text>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onPress={() => refetch()}
-          >
-            <Text>Retry</Text>
-          </Button>
-        </Card>
+        <View className="flex-1 items-center justify-center">
+          <Card className="gap-0 p-6">
+            <Text className="text-center text-lg font-semibold text-gray-900">
+              No household set up
+            </Text>
+            <Text className="mt-2 text-center text-sm text-gray-500">
+              Your account isn&apos;t linked to a household yet. Use the web app to
+              create or join a household, then open Budget Brain again.
+            </Text>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onPress={() => refetch()}
+            >
+              <Text>Retry</Text>
+            </Button>
+          </Card>
+
+        </View>
       </View>
     );
   }
 
   if (budgetLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-cyan-400">
+      <View className="flex-1 items-center justify-center ">
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
-  // Approximate header height for initial padding (status bar + content + padding)
-  const headerPaddingTop = top + 52;
+  const headerPaddingTop = top + (62);
 
   return (
     <View className="flex-1 bg-white">
@@ -87,7 +89,6 @@ export default function OverviewScreen() {
       />
 
       <Animated.ScrollView
-        className="flex-1"
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         contentContainerStyle={{
@@ -95,7 +96,7 @@ export default function OverviewScreen() {
           paddingBottom: 96,
         }}
       >
-        <View className="mt-4 gap-6 px-4 flex-1 min-h-full bg-gray-50 rounded-t-2xl">
+        <View className="gap-6 p-4">
           <BudgetProgressCard
             totalPlanned={totalPlanned}
             spentAmount={spentAmount}

@@ -1,7 +1,10 @@
+import { useState } from "react";
 import {
   useSharedValue,
   useAnimatedStyle,
   useAnimatedScrollHandler,
+  useAnimatedReaction,
+  runOnJS,
   clamp,
 } from "react-native-reanimated";
 
@@ -12,6 +15,16 @@ import {
 export function useCollapsibleHeader() {
   const headerHeight = useSharedValue(0);
   const headerTranslateY = useSharedValue(0);
+  const [measuredHeaderHeight, setMeasuredHeaderHeight] = useState(0);
+
+  useAnimatedReaction(
+    () => headerHeight.value,
+    (height) => {
+      if (height > 0) {
+        runOnJS(setMeasuredHeaderHeight)(height);
+      }
+    },
+  );
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -26,5 +39,5 @@ export function useCollapsibleHeader() {
     transform: [{ translateY: headerTranslateY.value }],
   }));
 
-  return { scrollHandler, headerAnimatedStyle, headerHeight };
+  return { scrollHandler, headerAnimatedStyle, headerHeight, measuredHeaderHeight };
 }

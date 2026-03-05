@@ -1,7 +1,7 @@
 import { MonthSelector } from "@/components/MonthSelector";
+import { type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { type SharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 
 interface AppHeaderProps {
   animatedStyle?: StyleProp<ViewStyle>;
