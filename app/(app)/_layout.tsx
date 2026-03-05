@@ -27,17 +27,17 @@ export default function AppLayout() {
       <NativeTabs.Trigger name="index">
         <Label>Overview</Label>
         {isIOS ? (
-          <Icon sf="house.fill" />
+          <Icon sf="eye.fill" />
         ) : (
-          <Icon src={<VectorIcon family={Ionicons} name="home" />} />
+          <Icon src={<VectorIcon family={Ionicons} name="eye" />} />
         )}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="plan">
-        <Label>Plan</Label>
+        <Label>Budget</Label>
         {isIOS ? (
-          <Icon sf="doc.text.fill" />
+          <Icon sf="chart.pie.fill" />
         ) : (
-          <Icon src={<VectorIcon family={Ionicons} name="document-text" />} />
+          <Icon src={<VectorIcon family={Ionicons} name="pie-chart" />} />
         )}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
