@@ -1,12 +1,12 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { AppHeader } from "@/components/AppHeader";
-import { IncomeCard } from "@/components/IncomeCard";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
+import { PlanHeader } from "@/components/PlanHeader";
+import { PlanTabBar } from "@/components/PlanTabBar";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { TransactionsList } from "@/components/TransactionsList";
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useBudgetPlan } from "@/hooks/useBudgetPlan";
@@ -64,68 +64,47 @@ export default function PlanScreen() {
 
   return (
     <View className="flex-1">
-      <ScreenWrapper>
+      <ScreenWrapper
+        customHeader={({ animatedStyle, headerHeight }) => (
+          <PlanHeader animatedStyle={animatedStyle} headerHeight={headerHeight}>
+            <PlanTabBar value={activeTab} onValueChange={setActiveTab} />
+          </PlanHeader>
+        )}
+      >
         <View className="gap-6">
-          <IncomeCard
-            income={income}
-            totalIncome={totalIncome}
-            totalPlanned={totalPlanned}
-            monthLabel={monthLabel}
-            error={error?.message}
-            householdId={householdId ?? undefined}
-            userId={currentUser?.id}
-            monthKey={monthKey}
-            onRefetch={refetch}
-          />
-
-          <View>
-            <Text className="mb-2 text-base font-semibold text-gray-900">
-              Budget Details
-            </Text>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full">
-                <TabsTrigger value="planned" className="flex-1">
-                  <Text>Planned</Text>
-                </TabsTrigger>
-                <TabsTrigger value="remaining" className="flex-1">
-                  <Text>Remaining</Text>
-                </TabsTrigger>
-                <TabsTrigger value="transactions" className="flex-1">
-                  <Text>Transactions</Text>
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="planned">
-                <PlanCategoryCards
-                  categories={categories}
-                  totalIncome={totalIncome}
-                  error={error?.message}
-                  householdId={householdId ?? undefined}
-                  userId={currentUser?.id}
-                  monthKey={monthKey}
-                  onRefetch={refetch}
-                />
-              </TabsContent>
-              <TabsContent value="remaining">
-                <RemainingSpentCards
-                  categories={categories}
-                  spentByLineItem={spentByLineItem}
-                  error={error?.message}
-                />
-              </TabsContent>
-              <TabsContent value="transactions">
-                <TransactionsList
-                  groupedTransactions={groupedTransactions}
-                  sortedDates={sortedDates}
-                  categories={categories}
-                  householdId={householdId ?? undefined}
-                  userId={currentUser?.id}
-                  monthKey={monthKey}
-                  onRefetch={refetch}
-                  error={error?.message}
-                />
-              </TabsContent>
-            </Tabs>
-          </View>
+          {activeTab === "planned" && (
+            <PlanCategoryCards
+              categories={categories}
+              totalIncome={totalIncome}
+              totalPlanned={totalPlanned}
+              income={income}
+              monthLabel={monthLabel}
+              error={error?.message}
+              householdId={householdId ?? undefined}
+              userId={currentUser?.id}
+              monthKey={monthKey}
+              onRefetch={refetch}
+            />
+          )}
+          {activeTab === "remaining" && (
+            <RemainingSpentCards
+              categories={categories}
+              spentByLineItem={spentByLineItem}
+              error={error?.message}
+            />
+          )}
+          {activeTab === "transactions" && (
+            <TransactionsList
+              groupedTransactions={groupedTransactions}
+              sortedDates={sortedDates}
+              categories={categories}
+              householdId={householdId ?? undefined}
+              userId={currentUser?.id}
+              monthKey={monthKey}
+              onRefetch={refetch}
+              error={error?.message}
+            />
+          )}
         </View>
       </ScreenWrapper>
       {householdId && currentUser?.id && (

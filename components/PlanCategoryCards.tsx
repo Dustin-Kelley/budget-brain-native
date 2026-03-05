@@ -8,10 +8,14 @@ import { deleteCategory } from "@/lib/mutations/deleteCategory";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
+import { IncomeCard } from "./IncomeCard";
 
 type PlanCategoryCardsProps = {
   categories: CategoryWithLineItems[] | null;
   totalIncome: number;
+  totalPlanned: number;
+  income: { id: string; name: string | null; amount: number }[];
+  monthLabel: string;
   error?: string | null;
   householdId?: string;
   userId?: string;
@@ -31,6 +35,9 @@ function formatCurrency(value: number) {
 export function PlanCategoryCards({
   categories,
   totalIncome,
+  totalPlanned,
+  income,
+  monthLabel,
   error,
   householdId,
   userId,
@@ -115,7 +122,18 @@ export function PlanCategoryCards({
 
   return (
     <View className="gap-4">
-      <View className="flex-row items-center justify-between">
+      <View className="flex-col items-center justify-between">
+        <IncomeCard
+          income={income}
+          totalIncome={totalIncome}
+          totalPlanned={totalPlanned}
+          monthLabel={monthLabel}
+          error={error}
+          householdId={householdId}
+          userId={userId}
+          monthKey={monthKey}
+          onRefetch={onRefetch}
+        />
         <Text className="font-semibold text-gray-900">Planned</Text>
         {householdId && monthKey && onRefetch && (
           <AddCategoryForm
