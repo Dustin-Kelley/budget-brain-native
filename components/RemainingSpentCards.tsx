@@ -230,6 +230,7 @@ export function RemainingSpentCards({
   const theme = getAppTheme(appTheme);
   const barColor = blendHex(theme.colors[0], theme.colors[1]);
 
+  const [viewMode, setViewMode] = useState<"spent" | "remaining">("spent");
   const [categoryForModal, setCategoryForModal] =
     useState<CategoryWithLineItems | null>(null);
 
@@ -262,9 +263,33 @@ export function RemainingSpentCards({
     );
   }
 
+  const isSpentView = viewMode === "spent";
+
   return (
     <View className="gap-4">
-      <Text className="font-semibold text-gray-900">Remaining</Text>
+      <View className="flex-row items-center justify-between">
+        <Text className="font-semibold text-gray-900">
+          {isSpentView ? "Spent" : "Remaining"}
+        </Text>
+        <View className="flex-row overflow-hidden rounded-lg border border-gray-200">
+          <Pressable
+            onPress={() => setViewMode("spent")}
+            className={`px-3 py-1.5 ${isSpentView ? "bg-gray-900" : "bg-white"}`}
+          >
+            <Text className={`text-xs font-medium ${isSpentView ? "text-white" : "text-gray-600"}`}>
+              Spent
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setViewMode("remaining")}
+            className={`px-3 py-1.5 ${!isSpentView ? "bg-gray-900" : "bg-white"}`}
+          >
+            <Text className={`text-xs font-medium ${!isSpentView ? "text-white" : "text-gray-600"}`}>
+              Remaining
+            </Text>
+          </Pressable>
+        </View>
+      </View>
       {categories.map((category) => {
         const planned =
           category.line_items?.reduce(
@@ -276,8 +301,13 @@ export function RemainingSpentCards({
           0
         );
         const remaining = planned - spent;
+        const percentSpent =
+          planned > 0 ? Math.round((spent / planned) * 100) : 0;
         const percentRemaining =
           planned > 0 ? Math.round((remaining / planned) * 100) : 0;
+        const catBarPercent = isSpentView
+          ? Math.min(percentSpent, 100)
+          : Math.min(Math.max(percentRemaining, 0), 100);
 
         return (
           <Card
@@ -290,10 +320,14 @@ export function RemainingSpentCards({
               </Text>
               <Text
                 className={
-                  remaining >= 0 ? "font-medium text-green-600" : "font-medium text-red-600"
+                  isSpentView
+                    ? "font-medium text-gray-900"
+                    : remaining >= 0 ? "font-medium text-green-600" : "font-medium text-red-600"
                 }
               >
-                {formatCurrency(remaining)} ({percentRemaining}%)
+                {isSpentView
+                  ? `${formatCurrency(spent)} (${percentSpent}%)`
+                  : `${formatCurrency(remaining)} (${percentRemaining}%)`}
               </Text>
             </View>
             {planned > 0 && (
@@ -302,7 +336,7 @@ export function RemainingSpentCards({
                   <View
                     className="h-full rounded-full"
                     style={{
-                      width: `${Math.min(Math.max(percentRemaining, 0), 100)}%`,
+                      width: `${catBarPercent}%`,
                       backgroundColor: barColor,
                     }}
                   />
@@ -310,16 +344,21 @@ export function RemainingSpentCards({
               </View>
             )}
             <Text className="px-4 py-1 text-xs text-gray-500">
-              Remaining: {formatCurrency(remaining)} / {formatCurrency(planned)}
+              {isSpentView
+                ? `Spent: ${formatCurrency(spent)} / ${formatCurrency(planned)}`
+                : `Remaining: ${formatCurrency(remaining)} / ${formatCurrency(planned)}`}
             </Text>
             {(category.line_items ?? []).map((item) => {
               const itemPlanned = item.planned_amount ?? 0;
               const itemSpent = getSpentForLineItem(item.id, spentByLineItem);
               const itemRemaining = itemPlanned - itemSpent;
-              const itemPercent =
-                itemPlanned > 0 ? Math.round((itemRemaining / itemPlanned) * 100) : 0;
               const itemSpentPercent =
                 itemPlanned > 0 ? Math.min(Math.round((itemSpent / itemPlanned) * 100), 100) : 0;
+              const itemRemainingPercent =
+                itemPlanned > 0 ? Math.round((itemRemaining / itemPlanned) * 100) : 0;
+              const itemBarPercent = isSpentView
+                ? itemSpentPercent
+                : Math.min(Math.max(itemRemainingPercent, 0), 100);
               return (
                 <View
                   key={item.id}
@@ -331,10 +370,14 @@ export function RemainingSpentCards({
                     </Text>
                     <Text
                       className={
-                        itemRemaining >= 0 ? "text-green-600" : "text-red-600"
+                        isSpentView
+                          ? "text-gray-900"
+                          : itemRemaining >= 0 ? "text-green-600" : "text-red-600"
                       }
                     >
-                      {formatCurrency(itemRemaining)} ({itemPercent}%)
+                      {isSpentView
+                        ? `${formatCurrency(itemSpent)} (${itemSpentPercent}%)`
+                        : `${formatCurrency(itemRemaining)} (${itemRemainingPercent}%)`}
                     </Text>
                   </View>
                   {itemPlanned > 0 && (
@@ -342,7 +385,7 @@ export function RemainingSpentCards({
                       <View
                         className="h-full rounded-full"
                         style={{
-                          width: `${itemSpentPercent}%`,
+                          width: `${itemBarPercent}%`,
                           backgroundColor: barColor,
                         }}
                       />
