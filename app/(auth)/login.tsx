@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { loginSchema, type LoginFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -15,26 +17,22 @@ import {
 
 export default function LoginScreen() {
   const { sendOtp } = useAuth();
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed) {
-      Alert.alert("Error", "Please enter your email address");
-      return;
-    }
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "" },
+    mode: "onBlur",
+  });
 
-    setIsSubmitting(true);
-    const { error } = await sendOtp(trimmed);
-    setIsSubmitting(false);
+  const onSubmit = async (data: LoginFormData) => {
+    const { error } = await sendOtp(data.email.toLowerCase());
 
     if (error) {
       Alert.alert("Error", error.message);
       return;
     }
 
-    router.push({ pathname: "/(auth)/verify-otp", params: { email: trimmed } });
+    router.push({ pathname: "/(auth)/verify-otp", params: { email: data.email.toLowerCase() } });
   };
 
   return (
@@ -50,18 +48,31 @@ export default function LoginScreen() {
         </Text>
 
         <View className="gap-4">
-          <Input
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-            editable={!isSubmitting}
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View>
+                <Input
+                  placeholder="Email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  editable={!form.formState.isSubmitting}
+                  className={error ? "border-destructive" : ""}
+                />
+                {error?.message && (
+                  <Text className="mt-1 text-sm text-destructive">{error.message}</Text>
+                )}
+              </View>
+            )}
           />
 
-          <Button variant="secondary" onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
-            {isSubmitting ? (
+          <Button variant="secondary" onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting} className="mt-2">
+            {form.formState.isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <Text>Continue</Text>

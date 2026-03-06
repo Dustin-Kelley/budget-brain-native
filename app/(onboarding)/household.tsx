@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/contexts/auth-context';
+import { householdSchema, type HouseholdFormData } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
 async function createHouseholdForUser(userId: string, name: string | null) {
@@ -29,16 +32,19 @@ async function createHouseholdForUser(userId: string, name: string | null) {
 }
 
 export default function HouseholdScreen() {
-  const [name, setName] = useState('');
-  const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [skipping, setSkipping] = useState(false);
 
-  async function handleNext() {
-    if (!name.trim() || !user) return;
-    setSaving(true);
-    const { error } = await createHouseholdForUser(user.id, name.trim());
-    setSaving(false);
+  const form = useForm<HouseholdFormData>({
+    resolver: zodResolver(householdSchema),
+    defaultValues: { name: '' },
+    mode: 'onChange',
+  });
+
+  async function onSubmit(data: HouseholdFormData) {
+    if (!user) return;
+    const { error } = await createHouseholdForUser(user.id, data.name.trim());
     if (error) return;
     await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     await queryClient.invalidateQueries({ queryKey: ['household'] });
@@ -47,9 +53,9 @@ export default function HouseholdScreen() {
 
   async function handleSkip() {
     if (!user) return;
-    setSaving(true);
+    setSkipping(true);
     const { error } = await createHouseholdForUser(user.id, null);
-    setSaving(false);
+    setSkipping(false);
     if (error) return;
     await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     router.push('/(onboarding)/welcome');
@@ -70,20 +76,27 @@ export default function HouseholdScreen() {
             <Text className="text-center text-muted-foreground">
               This helps you organize your budget
             </Text>
-            <Input
-              placeholder="Household name"
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              autoCapitalize="words"
+            <Controller
+              control={form.control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Household name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoFocus
+                  autoCapitalize="words"
+                />
+              )}
             />
           </View>
         </View>
         <View className="gap-3">
-          <Button onPress={handleNext} disabled={!name.trim() || saving}>
+          <Button onPress={form.handleSubmit(onSubmit)} disabled={!form.formState.isValid || form.formState.isSubmitting}>
             <Text>Next</Text>
           </Button>
-          <Button variant="ghost" onPress={handleSkip} disabled={saving}>
+          <Button variant="ghost" onPress={handleSkip} disabled={skipping}>
             <Text>Skip</Text>
           </Button>
         </View>

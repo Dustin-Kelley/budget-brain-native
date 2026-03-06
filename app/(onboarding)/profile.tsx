@@ -5,27 +5,30 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/contexts/auth-context';
 import { updateUserProfile } from '@/lib/mutations/updateUserProfile';
+import { profileSchema, type ProfileFormData } from '@/lib/validations';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
 export default function ProfileScreen() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  async function handleNext() {
-    if (!firstName.trim() || !user) return;
-    setSaving(true);
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { firstName: '', lastName: '' },
+    mode: 'onChange',
+  });
+
+  async function onSubmit(data: ProfileFormData) {
+    if (!user) return;
     const { error } = await updateUserProfile({
       userId: user.id,
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
     });
-    setSaving(false);
     if (error) return;
     await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     router.push('/(onboarding)/household');
@@ -40,23 +43,37 @@ export default function ProfileScreen() {
             <Text className="text-center text-2xl font-bold">
               What's your name?
             </Text>
-            <Input
-              placeholder="First name"
-              value={firstName}
-              onChangeText={setFirstName}
-              autoFocus
-              autoCapitalize="words"
+            <Controller
+              control={form.control}
+              name="firstName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="First name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoFocus
+                  autoCapitalize="words"
+                />
+              )}
             />
-            <Input
-              placeholder="Last name"
-              value={lastName}
-              onChangeText={setLastName}
-              autoCapitalize="words"
+            <Controller
+              control={form.control}
+              name="lastName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Last name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="words"
+                />
+              )}
             />
           </View>
         </View>
         <View className="gap-3">
-          <Button onPress={handleNext} disabled={!firstName.trim() || saving}>
+          <Button onPress={form.handleSubmit(onSubmit)} disabled={!form.formState.isValid || form.formState.isSubmitting}>
             <Text>Next</Text>
           </Button>
           <Button variant="ghost" onPress={() => router.push('/(onboarding)/household')}>

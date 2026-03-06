@@ -1,11 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { deleteLineItem } from "@/lib/mutations/deleteLineItem";
 import { updateLineItem } from "@/lib/mutations/updateLineItem";
+import { editLineItemSchema, type EditLineItemFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,20 +36,30 @@ export function EditLineItemForm({
   onSuccess,
 }: EditLineItemFormProps) {
   const insets = useSafeAreaInsets();
-  const [lineItemName, setLineItemName] = useState(lineItem.name ?? "");
-  const [plannedAmount, setPlannedAmount] = useState(
-    String(lineItem.planned_amount ?? 0)
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const resetForm = () => {
-    setLineItemName(lineItem.name ?? "");
-    setPlannedAmount(String(lineItem.planned_amount ?? 0));
-  };
+  const form = useForm<EditLineItemFormData>({
+    resolver: zodResolver(editLineItemSchema),
+    defaultValues: {
+      name: lineItem.name ?? "",
+      plannedAmount: String(lineItem.planned_amount ?? 0),
+    },
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    form.reset({
+      name: lineItem.name ?? "",
+      plannedAmount: String(lineItem.planned_amount ?? 0),
+    });
+  }, [lineItem, form]);
 
   const handleClose = () => {
     onClose();
-    resetForm();
+    form.reset({
+      name: lineItem.name ?? "",
+      plannedAmount: String(lineItem.planned_amount ?? 0),
+    });
   };
 
   const handleDelete = () => {
@@ -59,9 +72,9 @@ export function EditLineItemForm({
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            setIsSubmitting(true);
+            setIsDeleting(true);
             const { error } = await deleteLineItem({ lineItemId: lineItem.id });
-            setIsSubmitting(false);
+            setIsDeleting(false);
             if (error) {
               Alert.alert("Error", error.message);
               return;
@@ -74,26 +87,13 @@ export function EditLineItemForm({
     );
   };
 
-  const handleSubmit = async () => {
-    const name = lineItemName.trim();
-    if (!name) {
-      Alert.alert("Name required", "Please enter an item name.");
-      return;
-    }
-    const amountNum = parseFloat(plannedAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive planned amount.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: EditLineItemFormData) => {
     const { error } = await updateLineItem({
       lineItemId: lineItem.id,
-      lineItemName: name,
+      lineItemName: data.name,
       categoryId,
-      plannedAmount: amountNum,
+      plannedAmount: parseFloat(data.plannedAmount),
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -103,6 +103,8 @@ export function EditLineItemForm({
     onSuccess();
     handleClose();
   };
+
+  const isSubmitting = form.formState.isSubmitting || isDeleting;
 
   return (
     <Modal
@@ -126,29 +128,23 @@ export function EditLineItemForm({
 
           <ScrollView className="px-4 py-4">
             <View className="gap-4">
-              <View className="gap-2">
-                <Label>Name *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="Item name"
-                  value={lineItemName}
-                  onChangeText={setLineItemName}
-                  editable={!isSubmitting}
-                  autoCapitalize="words"
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="name"
+                label="Name *"
+                placeholder="Item name"
+                editable={!isSubmitting}
+                autoCapitalize="words"
+              />
 
-              <View className="gap-2">
-                <Label>Planned Amount *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="0"
-                  value={plannedAmount}
-                  onChangeText={setPlannedAmount}
-                  keyboardType="decimal-pad"
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="plannedAmount"
+                label="Planned Amount *"
+                placeholder="0"
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
             </View>
           </ScrollView>
 
@@ -165,8 +161,8 @@ export function EditLineItemForm({
             >
               <Ionicons name="trash-outline" size={20} color="#fff" />
             </Button>
-            <Button className="flex-1" onPress={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button className="flex-1" onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+              {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Text>Save Changes</Text>

@@ -1,13 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { addTransaction } from "@/lib/mutations/addTransaction";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
+import { addExpenseSchema, type AddExpenseFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { Controller, useForm } from "react-hook-form";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,7 +21,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type AddExpenseFormProps = {
   categories: CategoryWithLineItems[] | null;
@@ -50,57 +53,45 @@ export function AddExpenseForm({
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
   const [visible, setVisible] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [lineItemId, setLineItemId] = useState<string | null>(null);
-  const [date, setDate] = useState(() =>
-    new Date().toISOString().split("T")[0]
-  );
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const lineItems = flattenLineItems(categories);
-  const selectedLineItem = lineItems.find(({ item }) => item.id === lineItemId);
 
-  const resetForm = () => {
-    setAmount("");
-    setDescription("");
-    setLineItemId(null);
-    setDate(new Date().toISOString().split("T")[0]);
-  };
+  const form = useForm<AddExpenseFormData>({
+    resolver: zodResolver(addExpenseSchema),
+    defaultValues: {
+      amount: "",
+      description: "",
+      lineItemId: "",
+      date: new Date().toISOString().split("T")[0],
+    },
+    mode: "onBlur",
+  });
+
+  const lineItemId = form.watch("lineItemId");
+  const selectedLineItem = lineItems.find(({ item }) => item.id === lineItemId);
 
   const handleClose = () => {
     setVisible(false);
     setShowLineItemPicker(false);
-    resetForm();
+    form.reset({
+      amount: "",
+      description: "",
+      lineItemId: "",
+      date: new Date().toISOString().split("T")[0],
+    });
   };
 
-  const handleSubmit = async () => {
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive number.");
-      return;
-    }
-    if (!lineItemId) {
-      Alert.alert("Budget item required", "Please select a budget item.");
-      return;
-    }
-    if (!date.trim()) {
-      Alert.alert("Date required", "Please enter the date.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: AddExpenseFormData) => {
     const { error } = await addTransaction({
-      amount: amountNum,
-      description: description.trim() || undefined,
-      lineItemId,
-      dateOfTransaction: date.trim(),
+      amount: parseFloat(data.amount),
+      description: data.description?.trim() || undefined,
+      lineItemId: data.lineItemId,
+      dateOfTransaction: data.date,
       householdId,
       userId,
       monthKey,
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -149,91 +140,91 @@ export function AddExpenseForm({
 
             <ScrollView className="max-h-96 px-4 py-4">
               <View className="gap-4">
-                <View className="gap-2">
-                  <Label>Amount *</Label>
-                  <Input
-                    className="h-auto rounded-lg px-4 py-3"
-                    placeholder="0.00"
-                    value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="decimal-pad"
-                    editable={!isSubmitting}
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  label="Amount *"
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  editable={!form.formState.isSubmitting}
+                />
 
-                <View className="gap-2">
-                  <Label>Description</Label>
-                  <Input
-                    className="h-auto rounded-lg px-4 py-3"
-                    placeholder="Optional"
-                    value={description}
-                    onChangeText={setDescription}
-                    editable={!isSubmitting}
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  label="Description"
+                  placeholder="Optional"
+                  editable={!form.formState.isSubmitting}
+                />
 
-                <View className="gap-2">
-                  <Label>Budget Item *</Label>
-                  <Pressable
-                    onPress={() =>
-                      setShowLineItemPicker((prev) => !prev)
-                    }
-                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
-                  >
-                    <Text
-                      className={
-                        selectedLineItem
-                          ? "text-gray-900"
-                          : "text-gray-400"
-                      }
-                    >
-                      {selectedLineItem
-                        ? `${selectedLineItem.categoryName} → ${selectedLineItem.item.name ?? "Item"}`
-                        : "Select budget item"}
-                    </Text>
-                  </Pressable>
-                  {showLineItemPicker && (
-                    <View className="mt-2 max-h-40 rounded-lg border border-gray-200 bg-gray-50">
-                      <ScrollView className="max-h-40">
-                        {lineItems.length === 0 ? (
-                          <Text className="p-4 text-center text-sm text-gray-500">
-                            No budget items. Add categories and line items on the
-                            web app.
-                          </Text>
-                        ) : (
-                          lineItems.map(({ item, categoryName }) => (
-                            <Pressable
-                              key={item.id}
-                              onPress={() => {
-                                setLineItemId(item.id);
-                                setShowLineItemPicker(false);
-                              }}
-                              className="border-b border-gray-100 px-4 py-3 last:border-b-0"
-                            >
-                              <Text className="font-medium text-gray-900">
-                                {item.name ?? "Item"}
+                <Controller
+                  control={form.control}
+                  name="lineItemId"
+                  render={({ fieldState: { error } }) => (
+                    <View className="gap-2">
+                      <Label>Budget Item *</Label>
+                      <Pressable
+                        onPress={() =>
+                          setShowLineItemPicker((prev) => !prev)
+                        }
+                        className={`rounded-lg border bg-gray-50 px-4 py-3 ${error ? "border-destructive" : "border-gray-200"}`}
+                      >
+                        <Text
+                          className={
+                            selectedLineItem
+                              ? "text-gray-900"
+                              : "text-gray-400"
+                          }
+                        >
+                          {selectedLineItem
+                            ? `${selectedLineItem.categoryName} → ${selectedLineItem.item.name ?? "Item"}`
+                            : "Select budget item"}
+                        </Text>
+                      </Pressable>
+                      {showLineItemPicker && (
+                        <View className="mt-2 max-h-40 rounded-lg border border-gray-200 bg-gray-50">
+                          <ScrollView className="max-h-40">
+                            {lineItems.length === 0 ? (
+                              <Text className="p-4 text-center text-sm text-gray-500">
+                                No budget items. Add categories and line items on the
+                                web app.
                               </Text>
-                              <Text className="text-xs text-gray-500">
-                                {categoryName}
-                              </Text>
-                            </Pressable>
-                          ))
-                        )}
-                      </ScrollView>
+                            ) : (
+                              lineItems.map(({ item, categoryName }) => (
+                                <Pressable
+                                  key={item.id}
+                                  onPress={() => {
+                                    form.setValue("lineItemId", item.id, { shouldValidate: true });
+                                    setShowLineItemPicker(false);
+                                  }}
+                                  className="border-b border-gray-100 px-4 py-3 last:border-b-0"
+                                >
+                                  <Text className="font-medium text-gray-900">
+                                    {item.name ?? "Item"}
+                                  </Text>
+                                  <Text className="text-xs text-gray-500">
+                                    {categoryName}
+                                  </Text>
+                                </Pressable>
+                              ))
+                            )}
+                          </ScrollView>
+                        </View>
+                      )}
+                      {error?.message && (
+                        <Text className="text-sm text-destructive">{error.message}</Text>
+                      )}
                     </View>
                   )}
-                </View>
+                />
 
-                <View className="gap-2">
-                  <Label>Date *</Label>
-                  <Input
-                    className="h-auto rounded-lg px-4 py-3"
-                    placeholder="YYYY-MM-DD"
-                    value={date}
-                    onChangeText={setDate}
-                    editable={!isSubmitting}
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="date"
+                  label="Date *"
+                  placeholder="YYYY-MM-DD"
+                  editable={!form.formState.isSubmitting}
+                />
               </View>
             </ScrollView>
 
@@ -242,10 +233,10 @@ export function AddExpenseForm({
               style={{ paddingBottom: 16 + insets.bottom }}
             >
               <Button
-                onPress={handleSubmit}
-                disabled={isSubmitting}
+                onPress={form.handleSubmit(onSubmit)}
+                disabled={form.formState.isSubmitting}
               >
-                {isSubmitting ? (
+                {form.formState.isSubmitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <Text>Save Expense</Text>

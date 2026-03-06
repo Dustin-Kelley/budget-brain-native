@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { addIncome } from "@/lib/mutations/addIncome";
+import { addIncomeSchema, type AddIncomeFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -30,41 +32,26 @@ export function AddIncomeForm({
 }: AddIncomeFormProps) {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
-  const [incomeName, setIncomeName] = useState("");
-  const [incomeAmount, setIncomeAmount] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
-    setIncomeName("");
-    setIncomeAmount("");
-  };
+  const form = useForm<AddIncomeFormData>({
+    resolver: zodResolver(addIncomeSchema),
+    defaultValues: { name: "", amount: "" },
+    mode: "onBlur",
+  });
 
   const handleClose = () => {
     setVisible(false);
-    resetForm();
+    form.reset();
   };
 
-  const handleSubmit = async () => {
-    const name = incomeName.trim();
-    if (!name) {
-      Alert.alert("Name required", "Please enter an income source name.");
-      return;
-    }
-    const amountNum = parseFloat(incomeAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive number.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: AddIncomeFormData) => {
     const { error } = await addIncome({
-      incomeName: name,
-      incomeAmount: amountNum,
+      incomeName: data.name,
+      incomeAmount: parseFloat(data.amount),
       monthKey,
       householdId,
       userId,
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -111,29 +98,23 @@ export function AddIncomeForm({
 
             <ScrollView className="px-4 py-4">
               <View className="gap-4">
-                <View className="gap-2">
-                  <Label>Name *</Label>
-                  <Input
-                    className="rounded-lg px-4 py-3"
-                    placeholder="e.g. Paycheck, Side hustle"
-                    value={incomeName}
-                    onChangeText={setIncomeName}
-                    editable={!isSubmitting}
-                    autoCapitalize="words"
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  label="Name *"
+                  placeholder="e.g. Paycheck, Side hustle"
+                  editable={!form.formState.isSubmitting}
+                  autoCapitalize="words"
+                />
 
-                <View className="gap-2">
-                  <Label>Amount *</Label>
-                  <Input
-                    className="rounded-lg px-4 py-3"
-                    placeholder="0.00"
-                    value={incomeAmount}
-                    onChangeText={setIncomeAmount}
-                    keyboardType="decimal-pad"
-                    editable={!isSubmitting}
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  label="Amount *"
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  editable={!form.formState.isSubmitting}
+                />
               </View>
             </ScrollView>
 
@@ -141,8 +122,8 @@ export function AddIncomeForm({
               className="border-t border-gray-200 px-4 pt-4"
               style={{ paddingBottom: 16 + insets.bottom }}
             >
-              <Button onPress={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <Text>Save Income</Text>

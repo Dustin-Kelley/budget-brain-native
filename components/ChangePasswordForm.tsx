@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { supabase } from "@/lib/supabase";
+import { changePasswordSchema, type ChangePasswordFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
+import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type ChangePasswordFormProps = {
   visible: boolean;
@@ -25,33 +26,20 @@ export function ChangePasswordForm({
   onClose,
 }: ChangePasswordFormProps) {
   const insets = useSafeAreaInsets();
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
-    setNewPassword("");
-    setConfirmPassword("");
-  };
+  const form = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { newPassword: "", confirmPassword: "" },
+    mode: "onBlur",
+  });
 
   const handleClose = () => {
     onClose();
-    resetForm();
+    form.reset();
   };
 
-  const handleSubmit = async () => {
-    if (newPassword.length < 6) {
-      Alert.alert("Too short", "Password must be at least 6 characters.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      Alert.alert("Mismatch", "Passwords do not match.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    setIsSubmitting(false);
+  const onSubmit = async (data: ChangePasswordFormData) => {
+    const { error } = await supabase.auth.updateUser({ password: data.newPassword });
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -84,29 +72,23 @@ export function ChangePasswordForm({
 
           <ScrollView className="px-4 py-4">
             <View className="gap-4">
-              <View className="gap-2">
-                <Label>New Password *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="Min 6 characters"
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                  secureTextEntry
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="newPassword"
+                label="New Password *"
+                placeholder="Min 6 characters"
+                secureTextEntry
+                editable={!form.formState.isSubmitting}
+              />
 
-              <View className="gap-2">
-                <Label>Confirm Password *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="Re-enter password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                label="Confirm Password *"
+                placeholder="Re-enter password"
+                secureTextEntry
+                editable={!form.formState.isSubmitting}
+              />
             </View>
           </ScrollView>
 
@@ -114,8 +96,8 @@ export function ChangePasswordForm({
             className="border-t border-gray-200 px-4 pt-4"
             style={{ paddingBottom: 16 + insets.bottom }}
           >
-            <Button onPress={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Text>Update Password</Text>
