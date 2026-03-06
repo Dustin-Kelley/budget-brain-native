@@ -10,10 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
+import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useHasBudgetThisMonth } from "@/hooks/useHasBudgetThisMonth";
+import { Link } from "expo-router";
 import { View } from "react-native";
 
 export default function OverviewScreen() {
@@ -78,13 +79,19 @@ export default function OverviewScreen() {
     return (
       <View className="flex-1">
         <ScreenWrapper>
-          <View className="flex-1 items-center justify-center px-4">
-            <Card className="max-w-sm gap-4 border-2 border-primary/20 bg-card p-8 shadow-md shadow-black/10">
-              <Text className="text-center text-xl font-semibold text-gray-900">
-                No budget set up
-              </Text>
-            </Card>
-          </View>
+          <Card className="p-8">
+            <Text className="text-center text-xl font-semibold text-gray-900">
+              Hey — looks like you don&apos;t have a budget set up yet!
+            </Text>
+            <Text className="text-center text-gray-600">
+              Don't worry its easy! Head to the Budget tab to start. We'll guide you through the rest there.
+            </Text>
+            <Link href="/(app)/plan" asChild>
+              <Button className="mt-1">
+                <Text>Get Started</Text>
+              </Button>
+            </Link>
+          </Card>
         </ScreenWrapper>
       </View>
     );
