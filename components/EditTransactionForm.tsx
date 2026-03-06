@@ -16,7 +16,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Text as RNText,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -233,7 +232,7 @@ export function EditTransactionForm({
                       </View>
                     )}
                     {error?.message && (
-                      <RNText className="text-sm text-destructive">{error.message}</RNText>
+                      <Text className="text-sm text-destructive">{error.message}</Text>
                     )}
                   </View>
                 )}

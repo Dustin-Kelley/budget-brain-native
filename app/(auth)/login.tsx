@@ -12,7 +12,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Text as RNText,
   View,
 } from "react-native";
 
@@ -66,7 +65,7 @@ export default function LoginScreen() {
                   className={error ? "border-destructive" : ""}
                 />
                 {error?.message && (
-                  <RNText className="mt-1 text-sm text-destructive">{error.message}</RNText>
+                  <Text className="mt-1 text-sm text-destructive">{error.message}</Text>
                 )}
               </View>
             )}
