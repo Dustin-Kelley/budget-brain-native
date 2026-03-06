@@ -71,7 +71,7 @@ export function ScreenWrapper({
         scrollEventThrottle={16}
         contentContainerStyle={[
           {
-            paddingTop: contentPaddingTop,
+            paddingTop: contentPaddingTop + 16,
             paddingBottom: contentPaddingBottom,
           },
           contentContainerStyle,
