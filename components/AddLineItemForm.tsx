@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { addLineItem } from "@/lib/mutations/addLineItem";
+import { useAddLineItem } from "@/hooks/useAddLineItem";
 import { addLineItemSchema, type AddLineItemFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +33,7 @@ export function AddLineItemForm({
   onSuccess,
 }: AddLineItemFormProps) {
   const insets = useSafeAreaInsets();
+  const addLineItem = useAddLineItem();
   const [visible, setVisible] = useState(false);
 
   const form = useForm<AddLineItemFormData>({
@@ -47,21 +48,19 @@ export function AddLineItemForm({
   };
 
   const onSubmit = async (data: AddLineItemFormData) => {
-    const { error } = await addLineItem({
-      lineItemName: data.name,
-      categoryId,
-      plannedAmount: parseFloat(data.plannedAmount),
-      monthKey,
-      userId,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addLineItem.mutateAsync({
+        lineItemName: data.name,
+        categoryId,
+        plannedAmount: parseFloat(data.plannedAmount),
+        monthKey,
+        userId,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   return (

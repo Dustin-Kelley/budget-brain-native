@@ -88,10 +88,18 @@ const { data, isLoading } = useQuery({
 
 Reference implementations: `hooks/useHousehold.ts`, `hooks/useCurrentUser.ts`.
 
-### Mutations and error handling
+### Error logging
 
-- **Throw errors in server queries and mutations** (e.g. in `@/lib/queries/` and `@/lib/mutations/`). Return values for “expected” outcomes (e.g. no data) are fine; for real failures, throw so React Query can treat them as errors.
-- **Catch and handle errors with React Query’s `onError`** where the mutation is consumed (e.g. in the hook that uses `useMutation`). Do not rely on a global `onError` on the QueryClient; log or report errors at the call site so you have feature-specific context (tags, extra) and can decide what to log.
-- In the mutation’s `onError`, use the project’s logging (e.g. `logError` / `useLogError`) with appropriate tags and extra data (e.g. `feature: 'rollover'`, `monthKey`).
+Log errors as close to the source as possible. Never use `useEffect` to watch error state for logging.
 
-Reference: `hooks/useAutoRollover.ts` (rollover mutation with `onError` and `useLogError`).
+- **Queries (`lib/queries/`)**: Call standalone `logError()` right where the error is detected, before returning `{ ..., error }`. The server function is the source of the error, so it logs it. Query hooks do NOT log — they just throw to let React Query handle the error state.
+- **Mutations (`hooks/use*.ts`)**: Use `useMutation`’s `onError` callback. This is where you call `useLogError()` (the hook version, with user context). The mutation hook is the closest place to the error that has React context.
+- **Auth flows** (not React Query): Call standalone `logError()` at the call site in the component, right after receiving the error from `sendOtp`/`verifyOtp`.
+
+Two forms of `logError` (from `hooks/useLogError.ts`):
+- `logError()` — standalone function, no user context. Use in `lib/queries/`, `lib/mutations/`, and non-React code.
+- `useLogError()` — hook, attaches current user to Sentry. Use in React components and hooks. **Cannot be used in `useCurrentUser` or `useHousehold`** (circular dependency).
+
+Always include tags: `{ tags: { query: ‘getFoo’ } }` for queries, `{ tags: { feature: ‘transactions’ } }` for mutations.
+
+Reference: `hooks/useAutoRollover.ts` (mutation with `onError` and `useLogError`), `lib/queries/getCategories.ts` (query with standalone `logError`).

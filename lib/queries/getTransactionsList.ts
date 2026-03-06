@@ -1,3 +1,4 @@
+import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 import type { TransactionWithLineItem } from "@/types";
@@ -42,6 +43,7 @@ export async function getTransactionsList({
     .order("date", { ascending: false });
 
   if (error) {
+    logError(error, { tags: { query: 'getTransactionsList' } });
     return { groupedTransactions: {}, sortedDates: [], error: error as Error };
   }
 

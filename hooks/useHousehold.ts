@@ -9,8 +9,8 @@ export function useHousehold() {
   const { data, isLoading } = useQuery({
     queryKey: ['household', householdId],
     queryFn: async () => {
-      const { household, error } = await getHousehold(householdId);
-      return { household, error };
+      const { household } = await getHousehold(householdId);
+      return { household };
     },
     enabled: !!householdId,
   });

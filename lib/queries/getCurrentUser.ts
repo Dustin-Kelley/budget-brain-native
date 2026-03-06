@@ -1,3 +1,4 @@
+import { logError } from '@/hooks/useLogError';
 import { supabase } from '@/lib/supabase';
 
 export async function getCurrentUser(authUserId: string) {
@@ -8,6 +9,7 @@ export async function getCurrentUser(authUserId: string) {
     .single();
 
   if (error) {
+    logError(error, { tags: { query: 'getCurrentUser' } });
     return { currentUser: null, error };
   }
 

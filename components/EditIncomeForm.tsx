@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { updateIncome } from "@/lib/mutations/updateIncome";
-import { deleteIncome } from "@/lib/mutations/deleteIncome";
+import { useUpdateIncome } from "@/hooks/useUpdateIncome";
+import { useDeleteIncome } from "@/hooks/useDeleteIncome";
 import { editIncomeSchema, type EditIncomeFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,7 +17,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type EditIncomeFormProps = {
   income: { id: string; name: string | null; amount: number };
@@ -33,7 +32,8 @@ export function EditIncomeForm({
   onSuccess,
 }: EditIncomeFormProps) {
   const insets = useSafeAreaInsets();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const updateIncomeMutation = useUpdateIncome();
+  const deleteIncomeMutation = useDeleteIncome();
 
   const form = useForm<EditIncomeFormData>({
     resolver: zodResolver(editIncomeSchema),
@@ -60,19 +60,17 @@ export function EditIncomeForm({
   };
 
   const onSubmit = async (data: EditIncomeFormData) => {
-    const { error } = await updateIncome({
-      incomeId: income.id,
-      name: data.name,
-      amount: parseFloat(data.amount),
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await updateIncomeMutation.mutateAsync({
+        incomeId: income.id,
+        name: data.name,
+        amount: parseFloat(data.amount),
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   const handleDelete = () => {
@@ -85,22 +83,20 @@ export function EditIncomeForm({
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            setIsDeleting(true);
-            const { error } = await deleteIncome({ incomeId: income.id });
-            setIsDeleting(false);
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
+            try {
+              await deleteIncomeMutation.mutateAsync({ incomeId: income.id });
+              onSuccess();
+              handleClose();
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
             }
-            onSuccess();
-            handleClose();
           },
         },
       ]
     );
   };
 
-  const isSubmitting = form.formState.isSubmitting || isDeleting;
+  const isSubmitting = form.formState.isSubmitting || deleteIncomeMutation.isPending;
 
   return (
     <Modal

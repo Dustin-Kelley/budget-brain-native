@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
-import { addTransaction } from "@/lib/mutations/addTransaction";
+import { useAddTransaction } from "@/hooks/useAddTransaction";
 import { blendHex, formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -55,6 +55,7 @@ function QuickAddExpenseModal({
   onSuccess,
 }: QuickAddExpenseModalProps) {
   const insets = useSafeAreaInsets();
+  const addTransaction = useAddTransaction();
   const lineItems = category.line_items ?? [];
   const firstLineItemId = lineItems[0]?.id ?? null;
 
@@ -65,7 +66,6 @@ function QuickAddExpenseModal({
     new Date().toISOString().split("T")[0]
   );
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedLineItem = lineItems.find((item) => item.id === lineItemId);
 
@@ -84,25 +84,21 @@ function QuickAddExpenseModal({
       return;
     }
 
-    setIsSubmitting(true);
-    const { error } = await addTransaction({
-      amount: amountNum,
-      description: description.trim() || undefined,
-      lineItemId,
-      dateOfTransaction: date.trim(),
-      householdId,
-      userId,
-      monthKey,
-    });
-    setIsSubmitting(false);
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addTransaction.mutateAsync({
+        amount: amountNum,
+        description: description.trim() || undefined,
+        lineItemId,
+        dateOfTransaction: date.trim(),
+        householdId,
+        userId,
+        monthKey,
+      });
+      onSuccess();
+      onClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    onClose();
   };
 
   return (
@@ -135,7 +131,7 @@ function QuickAddExpenseModal({
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="decimal-pad"
-                editable={!isSubmitting}
+                editable={!addTransaction.isPending}
               />
             </View>
 
@@ -146,7 +142,7 @@ function QuickAddExpenseModal({
                 placeholder="Optional"
                 value={description}
                 onChangeText={setDescription}
-                editable={!isSubmitting}
+                editable={!addTransaction.isPending}
               />
             </View>
 
@@ -195,7 +191,7 @@ function QuickAddExpenseModal({
                 placeholder="YYYY-MM-DD"
                 value={date}
                 onChangeText={setDate}
-                editable={!isSubmitting}
+                editable={!addTransaction.isPending}
               />
             </View>
           </View>
@@ -205,8 +201,8 @@ function QuickAddExpenseModal({
         className="border-t border-gray-200 px-4 pt-4"
         style={{ paddingBottom: 16 + insets.bottom }}
       >
-        <Button onPress={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? (
+        <Button onPress={handleSubmit} disabled={addTransaction.isPending}>
+          {addTransaction.isPending ? (
             <ActivityIndicator color="white" />
           ) : (
             <Text>Save expense</Text>

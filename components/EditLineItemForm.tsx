@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { deleteLineItem } from "@/lib/mutations/deleteLineItem";
-import { updateLineItem } from "@/lib/mutations/updateLineItem";
+import { useDeleteLineItem } from "@/hooks/useDeleteLineItem";
+import { useUpdateLineItem } from "@/hooks/useUpdateLineItem";
 import { editLineItemSchema, type EditLineItemFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -36,7 +35,8 @@ export function EditLineItemForm({
   onSuccess,
 }: EditLineItemFormProps) {
   const insets = useSafeAreaInsets();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const updateLineItemMutation = useUpdateLineItem();
+  const deleteLineItemMutation = useDeleteLineItem();
 
   const form = useForm<EditLineItemFormData>({
     resolver: zodResolver(editLineItemSchema),
@@ -72,15 +72,13 @@ export function EditLineItemForm({
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            setIsDeleting(true);
-            const { error } = await deleteLineItem({ lineItemId: lineItem.id });
-            setIsDeleting(false);
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
+            try {
+              await deleteLineItemMutation.mutateAsync({ lineItemId: lineItem.id });
+              onSuccess();
+              handleClose();
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
             }
-            onSuccess();
-            handleClose();
           },
         },
       ]
@@ -88,23 +86,21 @@ export function EditLineItemForm({
   };
 
   const onSubmit = async (data: EditLineItemFormData) => {
-    const { error } = await updateLineItem({
-      lineItemId: lineItem.id,
-      lineItemName: data.name,
-      categoryId,
-      plannedAmount: parseFloat(data.plannedAmount),
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await updateLineItemMutation.mutateAsync({
+        lineItemId: lineItem.id,
+        lineItemName: data.name,
+        categoryId,
+        plannedAmount: parseFloat(data.plannedAmount),
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
-  const isSubmitting = form.formState.isSubmitting || isDeleting;
+  const isSubmitting = form.formState.isSubmitting || deleteLineItemMutation.isPending;
 
   return (
     <Modal

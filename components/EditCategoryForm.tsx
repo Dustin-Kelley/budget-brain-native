@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { updateCategory } from "@/lib/mutations/updateCategory";
+import { useUpdateCategory } from "@/hooks/useUpdateCategory";
 import { editCategorySchema, type EditCategoryFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Category } from "@/types";
@@ -32,6 +32,7 @@ export function EditCategoryForm({
   onSuccess,
 }: EditCategoryFormProps) {
   const insets = useSafeAreaInsets();
+  const updateCategoryMutation = useUpdateCategory();
 
   const form = useForm<EditCategoryFormData>({
     resolver: zodResolver(editCategorySchema),
@@ -49,18 +50,16 @@ export function EditCategoryForm({
   };
 
   const onSubmit = async (data: EditCategoryFormData) => {
-    const { error } = await updateCategory({
-      categoryId: category.id,
-      name: data.name,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await updateCategoryMutation.mutateAsync({
+        categoryId: category.id,
+        name: data.name,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   return (

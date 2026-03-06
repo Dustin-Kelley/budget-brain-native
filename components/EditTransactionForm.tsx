@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
-import { deleteTransaction } from "@/lib/mutations/deleteTransaction";
-import { updateTransaction } from "@/lib/mutations/updateTransaction";
+import { useDeleteTransaction } from "@/hooks/useDeleteTransaction";
+import { useUpdateTransaction } from "@/hooks/useUpdateTransaction";
 import { editTransactionSchema, type EditTransactionFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems, LineItem } from "@/types";
@@ -65,7 +65,8 @@ export function EditTransactionForm({
   const lineItems = flattenLineItems(categories);
   const insets = useSafeAreaInsets();
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const updateTransactionMutation = useUpdateTransaction();
+  const deleteTransactionMutation = useDeleteTransaction();
 
   const getDefaults = () => ({
     amount: String(transaction.amount ?? 0),
@@ -95,24 +96,22 @@ export function EditTransactionForm({
   const onSubmit = async (data: EditTransactionFormData) => {
     if (!transaction.id) return;
 
-    const { error } = await updateTransaction({
-      transactionId: transaction.id,
-      amount: parseFloat(data.amount),
-      description: data.description?.trim() || undefined,
-      lineItemId: data.lineItemId,
-      dateOfTransaction: data.date,
-      monthKey,
-      householdId,
-      userId,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await updateTransactionMutation.mutateAsync({
+        transactionId: transaction.id,
+        amount: parseFloat(data.amount),
+        description: data.description?.trim() || undefined,
+        lineItemId: data.lineItemId,
+        dateOfTransaction: data.date,
+        monthKey,
+        householdId,
+        userId,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   const handleDelete = () => {
@@ -126,22 +125,20 @@ export function EditTransactionForm({
           style: "destructive",
           onPress: async () => {
             if (!transaction.id) return;
-            setIsDeleting(true);
-            const { error } = await deleteTransaction({ transactionId: transaction.id });
-            setIsDeleting(false);
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
+            try {
+              await deleteTransactionMutation.mutateAsync({ transactionId: transaction.id });
+              onSuccess();
+              handleClose();
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
             }
-            onSuccess();
-            handleClose();
           },
         },
       ]
     );
   };
 
-  const isSubmitting = form.formState.isSubmitting || isDeleting;
+  const isSubmitting = form.formState.isSubmitting || deleteTransactionMutation.isPending;
 
   return (
     <Modal

@@ -1,3 +1,4 @@
+import { logError } from '@/hooks/useLogError';
 import { supabase } from '@/lib/supabase';
 
 export async function getHousehold(householdId: string | null) {
@@ -12,7 +13,7 @@ export async function getHousehold(householdId: string | null) {
     .maybeSingle();
 
   if (error) {
-    console.error(error);
+    logError(error, { tags: { query: 'getHousehold' } });
     return { household: null, error };
   }
 

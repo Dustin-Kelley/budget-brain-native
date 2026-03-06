@@ -1,3 +1,4 @@
+import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export async function getSpentByCategory({
     .eq("year", yearNumber);
 
   if (txError) {
+    logError(txError, { tags: { query: 'getSpentByCategory' } });
     return { categorySpent: [], error: txError as Error };
   }
 
@@ -45,6 +47,7 @@ export async function getSpentByCategory({
     .in("id", lineItemIds);
 
   if (liError) {
+    logError(liError, { tags: { query: 'getSpentByCategory' } });
     return { categorySpent: [], error: liError as Error };
   }
 

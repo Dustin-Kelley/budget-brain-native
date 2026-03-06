@@ -5,7 +5,7 @@ import { useEnsureUserRow } from '@/hooks/useEnsureUserRow';
 export function useOnboardingCheck() {
   const { user: authUser } = useAuth();
   const { isSuccess: userRowReady } = useEnsureUserRow();
-  const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const { currentUser, isCurrentUserLoading: userLoading } = useCurrentUser();
 
   const isLoading = !userRowReady || userLoading;
 

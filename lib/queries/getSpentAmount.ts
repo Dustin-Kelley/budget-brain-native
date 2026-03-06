@@ -1,3 +1,4 @@
+import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ export async function getSpentAmount({
     .eq("year", yearNumber);
 
   if (error) {
+    logError(error, { tags: { query: 'getSpentAmount' } });
     return { spentAmount: 0, error: error as Error };
   }
 

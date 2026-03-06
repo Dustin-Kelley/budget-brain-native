@@ -28,26 +28,41 @@ export function useBudgetPlan() {
 
   const categoriesQuery = useQuery({
     queryKey: ["plan-categories", householdId, monthKey],
-    queryFn: () => getCategories({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { categories, error } = await getCategories({ date: monthKey, householdId });
+      if (error) throw error;
+      return { categories };
+    },
     enabled: !!householdId,
   });
 
   const incomeQuery = useQuery({
     queryKey: ["plan-income", householdId, monthKey, userId],
-    queryFn: () =>
-      getTotalIncome({ date: monthKey, householdId, userId }),
+    queryFn: async () => {
+      const { income, totalIncome, error } = await getTotalIncome({ date: monthKey, householdId, userId });
+      if (error) throw error;
+      return { income, totalIncome };
+    },
     enabled: !!householdId && !!userId,
   });
 
   const transactionsQuery = useQuery({
     queryKey: ["plan-transactions", householdId, monthKey],
-    queryFn: () => getTransactions({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { transactions, error } = await getTransactions({ date: monthKey, householdId });
+      if (error) throw error;
+      return { transactions };
+    },
     enabled: !!householdId,
   });
 
   const transactionsListQuery = useQuery({
     queryKey: ["plan-transactions-list", householdId, monthKey],
-    queryFn: () => getTransactionsList({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { groupedTransactions, sortedDates, error } = await getTransactionsList({ date: monthKey, householdId });
+      if (error) throw error;
+      return { groupedTransactions, sortedDates };
+    },
     enabled: !!householdId,
   });
 

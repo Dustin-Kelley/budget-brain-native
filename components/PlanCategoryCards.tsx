@@ -4,7 +4,7 @@ import { EditCategoryForm } from "@/components/EditCategoryForm";
 import { EditLineItemForm } from "@/components/EditLineItemForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { deleteCategory } from "@/lib/mutations/deleteCategory";
+import { useDeleteCategory } from "@/hooks/useDeleteCategory";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
 import { useState } from "react";
@@ -36,6 +36,7 @@ export function PlanCategoryCards({
   monthKey,
   onRefetch,
 }: PlanCategoryCardsProps) {
+  const deleteCategoryMutation = useDeleteCategory();
   const [editingLineItem, setEditingLineItem] = useState<{
     item: LineItem;
     categoryId: string;
@@ -64,12 +65,12 @@ export function PlanCategoryCards({
                   text: "Delete",
                   style: "destructive",
                   onPress: async () => {
-                    const { error } = await deleteCategory({ categoryId: category.id });
-                    if (error) {
-                      Alert.alert("Error", error.message);
-                      return;
+                    try {
+                      await deleteCategoryMutation.mutateAsync({ categoryId: category.id });
+                      onRefetch?.();
+                    } catch (error) {
+                      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
                     }
-                    onRefetch?.();
                   },
                 },
               ]

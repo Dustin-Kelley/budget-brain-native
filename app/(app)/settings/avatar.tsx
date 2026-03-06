@@ -3,32 +3,30 @@ import { EmojiAvatarPicker } from "@/components/EmojiAvatarPicker";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Text } from "@/components/ui/text";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { updateUserProfile } from "@/lib/mutations/updateUserProfile";
-import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
 import { useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 
 export default function AvatarScreen() {
   const { currentUser } = useCurrentUser();
-  const queryClient = useQueryClient();
+  const updateProfile = useUpdateUserProfile();
   const [saving, setSaving] = useState(false);
 
   const handleSelect = async (emoji: string) => {
     if (!currentUser || saving) return;
     setSaving(true);
-    const { error } = await updateUserProfile({
-      userId: currentUser.id,
-      firstName: currentUser.first_name ?? "",
-      lastName: currentUser.last_name ?? "",
-      avatarEmoji: emoji,
-    });
-    setSaving(false);
-
-    if (error) {
+    try {
+      await updateProfile.mutateAsync({
+        userId: currentUser.id,
+        firstName: currentUser.first_name ?? "",
+        lastName: currentUser.last_name ?? "",
+        avatarEmoji: emoji,
+      });
+    } catch {
       Alert.alert("Error", "Failed to save avatar.");
-      return;
+    } finally {
+      setSaving(false);
     }
-    queryClient.invalidateQueries({ queryKey: ["currentUser"] });
   };
 
   return (

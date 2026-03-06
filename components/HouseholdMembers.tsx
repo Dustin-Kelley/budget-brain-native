@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
-import { addHouseholdMember } from "@/lib/mutations/addHouseholdMember";
-import { removeHouseholdMember } from "@/lib/mutations/removeHouseholdMember";
+import { useAddHouseholdMember } from "@/hooks/useAddHouseholdMember";
+import { useRemoveHouseholdMember } from "@/hooks/useRemoveHouseholdMember";
 import { getHouseholdMembers } from "@/lib/queries/getHouseholdMembers";
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 
@@ -20,13 +20,17 @@ export function HouseholdMembers({
   householdId,
   currentUserId,
 }: HouseholdMembersProps) {
-  const queryClient = useQueryClient();
+  const addMember = useAddHouseholdMember();
+  const removeMember = useRemoveHouseholdMember();
   const [email, setEmail] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["householdMembers", householdId],
-    queryFn: () => getHouseholdMembers({ householdId }),
+    queryFn: async () => {
+      const { members, error } = await getHouseholdMembers({ householdId });
+      if (error) throw error;
+      return { members };
+    },
     enabled: !!householdId,
   });
 
@@ -39,20 +43,15 @@ export function HouseholdMembers({
       return;
     }
 
-    setIsAdding(true);
-    const { error } = await addHouseholdMember({
-      email: trimmed,
-      householdId,
-    });
-    setIsAdding(false);
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addMember.mutateAsync({
+        email: trimmed,
+        householdId,
+      });
+      setEmail("");
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    setEmail("");
-    queryClient.invalidateQueries({ queryKey: ["householdMembers"] });
   };
 
   const handleRemove = (userId: string, memberEmail: string | null) => {
@@ -65,12 +64,11 @@ export function HouseholdMembers({
           text: "Remove",
           style: "destructive",
           onPress: async () => {
-            const { error } = await removeHouseholdMember({ userId });
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
+            try {
+              await removeMember.mutateAsync({ userId });
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
             }
-            queryClient.invalidateQueries({ queryKey: ["householdMembers"] });
           },
         },
       ]
@@ -122,10 +120,10 @@ export function HouseholdMembers({
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
-            editable={!isAdding}
+            editable={!addMember.isPending}
           />
-          <Button onPress={handleAdd} disabled={isAdding} className="px-4">
-            {isAdding ? (
+          <Button onPress={handleAdd} disabled={addMember.isPending} className="px-4">
+            {addMember.isPending ? (
               <ActivityIndicator color="white" />
             ) : (
               <Text>Add</Text>

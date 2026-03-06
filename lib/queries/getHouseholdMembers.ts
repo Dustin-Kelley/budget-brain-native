@@ -1,3 +1,4 @@
+import { logError } from '@/hooks/useLogError';
 import { supabase } from '@/lib/supabase';
 
 export async function getHouseholdMembers({
@@ -13,7 +14,10 @@ export async function getHouseholdMembers({
     .select('id, email, avatar_emoji')
     .eq('household_id', householdId);
 
-  if (error) return { members: [], error: error as Error };
+  if (error) {
+    logError(error, { tags: { query: 'getHouseholdMembers' } });
+    return { members: [], error: error as Error };
+  }
   return {
     members: (data ?? []) as { id: string; email: string | null; avatar_emoji: string | null }[],
     error: null,

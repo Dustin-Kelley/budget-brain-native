@@ -7,7 +7,11 @@ export function useCurrentUser() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['currentUser', authUser?.id],
-    queryFn: () => getCurrentUser(authUser!.id),
+    queryFn: async () => {
+      const { currentUser, error } = await getCurrentUser(authUser!.id);
+      if (error) throw error;
+      return { currentUser };
+    },
     enabled: !!authUser?.id,
   });
 

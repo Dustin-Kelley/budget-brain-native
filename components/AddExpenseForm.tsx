@@ -3,7 +3,7 @@ import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
-import { addTransaction } from "@/lib/mutations/addTransaction";
+import { useAddTransaction } from "@/hooks/useAddTransaction";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import { addExpenseSchema, type AddExpenseFormData } from "@/lib/validations";
@@ -52,6 +52,7 @@ export function AddExpenseForm({
   const insets = useSafeAreaInsets();
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
+  const addTransaction = useAddTransaction();
   const [visible, setVisible] = useState(false);
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
 
@@ -83,23 +84,21 @@ export function AddExpenseForm({
   };
 
   const onSubmit = async (data: AddExpenseFormData) => {
-    const { error } = await addTransaction({
-      amount: parseFloat(data.amount),
-      description: data.description?.trim() || undefined,
-      lineItemId: data.lineItemId,
-      dateOfTransaction: data.date,
-      householdId,
-      userId,
-      monthKey,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addTransaction.mutateAsync({
+        amount: parseFloat(data.amount),
+        description: data.description?.trim() || undefined,
+        lineItemId: data.lineItemId,
+        dateOfTransaction: data.date,
+        householdId,
+        userId,
+        monthKey,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   const tabBarHeight = 49;

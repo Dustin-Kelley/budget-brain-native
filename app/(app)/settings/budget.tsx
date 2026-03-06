@@ -3,18 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useHousehold } from "@/hooks/useHousehold";
-import { resetBudget } from "@/lib/mutations/resetBudget";
+import { useResetBudget } from "@/hooks/useResetBudget";
 import {
   formatMonthYearForDisplay
 } from "@/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { Alert, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BudgetScreen() {
   const { householdId } = useHousehold();
   const { monthKey } = useMonth();
-  const queryClient = useQueryClient();
+  const resetBudget = useResetBudget();
   const insets = useSafeAreaInsets();
 
   const handleResetBudget = () => {
@@ -29,13 +28,12 @@ export default function BudgetScreen() {
           text: "Reset",
           style: "destructive",
           onPress: async () => {
-            const { error } = await resetBudget({ householdId, monthKey });
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
+            try {
+              await resetBudget.mutateAsync({ householdId, monthKey });
+              Alert.alert("Done", `Budget for ${display} has been reset.`);
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
             }
-            queryClient.invalidateQueries();
-            Alert.alert("Done", `Budget for ${display} has been reset.`);
           },
         },
       ]

@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/auth-context';
+import { logError } from '@/hooks/useLogError';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 
@@ -19,7 +20,10 @@ export function useEnsureUserRow() {
           { id: user!.id, email: user!.email },
           { onConflict: 'id', ignoreDuplicates: true }
         );
-      if (error) throw error;
+      if (error) {
+        logError(error, { tags: { query: 'ensureUserRow' } });
+        throw error;
+      }
       return true;
     },
     enabled: !!user?.id,

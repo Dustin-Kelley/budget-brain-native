@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { logError } from "@/hooks/useLogError";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -33,6 +34,7 @@ export default function VerifyOtpScreen() {
     setIsSubmitting(false);
 
     if (error) {
+      logError(error, { tags: { feature: 'auth' } });
       Alert.alert("Verification failed", "Invalid or expired code. Please try again.");
       return;
     }
@@ -46,6 +48,7 @@ export default function VerifyOtpScreen() {
     setIsResending(false);
 
     if (error) {
+      logError(error, { tags: { feature: 'auth' } });
       Alert.alert("Error", error.message);
       return;
     }

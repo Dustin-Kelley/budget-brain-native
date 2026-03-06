@@ -1,3 +1,4 @@
+import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ export async function getTotalIncome({
     .eq("month", monthNumber);
 
   if (error) {
+    logError(error, { tags: { query: 'getTotalIncome' } });
     return { income: [], totalIncome: 0, error: error as Error };
   }
 

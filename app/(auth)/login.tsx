@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { logError } from "@/hooks/useLogError";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
@@ -28,6 +29,7 @@ export default function LoginScreen() {
     const { error } = await sendOtp(data.email.toLowerCase());
 
     if (error) {
+      logError(error, { tags: { feature: 'auth' } });
       Alert.alert("Error", error.message);
       return;
     }

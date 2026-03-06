@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { addIncome } from "@/lib/mutations/addIncome";
+import { useAddIncome } from "@/hooks/useAddIncome";
 import { addIncomeSchema, type AddIncomeFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +31,7 @@ export function AddIncomeForm({
   onSuccess,
 }: AddIncomeFormProps) {
   const insets = useSafeAreaInsets();
+  const addIncome = useAddIncome();
   const [visible, setVisible] = useState(false);
 
   const form = useForm<AddIncomeFormData>({
@@ -45,21 +46,19 @@ export function AddIncomeForm({
   };
 
   const onSubmit = async (data: AddIncomeFormData) => {
-    const { error } = await addIncome({
-      incomeName: data.name,
-      incomeAmount: parseFloat(data.amount),
-      monthKey,
-      householdId,
-      userId,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addIncome.mutateAsync({
+        incomeName: data.name,
+        incomeAmount: parseFloat(data.amount),
+        monthKey,
+        householdId,
+        userId,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   return (

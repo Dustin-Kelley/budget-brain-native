@@ -25,19 +25,31 @@ export function useBudgetOverview() {
 
   const categoriesQuery = useQuery({
     queryKey: ['categories', householdId, monthKey],
-    queryFn: () => getCategories({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { categories, error } = await getCategories({ date: monthKey, householdId });
+      if (error) throw error;
+      return { categories };
+    },
     enabled: !!householdId,
   });
 
   const spentQuery = useQuery({
     queryKey: ['spentAmount', householdId, monthKey],
-    queryFn: () => getSpentAmount({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { spentAmount, error } = await getSpentAmount({ date: monthKey, householdId });
+      if (error) throw error;
+      return { spentAmount };
+    },
     enabled: !!householdId,
   });
 
   const spentByCategoryQuery = useQuery({
     queryKey: ['spentByCategory', householdId, monthKey],
-    queryFn: () => getSpentByCategory({ date: monthKey, householdId }),
+    queryFn: async () => {
+      const { categorySpent, error } = await getSpentByCategory({ date: monthKey, householdId });
+      if (error) throw error;
+      return { categorySpent };
+    },
     enabled: !!householdId,
   });
 
@@ -54,9 +66,6 @@ export function useBudgetOverview() {
     spentQuery.isLoading ||
     spentByCategoryQuery.isLoading;
   const error =
-    categoriesQuery.data?.error ??
-    spentQuery.data?.error ??
-    spentByCategoryQuery.data?.error ??
     categoriesQuery.error ??
     spentQuery.error ??
     spentByCategoryQuery.error;

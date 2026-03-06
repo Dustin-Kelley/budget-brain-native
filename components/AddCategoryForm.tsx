@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
-import { addCategory } from "@/lib/mutations/addCategory";
+import { useAddCategory } from "@/hooks/useAddCategory";
 import { addCategorySchema, type AddCategoryFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,6 +29,7 @@ export function AddCategoryForm({
   onSuccess,
 }: AddCategoryFormProps) {
   const insets = useSafeAreaInsets();
+  const addCategory = useAddCategory();
   const [visible, setVisible] = useState(false);
 
   const form = useForm<AddCategoryFormData>({
@@ -43,19 +44,17 @@ export function AddCategoryForm({
   };
 
   const onSubmit = async (data: AddCategoryFormData) => {
-    const { error } = await addCategory({
-      categoryName: data.categoryName,
-      monthKey,
-      householdId,
-    });
-
-    if (error) {
-      Alert.alert("Error", error.message);
-      return;
+    try {
+      await addCategory.mutateAsync({
+        categoryName: data.categoryName,
+        monthKey,
+        householdId,
+      });
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
-
-    onSuccess();
-    handleClose();
   };
 
   return (

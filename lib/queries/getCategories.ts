@@ -1,3 +1,4 @@
+import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
@@ -23,6 +24,7 @@ export async function getCategories({
     .eq("month", monthNumber);
 
   if (error) {
+    logError(error, { tags: { query: 'getCategories' } });
     return { categories: null, error: error as Error };
   }
   return {
