@@ -1,5 +1,6 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { AppHeader } from "@/components/AppHeader";
+import { BudgetSetupWizard } from "@/components/BudgetSetupWizard";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
@@ -37,6 +38,10 @@ export default function PlanScreen() {
 
   const { isRollingOver } = useAutoRollover();
   const [activeTab, setActiveTab] = useState("planned");
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+
+  const hasBudgetThisMonth = totalPlanned > 0;
+  const showWizard = !hasBudgetThisMonth && !wizardDismissed;
 
   if (householdLoading || planLoading || isRollingOver) {
     return (
@@ -58,6 +63,23 @@ export default function PlanScreen() {
           </Text>
         </Card>
       </View>
+    );
+  }
+
+  if (showWizard && householdId && currentUser?.id) {
+    return (
+      <BudgetSetupWizard
+        householdId={householdId}
+        userId={currentUser.id}
+        monthKey={monthKey}
+        income={income}
+        totalIncome={totalIncome}
+        categories={categories}
+        totalPlanned={totalPlanned}
+        monthLabel={monthLabel}
+        refetch={refetch}
+        onComplete={() => setWizardDismissed(true)}
+      />
     );
   }
 

@@ -47,11 +47,7 @@ export default function AppLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Label>Settings</Label>
-        {isIOS ? (
-          <Icon sf="gear" />
-        ) : (
-          <Icon src={<VectorIcon family={Ionicons} name="settings" />} />
-        )}
+        <Icon src={<VectorIcon family={Ionicons} name="settings" />} />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
