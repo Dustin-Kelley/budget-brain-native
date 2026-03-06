@@ -27,6 +27,15 @@ Code should be easy for a human to read and understand. When opening any module,
 
 ---
 
+## TypeScript
+
+- **Infer types as much as possible.** Let TypeScript infer types from values, function returns, and generics instead of writing explicit annotations everywhere.
+- **Don’t manually type unless necessary.** Add type annotations only when inference isn’t enough (e.g. public API boundaries, ambiguous literals, or when the compiler needs help).
+- **Avoid type casts** (`as`, type assertions) unless we are certain they are required. Prefer fixing the types (narrowing, better generics, or typing the source) so the need for a cast goes away.
+- **Prioritize clean types:** well-shaped data and clear interfaces over casting or `any` to unblock. If types are awkward, improve the design rather than forcing the type system.
+
+---
+
 ## Query hooks (TanStack Query / React Query)
 
 Use this convention for all query hooks so behavior and return shapes stay consistent.
