@@ -11,6 +11,7 @@ import { addExpenseSchema, type AddExpenseFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
 import {
@@ -105,16 +106,32 @@ export function AddExpenseForm({
   const tabBarHeight = 49;
   const fabGapAboveTabs = 12;
   const fabBottom = insets.bottom + tabBarHeight + fabGapAboveTabs;
+  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
   return (
     <>
-      <Pressable
-        onPress={() => setVisible(true)}
-        className="absolute right-4 h-14 w-14 items-center justify-center rounded-full shadow-lg"
-        style={{ bottom: fabBottom, backgroundColor: blendHex(theme.colors[0], theme.colors[1]) }}
+      <View
+        style={{
+          position: "absolute",
+          right: 16,
+          bottom: fabBottom,
+          borderRadius: 28,
+          overflow: "hidden",
+          borderWidth: 0.5,
+          borderColor: "rgba(255,255,255,0.3)",
+        }}
+        className="shadow-lg"
       >
-        <Ionicons name="add" size={28} color="white" />
-      </Pressable>
+        <BlurView tint="prominent" intensity={50}>
+          <Pressable
+            onPress={() => setVisible(true)}
+            className="h-14 w-14 items-center justify-center"
+            style={{ backgroundColor: accentColor + "B3" }}
+          >
+            <Ionicons name="add" size={28} color="white" />
+          </Pressable>
+        </BlurView>
+      </View>
 
       <Modal
         visible={visible}
@@ -122,18 +139,21 @@ export function AddExpenseForm({
         transparent
         onRequestClose={handleClose}
       >
-        <View className="flex-1 justify-end bg-black/50">
+        <View className="flex-1 justify-end bg-black/40">
           <View className="h-[90%] flex flex-col rounded-t-2xl bg-white shadow-none">
+            <View className="items-center mt-2 mb-1">
+              <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+            </View>
             {showLineItemPicker ? (
               <>
-                <View className="shrink-0 border-b border-gray-200 px-4 py-3">
+                <View className="shrink-0 border-b border-gray-100 px-4 py-3">
                   <View className="flex-row items-center justify-between">
                     <BackButton onPress={() => setShowLineItemPicker(false)} />
-                    <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                    <Pressable onPress={handleClose} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200">
                       <Ionicons name="close" size={16} color="#6B7280" />
                     </Pressable>
                   </View>
-                  <Text className="mt-2 text-lg font-semibold text-gray-900">
+                  <Text className="mt-2 text-lg font-semibold text-gray-800">
                     Select Budget Item
                   </Text>
                 </View>
@@ -164,7 +184,7 @@ export function AddExpenseForm({
                                 }}
                                 className={`flex-row items-center justify-between px-4 py-3 active:bg-gray-100 ${index > 0 ? "border-t border-gray-200" : ""}`}
                               >
-                                <Text className="font-medium text-gray-900">
+                                <Text className="font-medium text-gray-800">
                                   {item.name ?? "Item"}
                                 </Text>
                                 {lineItemId === item.id && (
@@ -181,12 +201,12 @@ export function AddExpenseForm({
               </>
             ) : (
               <>
-                <View className="shrink-0 border-b border-gray-200 px-4 py-3">
+                <View className="shrink-0 border-b border-gray-100 px-4 py-3">
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-lg font-semibold text-gray-900">
+                    <Text className="text-lg font-semibold text-gray-800">
                       Add New Expense
                     </Text>
-                    <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                    <Pressable onPress={handleClose} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200">
                       <Ionicons name="close" size={16} color="#6B7280" />
                     </Pressable>
                   </View>
@@ -227,7 +247,7 @@ export function AddExpenseForm({
                             <Text
                               className={
                                 selectedLineItem
-                                  ? "text-gray-900"
+                                  ? "text-gray-800"
                                   : "text-gray-400"
                               }
                             >

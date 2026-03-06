@@ -81,7 +81,7 @@ export function CategoryPieChart({ categorySpent }: CategoryPieChartProps) {
 
   return (
     <Card className="gap-0 p-4">
-      <Text className="mb-3 font-semibold text-gray-900">
+      <Text className="mb-3 font-semibold text-gray-800">
         Spending by Category
       </Text>
       <View className="items-center">
@@ -105,6 +105,7 @@ export function CategoryPieChart({ categorySpent }: CategoryPieChartProps) {
               )
             )}
           </G>
+          <Circle cx={cx} cy={cy} r={50} fill="white" />
         </Svg>
       </View>
       <View className="mt-3 gap-2">
@@ -122,7 +123,7 @@ export function CategoryPieChart({ categorySpent }: CategoryPieChartProps) {
                 {slice.category_name ?? "Category"}
               </Text>
             </View>
-            <Text className="text-sm font-medium text-gray-900">
+            <Text className="text-sm font-medium text-gray-800">
               {formatCurrency(slice.spent)}
             </Text>
           </View>

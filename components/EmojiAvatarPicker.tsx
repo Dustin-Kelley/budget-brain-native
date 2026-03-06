@@ -27,7 +27,7 @@ export function EmojiAvatarPicker({ selected, onSelect }: EmojiAvatarPickerProps
   const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
   return (
-    <View className="flex-row flex-wrap gap-2">
+    <View className="flex-row flex-wrap gap-2.5">
       {PEOPLE_EMOJIS.map((emoji) => {
         const isSelected = emoji === selected;
         return (
@@ -35,10 +35,10 @@ export function EmojiAvatarPicker({ selected, onSelect }: EmojiAvatarPickerProps
             key={emoji}
             onPress={() => onSelect(emoji)}
             className={cn(
-              "h-12 w-12 items-center justify-center rounded-xl",
+              "h-12 w-12 items-center justify-center rounded-2xl",
               isSelected ? "scale-110" : "active:scale-95"
             )}
-            style={isSelected ? { backgroundColor: accentColor + "30", borderWidth: 2, borderColor: accentColor } : undefined}
+            style={isSelected ? { backgroundColor: accentColor + "30", borderWidth: 1.5, borderColor: accentColor } : undefined}
           >
             <Text className="text-2xl">{emoji}</Text>
           </Pressable>

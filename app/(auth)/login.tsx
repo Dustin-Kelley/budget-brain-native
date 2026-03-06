@@ -44,7 +44,7 @@ export default function LoginScreen() {
     >
       <View className="w-full max-w-[400px] self-center">
         <Logo />
-        <Text className="mt-4 text-center text-3xl font-bold">Budget Brain</Text>
+        <Text className="mt-6 text-center text-3xl font-bold">Budget Brain</Text>
         <Text className="mb-8 text-center text-lg text-muted-foreground">
           Enter your email to get started
         </Text>

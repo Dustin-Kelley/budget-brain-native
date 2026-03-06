@@ -6,6 +6,7 @@ import {
   getMonthYearString,
 } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { Pressable, View } from "react-native";
 
 export function MonthSelector() {
@@ -34,24 +35,36 @@ export function MonthSelector() {
   };
 
   return (
-    <View className="m-4 flex-row items-center justify-between gap-4 rounded-full bg-white p-2 shadow-sm shadow-black/10">
-      <Pressable
-        onPress={goPrevious}
-        className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
-        hitSlop={12}
+    <View className="m-4" style={{ borderRadius: 9999, overflow: "hidden" }}>
+      <BlurView
+        tint="light"
+        intensity={40}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          padding: 8,
+        }}
       >
-        <Ionicons name="chevron-back" size={20} color="#6B7280" />
-      </Pressable>
-      <Text className="text-base font-semibold tracking-tight text-gray-900">
-        {displayLabel}
-      </Text>
-      <Pressable
-        onPress={goNext}
-        className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
-        hitSlop={12}
-      >
-        <Ionicons name="chevron-forward" size={20} color="#6B7280" />
-      </Pressable>
+        <Pressable
+          onPress={goPrevious}
+          className="h-10 w-10 items-center justify-center rounded-full active:bg-white/20"
+          hitSlop={12}
+        >
+          <Ionicons name="chevron-back" size={20} color="rgba(255,255,255,0.8)" />
+        </Pressable>
+        <Text className="text-base font-semibold tracking-tight text-white">
+          {displayLabel}
+        </Text>
+        <Pressable
+          onPress={goNext}
+          className="h-10 w-10 items-center justify-center rounded-full active:bg-white/20"
+          hitSlop={12}
+        >
+          <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.8)" />
+        </Pressable>
+      </BlurView>
     </View>
   );
 }

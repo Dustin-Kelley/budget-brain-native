@@ -5,12 +5,13 @@ import { Text } from "@/components/ui/text";
 
 type UserAvatarProps = {
   emoji: string | null | undefined;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 };
 
 const sizeStyles = {
   sm: { container: "h-8 w-8", emoji: "text-base", iconSize: 16 },
   md: { container: "h-12 w-12", emoji: "text-2xl", iconSize: 24 },
+  lg: { container: "h-20 w-20", emoji: "text-4xl", iconSize: 36 },
 } as const;
 
 export function UserAvatar({ emoji, size = "sm" }: UserAvatarProps) {

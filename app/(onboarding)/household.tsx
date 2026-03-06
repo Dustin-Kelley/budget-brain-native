@@ -63,7 +63,7 @@ export default function HouseholdScreen() {
 
   return (
     <OnboardingBackground>
-      <View className="flex-1 justify-between px-6 pb-12 pt-20">
+      <View className="flex-1 justify-between px-6 pb-16 pt-20">
         <View className="gap-8">
           <BackButton />
           <StepIndicator currentStep={2} totalSteps={3} />

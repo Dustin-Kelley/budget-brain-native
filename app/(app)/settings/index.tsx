@@ -46,12 +46,12 @@ export default function SettingsMenuScreen() {
 
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
-      <View className="gap-3">
-        {menuItems.map((item) => (
+      <View className="rounded-2xl overflow-hidden bg-card">
+        {menuItems.map((item, index) => (
           <Pressable
             key={item.label}
             onPress={() => router.push(item.route)}
-            className="bg-card border-border flex-row items-center rounded-2xl border px-5 py-4 shadow-sm shadow-black/5 active:opacity-80"
+            className={`flex-row items-center px-5 py-5 active:opacity-80 ${index < menuItems.length - 1 ? "border-b border-gray-100" : ""}`}
           >
             <View
               className="items-center justify-center rounded-xl"

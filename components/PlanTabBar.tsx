@@ -1,7 +1,8 @@
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
-import { blendHex, cn, hexToRgba } from "@/lib/utils";
+import { blendHex, cn } from "@/lib/utils";
+import { BlurView } from "expo-blur";
 import { Pressable, View } from "react-native";
 
 const PLAN_TABS = [
@@ -16,10 +17,6 @@ interface PlanTabBarProps {
   className?: string;
 }
 
-/**
- * Tab bar for the Plan screen. Uses the selected header theme for styling.
- * State-driven (no Tabs context) so it can live in the header while content is rendered by the screen.
- */
 export function PlanTabBar({
   value,
   onValueChange,
@@ -27,32 +24,52 @@ export function PlanTabBar({
 }: PlanTabBarProps) {
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
-  const trackBackground = hexToRgba(theme.colors[0], 0.4);
-  const selectedBackground = "white";
 
   return (
     <View
-      className={cn("mt-1 w-full flex-row rounded-lg p-[3px]", className)}
-      style={{ backgroundColor: trackBackground }}
+      className={cn("mt-1 w-full rounded-lg overflow-hidden", className)}
     >
-      {PLAN_TABS.map((tab) => {
-        const isActive = value === tab.value;
-        return (
-          <Pressable
-            key={tab.value}
-            className="flex-1 items-center justify-center rounded-md py-1.5"
-            style={isActive ? { backgroundColor: selectedBackground } : undefined}
-            onPress={() => onValueChange(tab.value)}
-          >
-            <Text
-              className="text-sm font-bold"
-              style={{ color: isActive ? blendHex(theme.colors[0], theme.colors[1]) : "#fff" }}
+      <BlurView
+        tint="light"
+        intensity={30}
+        style={{
+          flexDirection: "row",
+          padding: 4,
+        }}
+      >
+        {PLAN_TABS.map((tab) => {
+          const isActive = value === tab.value;
+          return (
+            <Pressable
+              key={tab.value}
+              className="flex-1 items-center justify-center rounded-md py-1.5"
+              style={
+                isActive
+                  ? {
+                      backgroundColor: "rgba(255,255,255,0.85)",
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 2,
+                    }
+                  : undefined
+              }
+              onPress={() => onValueChange(tab.value)}
             >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+              <Text
+                className="text-sm font-bold"
+                style={{
+                  color: isActive
+                    ? blendHex(theme.colors[0], theme.colors[1])
+                    : "rgba(255,255,255,0.7)",
+                }}
+              >
+                {tab.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </BlurView>
     </View>
   );
 }

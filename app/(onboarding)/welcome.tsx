@@ -43,7 +43,7 @@ export default function WelcomeScreen() {
 
   return (
     <OnboardingBackground>
-      <View className="flex-1 justify-between px-6 pb-12 pt-20">
+      <View className="flex-1 justify-between px-6 pb-16 pt-20">
         <BackButton />
         <View className="flex-1 items-center justify-center gap-6">
           <StepIndicator currentStep={3} totalSteps={3} />

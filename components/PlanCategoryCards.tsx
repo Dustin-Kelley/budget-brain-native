@@ -85,7 +85,7 @@ export function PlanCategoryCards({
   if (error) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="font-semibold text-gray-900">Planned</Text>
+        <Text className="font-semibold text-gray-800">Planned</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading categories</Text>
       </Card>
     );
@@ -95,7 +95,7 @@ export function PlanCategoryCards({
     return (
       <View className="gap-4">
         <View className="flex-row items-center justify-between">
-          <Text className="font-semibold text-gray-900">Planned</Text>
+          <Text className="font-semibold text-gray-800">Planned</Text>
           {householdId && monthKey && onRefetch && (
             <AddCategoryForm
               householdId={householdId}
@@ -142,9 +142,9 @@ export function PlanCategoryCards({
           >
             <Pressable
               onPress={() => handleCategoryPress(category)}
-              className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3 active:bg-gray-50"
+              className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3.5 active:bg-gray-50"
             >
-              <Text className="font-semibold text-gray-900" numberOfLines={1}>
+              <Text className="font-semibold text-gray-800" numberOfLines={1}>
                 {category.name ?? "Category"}
               </Text>
               <Text className="text-gray-600">
@@ -160,12 +160,12 @@ export function PlanCategoryCards({
                   onRefetch &&
                   setEditingLineItem({ item, categoryId: category.id })
                 }
-                className="flex-row items-center justify-between border-b border-gray-50 px-4 py-2 last:border-b-0 active:bg-gray-50"
+                className="flex-row items-center justify-between border-b border-gray-50 px-4 py-2.5 last:border-b-0 active:bg-gray-50"
               >
-                <Text className="text-gray-700 pl-2" numberOfLines={1}>
+                <Text className="text-gray-700 pl-3" numberOfLines={1}>
                   {item.name ?? "Line item"}
                 </Text>
-                <Text className="font-medium text-gray-900">
+                <Text className="font-medium text-gray-800">
                   {formatCurrency(item.planned_amount ?? 0)}
                 </Text>
               </Pressable>

@@ -11,14 +11,14 @@ module.exports = {
         input: '#e2e8f0',
         ring: '#94a3b8',
         background: '#ffffff',
-        foreground: '#0f172a',
+        foreground: '#1e293b',
         primary: {
-          DEFAULT: '#0f172a',
+          DEFAULT: '#1e293b',
           foreground: '#f8fafc',
         },
         secondary: {
           DEFAULT: '#f1f5f9',
-          foreground: '#0f172a',
+          foreground: '#1e293b',
         },
         destructive: {
           DEFAULT: '#ef4444',
@@ -30,7 +30,7 @@ module.exports = {
         },
         accent: {
           DEFAULT: '#f1f5f9',
-          foreground: '#0f172a',
+          foreground: '#1e293b',
         },
       },
     },

@@ -1,13 +1,15 @@
 import { MonthSelector } from "@/components/MonthSelector";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
+import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
+import { View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+const AnimatedView = Animated.View;
 
 interface PlanHeaderProps {
   animatedStyle?: StyleProp<ViewStyle>;
@@ -15,10 +17,6 @@ interface PlanHeaderProps {
   children?: React.ReactNode;
 }
 
-/**
- * Header for the Plan screen: same gradient and month selector as AppHeader,
- * with an optional slot below (e.g. tab triggers) via children.
- */
 export function PlanHeader({
   animatedStyle,
   headerHeight,
@@ -35,10 +33,7 @@ export function PlanHeader({
   };
 
   return (
-    <AnimatedLinearGradient
-      colors={theme.colors}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
+    <AnimatedView
       onLayout={handleLayout}
       style={[
         {
@@ -46,6 +41,15 @@ export function PlanHeader({
           left: 0,
           right: 0,
           zIndex: 10,
+          overflow: "hidden",
+        },
+        animatedStyle,
+      ]}
+    >
+      <BlurView
+        tint="prominent"
+        intensity={60}
+        style={{
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
@@ -53,12 +57,34 @@ export function PlanHeader({
           paddingHorizontal: 16,
           paddingBottom: 8,
           paddingTop: top,
-        },
-        animatedStyle,
-      ]}
-    >
-      <MonthSelector />
-      {children}
-    </AnimatedLinearGradient>
+        }}
+      >
+        <LinearGradient
+          colors={theme.colors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.6,
+          }}
+        />
+        <MonthSelector />
+        {children}
+      </BlurView>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          borderBottomWidth: 0.5,
+          borderBottomColor: "rgba(255,255,255,0.2)",
+        }}
+      />
+    </AnimatedView>
   );
 }

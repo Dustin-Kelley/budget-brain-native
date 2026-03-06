@@ -1,4 +1,3 @@
-import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
@@ -40,29 +39,23 @@ export default function BudgetScreen() {
     );
   };
 
-
-
   return (
     <ScrollView
       className="flex-1"
       contentContainerStyle={{
-        padding: 24,
-        paddingTop: 24 + insets.top,
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+        paddingTop: insets.top + 56,
       }}
     >
-      <View className="gap-6">
-        <View className="flex-row items-center gap-2">
-          <BackButton />
-          <Text variant="h3" className="items-center">Budget</Text>
-        </View>
+      <View className="gap-8">
         <View className="gap-3">
-          <Text className="text-base font-semibold text-gray-900">
+          <Text className="text-base font-semibold text-gray-800">
             Budget for {formatMonthYearForDisplay(monthKey)}
           </Text>
           <Button variant="outline" onPress={handleResetBudget}>
             <Text>Reset Budget</Text>
           </Button>
-
         </View>
       </View>
     </ScrollView>

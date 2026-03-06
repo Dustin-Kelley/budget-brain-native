@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
-import { blendHex, formatCurrency } from "@/lib/utils";
+import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { View } from "react-native";
 
@@ -20,7 +20,7 @@ export function CategorySpendingList({
 }: CategorySpendingListProps) {
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
-  const barColor = blendHex(theme.colors[0], theme.colors[1]);
+  const barColor = hexToRgba(blendHex(theme.colors[0], theme.colors[1]), 0.65);
 
   const plannedByCategory = new Map<string, number>();
   if (categories) {
@@ -35,7 +35,7 @@ export function CategorySpendingList({
   if (error) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="text-base font-semibold text-gray-900">
+        <Text className="text-base font-semibold text-gray-800">
           Spending by Category
         </Text>
         <Text className="mt-2 text-sm text-red-600">Error loading categories</Text>
@@ -46,7 +46,7 @@ export function CategorySpendingList({
   if (categorySpent.length === 0) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="text-base font-semibold text-gray-900">
+        <Text className="text-base font-semibold text-gray-800">
           Spending by Category
         </Text>
         <Text className="mt-2 text-sm text-gray-500">
@@ -58,8 +58,8 @@ export function CategorySpendingList({
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
-      <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
-        <Text className="text-base font-semibold text-gray-900">
+      <View className="border-b border-gray-100 px-4 pb-2.5">
+        <Text className="text-base font-semibold text-gray-800">
           Spending by Category
         </Text>
       </View>
@@ -69,13 +69,13 @@ export function CategorySpendingList({
         return (
           <View
             key={item.category_id}
-            className="border-b border-gray-100 px-4 py-3 last:border-b-0"
+            className="border-b border-gray-100 px-4 py-3.5 last:border-b-0"
           >
             <View className="flex-row items-center justify-between">
-              <Text className="text-base text-gray-900" numberOfLines={1}>
+              <Text className="text-base text-gray-800" numberOfLines={1}>
                 {item.category_name ?? "Uncategorized"}
               </Text>
-              <Text className="text-base font-medium text-gray-900">
+              <Text className="text-base font-medium text-gray-800">
                 {formatCurrency(item.spent)}{planned > 0 ? ` / ${formatCurrency(planned)}` : ""}
               </Text>
             </View>

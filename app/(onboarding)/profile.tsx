@@ -37,7 +37,7 @@ export default function ProfileScreen() {
 
   return (
     <OnboardingBackground>
-      <View className="flex-1 justify-between px-6 pb-12 pt-20">
+      <View className="flex-1 justify-between px-6 pb-16 pt-20">
         <View className="gap-8">
           <StepIndicator currentStep={1} totalSteps={3} />
           <View className="gap-4">

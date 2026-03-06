@@ -45,7 +45,7 @@ export default function OverviewScreen() {
         <AppHeader />
         <View className="flex-1 items-center justify-center">
           <Card className="gap-0 p-6">
-            <Text className="text-center text-lg font-semibold text-gray-900">
+            <Text className="text-center text-lg font-semibold text-gray-800">
               No household set up
             </Text>
             <Text className="mt-2 text-center text-sm text-gray-500">
@@ -77,7 +77,7 @@ export default function OverviewScreen() {
       <View className="flex-1">
         <ScreenWrapper>
           <Card className="p-8">
-            <Text className="text-center text-xl font-semibold text-gray-900">
+            <Text className="text-center text-xl font-semibold text-gray-800">
               Hey — looks like you don&apos;t have a budget set up yet!
             </Text>
             <Text className="text-center text-gray-600">
@@ -97,7 +97,7 @@ export default function OverviewScreen() {
   return (
     <View className="flex-1">
       <ScreenWrapper>
-        <View className="gap-6">
+        <View className="gap-5">
           <BudgetProgressCard
             totalPlanned={totalPlanned}
             spentAmount={spentAmount}

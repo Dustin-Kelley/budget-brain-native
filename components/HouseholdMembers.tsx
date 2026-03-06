@@ -77,18 +77,18 @@ export function HouseholdMembers({
 
   return (
     <View className="gap-4">
-      <Text className="text-base font-semibold text-gray-900">
+      <Text className="text-base font-semibold text-gray-800">
         Household Members
       </Text>
 
       {isLoading ? (
         <ActivityIndicator />
       ) : (
-        <View className="gap-2">
-          {members.map((member) => (
+        <View className="rounded-2xl overflow-hidden bg-card">
+          {members.map((member, index) => (
             <View
               key={member.id}
-              className="flex-row items-center justify-between rounded-lg bg-gray-50 px-4 py-3"
+              className={`flex-row items-center justify-between px-4 py-3.5 ${index < members.length - 1 ? "border-b border-gray-100" : ""}`}
             >
               <View className="flex-row items-center gap-3">
                 <UserAvatar emoji={member.avatar_emoji} size="sm" />

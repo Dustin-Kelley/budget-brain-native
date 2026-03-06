@@ -6,7 +6,7 @@ import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
-import { blendHex, formatCurrency } from "@/lib/utils";
+import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -103,15 +103,18 @@ function QuickAddExpenseModal({
 
   return (
     <>
-      <View className="border-b border-gray-200 px-4 py-3">
+      <View className="items-center mt-2 mb-1">
+        <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+      </View>
+      <View className="border-b border-gray-100 px-4 py-3">
         <View className="flex-row items-center justify-between">
-          <Text className="text-lg font-semibold text-gray-900">
+          <Text className="text-lg font-semibold text-gray-800">
             Add expense — {category.name ?? "Category"}
           </Text>
           <Pressable
             onPress={onClose}
             hitSlop={8}
-            className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+            className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200"
           >
             <Ionicons name="close" size={16} color="#6B7280" />
           </Pressable>
@@ -155,7 +158,7 @@ function QuickAddExpenseModal({
                 >
                   <Text
                     className={
-                      selectedLineItem ? "text-gray-900" : "text-gray-400"
+                      selectedLineItem ? "text-gray-800" : "text-gray-400"
                     }
                   >
                     {selectedLineItem?.name ?? "Select budget item"}
@@ -173,7 +176,7 @@ function QuickAddExpenseModal({
                           }}
                           className="border-b border-gray-100 px-4 py-3 last:border-b-0"
                         >
-                          <Text className="font-medium text-gray-900">
+                          <Text className="font-medium text-gray-800">
                             {item.name ?? "Item"}
                           </Text>
                         </Pressable>
@@ -224,7 +227,9 @@ export function RemainingSpentCards({
 }: RemainingSpentCardsProps) {
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
-  const barColor = blendHex(theme.colors[0], theme.colors[1]);
+  const accentHex = blendHex(theme.colors[0], theme.colors[1]);
+  const barColor = hexToRgba(accentHex, 0.65);
+  const accentColor = accentHex;
 
   const [viewMode, setViewMode] = useState<"spent" | "remaining">("spent");
   const [categoryForModal, setCategoryForModal] =
@@ -242,7 +247,7 @@ export function RemainingSpentCards({
   if (error) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="font-semibold text-gray-900">Remaining</Text>
+        <Text className="font-semibold text-gray-800">Remaining</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading data</Text>
       </Card>
     );
@@ -251,7 +256,7 @@ export function RemainingSpentCards({
   if (!categories || categories.length === 0) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="font-semibold text-gray-900">Remaining</Text>
+        <Text className="font-semibold text-gray-800">Remaining</Text>
         <Text className="mt-2 text-sm text-gray-500">
           No categories for this month.
         </Text>
@@ -264,23 +269,23 @@ export function RemainingSpentCards({
   return (
     <View className="gap-4">
       <View className="flex-row items-center justify-between">
-        <Text className="font-semibold text-gray-900">
+        <Text className="font-semibold text-gray-800">
           {isSpentView ? "Spent" : "Remaining"}
         </Text>
-        <View className="flex-row overflow-hidden rounded-lg border border-gray-200">
+        <View className="flex-row rounded-lg bg-gray-100 p-0.5">
           <Pressable
             onPress={() => setViewMode("spent")}
-            className={`px-3 py-1.5 ${isSpentView ? "bg-gray-900" : "bg-white"}`}
+            className={`rounded-md px-3 py-1.5 ${isSpentView ? "bg-white shadow-sm" : ""}`}
           >
-            <Text className={`text-xs font-medium ${isSpentView ? "text-white" : "text-gray-600"}`}>
+            <Text className={`text-xs font-semibold ${isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Spent
             </Text>
           </Pressable>
           <Pressable
             onPress={() => setViewMode("remaining")}
-            className={`px-3 py-1.5 ${!isSpentView ? "bg-gray-900" : "bg-white"}`}
+            className={`rounded-md px-3 py-1.5 ${!isSpentView ? "bg-white shadow-sm" : ""}`}
           >
-            <Text className={`text-xs font-medium ${!isSpentView ? "text-white" : "text-gray-600"}`}>
+            <Text className={`text-xs font-semibold ${!isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Remaining
             </Text>
           </Pressable>
@@ -310,14 +315,14 @@ export function RemainingSpentCards({
             key={category.id}
             className="gap-0 overflow-hidden py-0"
           >
-            <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
-              <Text className="font-semibold text-gray-900" numberOfLines={1}>
+            <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3.5">
+              <Text className="font-semibold text-gray-800" numberOfLines={1}>
                 {category.name ?? "Category"}
               </Text>
               <Text
                 className={
                   isSpentView
-                    ? "font-medium text-gray-900"
+                    ? "font-medium text-gray-800"
                     : remaining >= 0 ? "font-medium text-green-600" : "font-medium text-red-600"
                 }
               >
@@ -358,16 +363,16 @@ export function RemainingSpentCards({
               return (
                 <View
                   key={item.id}
-                  className="border-t border-gray-50 px-4 py-2"
+                  className="border-t border-gray-50 px-4 py-2.5"
                 >
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-gray-700 pl-2" numberOfLines={1}>
+                    <Text className="text-gray-700 pl-3" numberOfLines={1}>
                       {item.name ?? "Line item"}
                     </Text>
                     <Text
                       className={
                         isSpentView
-                          ? "text-gray-900"
+                          ? "text-gray-800"
                           : itemRemaining >= 0 ? "text-green-600" : "text-red-600"
                       }
                     >
@@ -377,7 +382,7 @@ export function RemainingSpentCards({
                     </Text>
                   </View>
                   {itemPlanned > 0 && (
-                    <View className="mt-1.5 ml-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                    <View className="mt-1.5 ml-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                       <View
                         className="h-full rounded-full"
                         style={{
@@ -391,15 +396,18 @@ export function RemainingSpentCards({
               );
             })}
             {canAddExpense && (category.line_items?.length ?? 0) > 0 && (
-              <View className="border-t border-gray-50 px-4 py-2">
+              <View className="border-t border-gray-50 px-4 py-2.5">
                 <Pressable
                   onPress={() => setCategoryForModal(category)}
                   className="flex-row items-center gap-2 active:opacity-90"
                 >
-                  <View className="items-center justify-center rounded-full bg-[#36454F]">
-                    <Ionicons name="add" size={20} color="#fff" />
+                  <View
+                    className="items-center justify-center rounded-full"
+                    style={{ backgroundColor: accentColor + "20" }}
+                  >
+                    <Ionicons name="add" size={20} color={accentColor} />
                   </View>
-                  <Text className="text-sm font-semibold">Add expense</Text>
+                  <Text className="text-sm font-medium" style={{ color: accentColor }}>Add expense</Text>
                 </Pressable>
               </View>
             )}
@@ -414,7 +422,7 @@ export function RemainingSpentCards({
           transparent
           onRequestClose={handleQuickAddClose}
         >
-          <View className="flex-1 justify-end bg-black/50">
+          <View className="flex-1 justify-end bg-black/40">
             <Pressable
               className="flex-1"
               onPress={handleQuickAddClose}

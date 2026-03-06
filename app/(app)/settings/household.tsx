@@ -1,26 +1,26 @@
-import { BackButton } from "@/components/BackButton";
 import { HouseholdMembers } from "@/components/HouseholdMembers";
 import { Text } from "@/components/ui/text";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HouseholdScreen() {
   const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
-
-  const header = (
-    <View className="flex-row items-center gap-2">
-      <BackButton />
-      <Text variant="h3" className="items-center">Household</Text>
-    </View>
-  );
+  const insets = useSafeAreaInsets();
 
   if (!householdId || !currentUser) {
     return (
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
-        <View className="gap-6">
-          {header}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingBottom: 40,
+          paddingTop: insets.top + 56,
+        }}
+      >
+        <View className="gap-8">
           <Text className="text-base text-gray-500">
             Join or create a household to manage members.
           </Text>
@@ -30,13 +30,19 @@ export default function HouseholdScreen() {
   }
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
-      <View className="gap-6">
-        {header}
-      <HouseholdMembers
-        householdId={householdId}
-        currentUserId={currentUser.id}
-      />
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+        paddingTop: insets.top + 56,
+      }}
+    >
+      <View className="gap-8">
+        <HouseholdMembers
+          householdId={householdId}
+          currentUserId={currentUser.id}
+        />
       </View>
     </ScrollView>
   );

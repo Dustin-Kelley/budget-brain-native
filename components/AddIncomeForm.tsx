@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import { useAddIncome } from "@/hooks/useAddIncome";
 import { addIncomeSchema, type AddIncomeFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +36,9 @@ export function AddIncomeForm({
   const insets = useSafeAreaInsets();
   const addIncome = useAddIncome();
   const [visible, setVisible] = useState(false);
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
   const form = useForm<AddIncomeFormData>({
     resolver: zodResolver(addIncomeSchema),
@@ -67,10 +73,13 @@ export function AddIncomeForm({
         onPress={() => setVisible(true)}
         className="flex-row gap-2 items-center active:opacity-90"
       >
-        <View className="items-center justify-center rounded-full bg-[#36454F]">
-          <Ionicons name="add" size={20} color="#fff" />
+        <View
+          className="items-center justify-center rounded-full"
+          style={{ backgroundColor: accentColor + "20" }}
+        >
+          <Ionicons name="add" size={20} color={accentColor} />
         </View>
-        <Text className="text-sm font-semibold">Add income</Text>
+        <Text className="text-sm font-medium" style={{ color: accentColor }}>Add income</Text>
       </Pressable>
 
       <Modal
@@ -79,15 +88,18 @@ export function AddIncomeForm({
         transparent
         onRequestClose={handleClose}
       >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
-            <View className="border-b border-gray-200 px-4 py-3">
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="h-[85%] rounded-t-2xl bg-white shadow-none">
+            <View className="items-center mt-2 mb-1">
+              <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+            </View>
+            <View className="border-b border-gray-100 px-4 py-3">
               <View className="flex-row items-center justify-between">
-                <Text className="text-lg font-semibold text-gray-900">
+                <Text className="text-lg font-semibold text-gray-800">
                   Add Income Source
                 </Text>
-                <Pressable onPress={handleClose} hitSlop={12}>
-                  <Ionicons name="close" size={24} color="#374151" />
+                <Pressable onPress={handleClose} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200">
+                  <Ionicons name="close" size={16} color="#6B7280" />
                 </Pressable>
               </View>
               <Text className="mt-1 text-sm text-gray-500">

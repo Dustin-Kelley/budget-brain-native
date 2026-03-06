@@ -147,14 +147,17 @@ export function EditTransactionForm({
       transparent
       onRequestClose={handleClose}
     >
-      <View className="flex-1 justify-end bg-black/50">
+      <View className="flex-1 justify-end bg-black/40">
         <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
-          <View className="border-b border-gray-200 px-4 py-3">
+          <View className="items-center mt-2 mb-1">
+            <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+          </View>
+          <View className="border-b border-gray-100 px-4 py-3">
             <View className="flex-row items-center justify-between">
-              <Text className="text-lg font-semibold text-gray-900">
+              <Text className="text-lg font-semibold text-gray-800">
                 Edit Transaction
               </Text>
-              <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+              <Pressable onPress={handleClose} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200">
                 <Ionicons name="close" size={16} color="#6B7280" />
               </Pressable>
             </View>
@@ -191,7 +194,7 @@ export function EditTransactionForm({
                     >
                       <Text
                         className={
-                          selectedLineItem ? "text-gray-900" : "text-gray-400"
+                          selectedLineItem ? "text-gray-800" : "text-gray-400"
                         }
                       >
                         {selectedLineItem
@@ -216,7 +219,7 @@ export function EditTransactionForm({
                                 }}
                                 className="border-b border-gray-100 px-4 py-3 last:border-b-0"
                               >
-                                <Text className="font-medium text-gray-900">
+                                <Text className="font-medium text-gray-800">
                                   {item.name ?? "Item"}
                                 </Text>
                                 <Text className="text-xs text-gray-500">

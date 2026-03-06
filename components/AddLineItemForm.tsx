@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
+import { blendHex } from "@/lib/utils";
 import { useAddLineItem } from "@/hooks/useAddLineItem";
 import { addLineItemSchema, type AddLineItemFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +38,9 @@ export function AddLineItemForm({
   const insets = useSafeAreaInsets();
   const addLineItem = useAddLineItem();
   const [visible, setVisible] = useState(false);
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
   const form = useForm<AddLineItemFormData>({
     resolver: zodResolver(addLineItemSchema),
@@ -69,10 +75,13 @@ export function AddLineItemForm({
         onPress={() => setVisible(true)}
         className="flex-row items-center gap-2 active:opacity-90"
       >
-        <View className="items-center justify-center rounded-full bg-[#36454F]">
-          <Ionicons name="add" size={20} color="#fff" />
+        <View
+          className="items-center justify-center rounded-full"
+          style={{ backgroundColor: accentColor + "20" }}
+        >
+          <Ionicons name="add" size={20} color={accentColor} />
         </View>
-        <Text className="text-sm font-semibold">
+        <Text className="text-sm font-medium" style={{ color: accentColor }}>
           Add item to {categoryName}
         </Text>
       </Pressable>
@@ -83,14 +92,17 @@ export function AddLineItemForm({
         transparent
         onRequestClose={handleClose}
       >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
-            <View className="border-b border-gray-200 px-4 py-3">
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="h-[85%] rounded-t-2xl bg-white shadow-none">
+            <View className="items-center mt-2 mb-1">
+              <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+            </View>
+            <View className="border-b border-gray-100 px-4 py-3">
               <View className="flex-row items-center justify-between">
-                <Text className="text-lg font-semibold text-gray-900">
+                <Text className="text-lg font-semibold text-gray-800">
                   Add Budget Item
                 </Text>
-                <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                <Pressable onPress={handleClose} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200">
                   <Ionicons name="close" size={16} color="#6B7280" />
                 </Pressable>
               </View>

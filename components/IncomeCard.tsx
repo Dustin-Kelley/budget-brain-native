@@ -38,7 +38,7 @@ export function IncomeCard({
   if (error) {
     return (
       <Card className="gap-0 p-4">
-        <Text className="font-semibold text-gray-900">Income</Text>
+        <Text className="font-semibold text-gray-800">Income</Text>
         <Text className="mt-2 text-sm text-red-600">Error loading income</Text>
       </Card>
     );
@@ -48,11 +48,11 @@ export function IncomeCard({
 
   return (
     <Card className="gap-0 overflow-hidden py-0">
-      <View className="border-b border-gray-100 bg-gray-50 px-4 py-3">
+      <View className="border-b border-gray-100 px-4 py-3">
         <Text className="text-sm font-medium text-gray-500">
           Total Income for: {monthLabel}
         </Text>
-        <Text className="mt-1 text-2xl font-bold text-gray-900">
+        <Text className="mt-1 text-2xl font-bold text-gray-800">
           {formatCurrency(totalIncome, { fractionDigits: 2 })}
         </Text>
       </View>
@@ -62,12 +62,12 @@ export function IncomeCard({
             <Pressable
               key={entry.id}
               onPress={() => onRefetch && setEditingIncome(entry)}
-              className="flex-row justify-between py-2 active:bg-gray-50"
+              className="flex-row justify-between py-2.5 active:bg-gray-50"
             >
               <Text className="text-gray-700" numberOfLines={1}>
                 {entry.name ?? "Income"}
               </Text>
-              <Text className="font-medium text-gray-900">
+              <Text className="font-medium text-gray-800">
                 {formatCurrency(entry.amount, { fractionDigits: 2 })}
               </Text>
             </Pressable>
