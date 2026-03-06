@@ -27,11 +27,8 @@ export function BudgetSetupWizard({
   householdId,
   userId,
   monthKey,
-  income,
   totalIncome,
   categories,
-  totalPlanned,
-  monthLabel,
   refetch,
   onComplete,
 }: BudgetSetupWizardProps) {

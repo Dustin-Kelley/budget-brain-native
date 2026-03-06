@@ -1,15 +1,12 @@
 import { BackButton } from "@/components/BackButton";
-import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { router } from "expo-router";
-import { useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 
 export default function AccountScreen() {
   const { user, signOut } = useAuth();
-  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert("Sign out", "Are you sure you want to sign out?", [
@@ -43,20 +40,11 @@ export default function AccountScreen() {
           </View>
 
           <View className="gap-3">
-            <Button variant="outline" onPress={() => setShowChangePassword(true)}>
-              <Text>Change Password</Text>
-            </Button>
-
             <Button variant="destructive" onPress={handleSignOut}>
               <Text>Sign Out</Text>
             </Button>
           </View>
         </View>
-
-        <ChangePasswordForm
-          visible={showChangePassword}
-          onClose={() => setShowChangePassword(false)}
-        />
       </View>
     </ScrollView>
   );

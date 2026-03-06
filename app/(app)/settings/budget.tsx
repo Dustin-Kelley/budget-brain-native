@@ -2,23 +2,20 @@ import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { resetBudget } from "@/lib/mutations/resetBudget";
-import { rolloverBudget } from "@/lib/mutations/rolloverBudget";
 import {
-  formatMonthYearForDisplay,
-  getMonthAndYearNumberFromDate,
-  getMonthYearString,
+  formatMonthYearForDisplay
 } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { Alert, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BudgetScreen() {
-  const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
   const { monthKey } = useMonth();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   const handleResetBudget = () => {
     if (!householdId) return;
@@ -45,59 +42,30 @@ export default function BudgetScreen() {
     );
   };
 
-  const handleRolloverBudget = () => {
-    if (!householdId || !currentUser) return;
-    const { monthNumber, yearNumber } = getMonthAndYearNumberFromDate(monthKey);
-    const nextMonth = monthNumber === 12 ? 1 : monthNumber + 1;
-    const nextYear = monthNumber === 12 ? yearNumber + 1 : yearNumber;
-    const toMonthKey = getMonthYearString(nextMonth, nextYear);
-    const fromDisplay = formatMonthYearForDisplay(monthKey);
-    const toDisplay = formatMonthYearForDisplay(toMonthKey);
 
-    Alert.alert(
-      "Rollover Budget",
-      `Copy all categories, budget items, and income from ${fromDisplay} to ${toDisplay}? This will replace any existing data in ${toDisplay}.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Rollover",
-          onPress: async () => {
-            const { error } = await rolloverBudget({
-              householdId,
-              fromMonthKey: monthKey,
-              toMonthKey,
-              userId: currentUser.id,
-            });
-            if (error) {
-              Alert.alert("Error", error.message);
-              return;
-            }
-            queryClient.invalidateQueries();
-            Alert.alert("Done", `Budget rolled over to ${toDisplay}.`);
-          },
-        },
-      ]
-    );
-  };
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{
+        padding: 24,
+        paddingTop: 24 + insets.top,
+      }}
+    >
       <View className="gap-6">
         <View className="flex-row items-center gap-2">
           <BackButton />
           <Text variant="h3" className="items-center">Budget</Text>
         </View>
-      <View className="gap-3">
-        <Text className="text-base font-semibold text-gray-900">
-          Budget for {formatMonthYearForDisplay(monthKey)}
-        </Text>
-        <Button variant="outline" onPress={handleResetBudget}>
-          <Text>Reset Budget</Text>
-        </Button>
-        <Button variant="outline" onPress={handleRolloverBudget}>
-          <Text>Rollover to Next Month</Text>
-        </Button>
-      </View>
+        <View className="gap-3">
+          <Text className="text-base font-semibold text-gray-900">
+            Budget for {formatMonthYearForDisplay(monthKey)}
+          </Text>
+          <Button variant="outline" onPress={handleResetBudget}>
+            <Text>Reset Budget</Text>
+          </Button>
+
+        </View>
       </View>
     </ScrollView>
   );

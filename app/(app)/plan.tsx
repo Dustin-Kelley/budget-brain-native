@@ -1,12 +1,10 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
-import { AppHeader } from "@/components/AppHeader";
 import { BudgetSetupWizard } from "@/components/BudgetSetupWizard";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { TransactionsList } from "@/components/TransactionsList";
-import { Card } from "@/components/ui/card";
-import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useBudgetPlan } from "@/hooks/useBudgetPlan";
@@ -15,7 +13,6 @@ import { useHousehold } from "@/hooks/useHousehold";
 import { formatMonthYearForDisplay } from "@/lib/utils";
 import { useState } from "react";
 import { View } from "react-native";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function PlanScreen() {
   const { householdId, isLoading: householdLoading } = useHousehold();
@@ -49,22 +46,6 @@ export default function PlanScreen() {
     );
   }
 
-  if (!householdId) {
-    return (
-      <View className="flex-1 bg-gray-50 p-6">
-        <AppHeader />
-        <Card className="gap-0 p-6">
-          <Text className="text-center text-lg font-semibold text-gray-900">
-            No household set up
-          </Text>
-          <Text className="mt-2 text-center text-sm text-gray-500">
-            Your account isn’t linked to a household yet. Use the web app to
-            create or join a household.
-          </Text>
-        </Card>
-      </View>
-    );
-  }
 
   if (showWizard && householdId && currentUser?.id) {
     return (
