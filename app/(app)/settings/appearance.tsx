@@ -1,17 +1,43 @@
+import { BackButton } from "@/components/BackButton";
+import { EmojiAvatarPicker } from "@/components/EmojiAvatarPicker";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
 import { appThemes } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import { getAppTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import { Pressable, ScrollView, Switch, View } from "react-native";
+import { useState } from "react";
+import { Alert, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppearanceScreen() {
-  const { isDark, toggleTheme, appTheme, setAppTheme } = useTheme();
+  const { appTheme, setAppTheme } = useTheme();
+  const { currentUser } = useCurrentUser();
+  const updateProfile = useUpdateUserProfile();
+  const [saving, setSaving] = useState(false);
   const insets = useSafeAreaInsets();
   const theme = getAppTheme(appTheme);
   const accentColor = blendHex(theme.colors[0], theme.colors[1]);
+
+  const handleSelect = async (emoji: string) => {
+    if (!currentUser || saving) return;
+    setSaving(true);
+    try {
+      await updateProfile.mutateAsync({
+        userId: currentUser.id,
+        firstName: currentUser.first_name ?? "",
+        lastName: currentUser.last_name ?? "",
+        avatarEmoji: emoji,
+      });
+    } catch {
+      Alert.alert("Error", "Failed to save avatar.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <ScrollView
@@ -19,19 +45,31 @@ export default function AppearanceScreen() {
       contentContainerStyle={{
         paddingHorizontal: 20,
         paddingBottom: 40,
-        paddingTop: insets.top + 56,
+        paddingTop: insets.top + 16,
       }}
     >
-      <View className="gap-8">
-        <View className="bg-card rounded-2xl px-5 py-4">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-base text-gray-800">Dark Mode</Text>
-            <Switch value={isDark} onValueChange={toggleTheme} />
-          </View>
+      <View className="gap-4">
+        <View className="flex-row items-center gap-3">
+          <BackButton />
+          <Text className="text-lg font-semibold">Appearance</Text>
         </View>
 
         <View className="gap-2">
-          <Text className="text-base text-gray-800">Header Theme</Text>
+          <Text className="text-base font-semibold text-gray-800">Avatar</Text>
+          <View className="items-center gap-2">
+            <UserAvatar emoji={currentUser?.avatar_emoji} size="lg" />
+            <Text className="text-sm text-gray-500">
+              {currentUser?.avatar_emoji ? "Your current avatar" : "No avatar set"}
+            </Text>
+          </View>
+          <EmojiAvatarPicker
+            selected={currentUser?.avatar_emoji}
+            onSelect={handleSelect}
+          />
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-base font-semibold text-gray-800">App Theme</Text>
           <View className="flex-row flex-wrap gap-3">
             {appThemes.map((t) => {
               const isSelected = appTheme === t.id;

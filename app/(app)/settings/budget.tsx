@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
@@ -6,7 +7,7 @@ import { useResetBudget } from "@/hooks/useResetBudget";
 import {
   formatMonthYearForDisplay
 } from "@/lib/utils";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BudgetScreen() {
@@ -40,24 +41,28 @@ export default function BudgetScreen() {
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
+    <View
+      className="flex-1 justify-between"
+      style={{
         paddingHorizontal: 20,
-        paddingBottom: 40,
-        paddingTop: insets.top + 56,
+        paddingBottom: insets.bottom + 49 + 20,
+        paddingTop: insets.top + 16,
       }}
     >
-      <View className="gap-8">
-        <View className="gap-3">
-          <Text className="text-base font-semibold text-gray-800">
-            Budget for {formatMonthYearForDisplay(monthKey)}
-          </Text>
-          <Button variant="outline" onPress={handleResetBudget}>
-            <Text>Reset Budget</Text>
-          </Button>
+      <View className="gap-4">
+        <View className="flex-row items-center gap-3">
+          <BackButton />
+          <Text className="text-lg font-semibold">Budget</Text>
         </View>
+
+        <Text className="text-base font-semibold text-gray-800">
+          Budget for {formatMonthYearForDisplay(monthKey)}
+        </Text>
       </View>
-    </ScrollView>
+
+      <Button variant="outline" onPress={handleResetBudget}>
+        <Text>Reset Budget</Text>
+      </Button>
+    </View>
   );
 }

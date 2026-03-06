@@ -1,23 +1,26 @@
 import { useLogError } from '@/hooks/useLogError';
-import { addHouseholdMember } from '@/lib/mutations/addHouseholdMember';
+import { acceptHouseholdInvitation } from '@/lib/mutations/acceptHouseholdInvitation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export function useAddHouseholdMember() {
+export function useAcceptInvitation() {
   const { logError } = useLogError();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: {
-      email: string;
+      invitationId: string;
+      userId: string;
       householdId: string;
     }) => {
-      const { error } = await addHouseholdMember(params);
+      const { error } = await acceptHouseholdInvitation(params);
       if (error) throw error;
     },
     onError: (error) => {
       logError(error, { tags: { feature: 'household' } });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['household'] });
       queryClient.invalidateQueries({ queryKey: ['householdMembers'] });
     },
   });

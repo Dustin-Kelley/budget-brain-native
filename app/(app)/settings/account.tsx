@@ -1,10 +1,11 @@
+import { BackButton } from "@/components/BackButton";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { router } from "expo-router";
-import { Alert, Pressable, ScrollView, View } from "react-native";
+import { Alert, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AccountScreen() {
@@ -26,32 +27,62 @@ export default function AccountScreen() {
     ]);
   };
 
+  const fullName = [currentUser?.first_name, currentUser?.last_name]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
+    <View
+      className="flex-1 justify-between"
+      style={{
         paddingHorizontal: 20,
-        paddingBottom: 40,
-        paddingTop: insets.top + 56,
+        paddingBottom: insets.bottom + 49 + 20,
+        paddingTop: insets.top + 16,
       }}
     >
-      <View className="gap-8">
-        <Pressable className="items-center gap-2" onPress={() => router.push("/(app)/settings/avatar")}>
-          <UserAvatar emoji={currentUser?.avatar_emoji} size="lg" />
-          <Text className="text-sm text-gray-500">Tap to change avatar</Text>
-        </Pressable>
+      <View className="gap-4">
+        <View className="flex-row items-center gap-3">
+          <BackButton />
+          <Text className="text-lg font-semibold">Account</Text>
+        </View>
 
-        <View className="bg-card rounded-2xl px-5 py-4">
-          <Text className="text-sm text-gray-500">Email</Text>
-          <Text className="mt-1 text-base font-medium text-gray-800">
+        <View className="items-center gap-1">
+          <UserAvatar emoji={currentUser?.avatar_emoji} size="lg" />
+          {fullName ? (
+            <Text className="text-lg font-semibold text-gray-800">
+              {fullName}
+            </Text>
+          ) : null}
+          <Text className="text-sm text-gray-500">
             {user?.email ?? "\u2014"}
           </Text>
         </View>
 
-        <Button variant="destructive" onPress={handleSignOut} className="mt-2">
-          <Text>Sign Out</Text>
-        </Button>
+        <View className="bg-card rounded-2xl px-5 py-4 gap-4">
+          <View>
+            <Text className="text-sm text-gray-500">First Name</Text>
+            <Text className="mt-1 text-base font-medium text-gray-800">
+              {currentUser?.first_name ?? "\u2014"}
+            </Text>
+          </View>
+          <View>
+            <Text className="text-sm text-gray-500">Last Name</Text>
+            <Text className="mt-1 text-base font-medium text-gray-800">
+              {currentUser?.last_name ?? "\u2014"}
+            </Text>
+          </View>
+          <View>
+            <Text className="text-sm text-gray-500">Email</Text>
+            <Text className="mt-1 text-base font-medium text-gray-800">
+              {user?.email ?? "\u2014"}
+            </Text>
+          </View>
+        </View>
       </View>
-    </ScrollView>
+
+      <Button variant="destructive" onPress={handleSignOut}>
+        <Text>Sign Out</Text>
+      </Button>
+    </View>
   );
 }

@@ -5,23 +5,18 @@ import { blendHex } from "@/lib/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { Pressable, ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const menuItems = [
   {
     label: "Account",
-    description: "Email, password & sign out",
+    description: "Email & sign out",
     icon: "person-outline" as const,
     route: "/(app)/settings/account",
   },
   {
-    label: "Avatar",
-    description: "Pick your emoji avatar",
-    icon: "happy-outline" as const,
-    route: "/(app)/settings/avatar",
-  },
-  {
     label: "Appearance",
-    description: "Dark mode & header theme",
+    description: "Avatar & app theme",
     icon: "color-palette-outline" as const,
     route: "/(app)/settings/appearance",
   },
@@ -43,9 +38,11 @@ export default function SettingsMenuScreen() {
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
   const accentColor = blendHex(theme.colors[0], theme.colors[1]);
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
+    <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: insets.top + 16 }}>
+      <Text className="text-lg font-semibold mb-4">Settings</Text>
       <View className="rounded-2xl overflow-hidden bg-card">
         {menuItems.map((item, index) => (
           <Pressable
