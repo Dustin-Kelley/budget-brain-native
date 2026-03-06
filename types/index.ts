@@ -18,4 +18,8 @@ export type TransactionWithLineItem = Database["public"]["Tables"]["transactions
       name?: string | null;
     } | null;
   } | null;
+  users?: {
+    avatar_emoji?: string | null;
+    first_name?: string | null;
+  } | null;
 };

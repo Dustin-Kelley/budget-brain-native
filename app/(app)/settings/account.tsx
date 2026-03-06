@@ -1,12 +1,15 @@
 import { BackButton } from "@/components/BackButton";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { router } from "expo-router";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, Pressable, ScrollView, View } from "react-native";
 
 export default function AccountScreen() {
   const { user, signOut } = useAuth();
+  const { currentUser } = useCurrentUser();
 
   const handleSignOut = () => {
     Alert.alert("Sign out", "Are you sure you want to sign out?", [
@@ -30,6 +33,11 @@ export default function AccountScreen() {
           <Text variant="h3" className="items-center">Account Settings</Text>
         </View>
 
+
+        <Pressable className="items-center gap-2" onPress={() => router.push("/(app)/settings/avatar")}>
+          <UserAvatar emoji={currentUser?.avatar_emoji} size="md" />
+          <Text className="text-sm text-gray-500">Tap to change avatar</Text>
+        </Pressable>
 
         <View className="gap-6">
           <View className="gap-1">

@@ -35,7 +35,7 @@ export async function getTransactionsList({
 
   const { data, error } = await supabase
     .from("transactions")
-    .select("*, line_items(*, categories(*))")
+    .select("*, line_items(*, categories(*)), users!transactions_created_by_fkey(avatar_emoji, first_name)")
     .eq("household_id", householdId)
     .eq("month", monthNumber)
     .eq("year", yearNumber)

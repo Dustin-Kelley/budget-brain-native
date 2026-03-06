@@ -5,17 +5,17 @@ export async function getHouseholdMembers({
 }: {
   householdId: string;
 }): Promise<{
-  members: { id: string; email: string | null }[];
+  members: { id: string; email: string | null; avatar_emoji: string | null }[];
   error: Error | null;
 }> {
   const { data, error } = await supabase
     .from('users')
-    .select('id, email')
+    .select('id, email, avatar_emoji')
     .eq('household_id', householdId);
 
   if (error) return { members: [], error: error as Error };
   return {
-    members: (data ?? []) as { id: string; email: string | null }[],
+    members: (data ?? []) as { id: string; email: string | null; avatar_emoji: string | null }[],
     error: null,
   };
 }

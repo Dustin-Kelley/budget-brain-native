@@ -192,6 +192,7 @@ export type Database = {
       };
       users: {
         Row: {
+          avatar_emoji: string | null;
           created_at: string;
           email: string | null;
           first_name: string | null;
@@ -200,6 +201,7 @@ export type Database = {
           last_name: string | null;
         };
         Insert: {
+          avatar_emoji?: string | null;
           created_at?: string;
           email?: string | null;
           first_name?: string | null;
@@ -208,6 +210,7 @@ export type Database = {
           last_name?: string | null;
         };
         Update: {
+          avatar_emoji?: string | null;
           created_at?: string;
           email?: string | null;
           first_name?: string | null;

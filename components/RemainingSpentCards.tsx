@@ -3,8 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
 import { addTransaction } from "@/lib/mutations/addTransaction";
-import { formatCurrency } from "@/lib/utils";
+import { blendHex, formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -224,6 +226,10 @@ export function RemainingSpentCards({
   monthKey,
   onSuccess,
 }: RemainingSpentCardsProps) {
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const barColor = blendHex(theme.colors[0], theme.colors[1]);
+
   const [categoryForModal, setCategoryForModal] =
     useState<CategoryWithLineItems | null>(null);
 
@@ -290,6 +296,19 @@ export function RemainingSpentCards({
                 {formatCurrency(remaining)} ({percentRemaining}%)
               </Text>
             </View>
+            {planned > 0 && (
+              <View className="px-4 pt-2">
+                <View className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <View
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.min(Math.max(percentRemaining, 0), 100)}%`,
+                      backgroundColor: barColor,
+                    }}
+                  />
+                </View>
+              </View>
+            )}
             <Text className="px-4 py-1 text-xs text-gray-500">
               Remaining: {formatCurrency(remaining)} / {formatCurrency(planned)}
             </Text>
@@ -299,21 +318,36 @@ export function RemainingSpentCards({
               const itemRemaining = itemPlanned - itemSpent;
               const itemPercent =
                 itemPlanned > 0 ? Math.round((itemRemaining / itemPlanned) * 100) : 0;
+              const itemSpentPercent =
+                itemPlanned > 0 ? Math.min(Math.round((itemSpent / itemPlanned) * 100), 100) : 0;
               return (
                 <View
                   key={item.id}
-                  className="flex-row items-center justify-between border-t border-gray-50 px-4 py-2"
+                  className="border-t border-gray-50 px-4 py-2"
                 >
-                  <Text className="text-gray-700 pl-2" numberOfLines={1}>
-                    {item.name ?? "Line item"}
-                  </Text>
-                  <Text
-                    className={
-                      itemRemaining >= 0 ? "text-green-600" : "text-red-600"
-                    }
-                  >
-                    {formatCurrency(itemRemaining)} ({itemPercent}%)
-                  </Text>
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-gray-700 pl-2" numberOfLines={1}>
+                      {item.name ?? "Line item"}
+                    </Text>
+                    <Text
+                      className={
+                        itemRemaining >= 0 ? "text-green-600" : "text-red-600"
+                      }
+                    >
+                      {formatCurrency(itemRemaining)} ({itemPercent}%)
+                    </Text>
+                  </View>
+                  {itemPlanned > 0 && (
+                    <View className="mt-1.5 ml-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                      <View
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${itemSpentPercent}%`,
+                          backgroundColor: barColor,
+                        }}
+                      />
+                    </View>
+                  )}
                 </View>
               );
             })}

@@ -1,4 +1,5 @@
 import { EditTransactionForm } from "@/components/EditTransactionForm";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import type { CategoryWithLineItems } from "@/types";
@@ -13,6 +14,7 @@ type TransactionItem = {
   description: string | null;
   line_item_id?: string | null;
   line_items?: { name?: string | null } | null;
+  users?: { avatar_emoji?: string | null; first_name?: string | null } | null;
 };
 
 type TransactionsListProps = {
@@ -98,6 +100,9 @@ export function TransactionsList({
               }
               className="flex-row items-center justify-between border-b border-gray-50 px-4 py-3 last:border-b-0 active:bg-gray-50"
             >
+              <View className="mr-3">
+                <UserAvatar emoji={tx.users?.avatar_emoji} size="sm" />
+              </View>
               <View className="flex-1">
                 <Text className="font-medium text-gray-900" numberOfLines={1}>
                   {tx.line_items?.name ?? "Uncategorized"}

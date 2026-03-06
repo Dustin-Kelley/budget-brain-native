@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { formatCurrency } from "@/lib/utils";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
+import { blendHex, formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 
 type BudgetSummaryCardsProps = {
@@ -18,6 +20,12 @@ export function BudgetSummaryCards({
   percentSpent,
   error,
 }: BudgetSummaryCardsProps) {
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const barColor = blendHex(theme.colors[0], theme.colors[1]);
+  const spentWidth = Math.min(percentSpent, 100);
+  const remainingWidth = Math.min(100 - percentSpent, 100);
+
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -53,7 +61,13 @@ export function BudgetSummaryCards({
           <Text className="mt-1 text-xl font-bold text-gray-900">
             {formatCurrency(spentAmount)}
           </Text>
-          <Text className="mt-0.5 text-xs text-gray-500">
+          <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+            <View
+              className="h-full rounded-full"
+              style={{ width: `${spentWidth}%`, backgroundColor: barColor }}
+            />
+          </View>
+          <Text className="mt-1 text-xs text-gray-500">
             {percentSpent}% of budget used
           </Text>
         </Card>
@@ -64,7 +78,13 @@ export function BudgetSummaryCards({
           <Text className="mt-1 text-xl font-bold text-gray-900">
             {formatCurrency(remaining)}
           </Text>
-          <Text className="mt-0.5 text-xs text-gray-500">
+          <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+            <View
+              className="h-full rounded-full"
+              style={{ width: `${Math.max(remainingWidth, 0)}%`, backgroundColor: barColor }}
+            />
+          </View>
+          <Text className="mt-1 text-xs text-gray-500">
             {100 - percentSpent}% left
           </Text>
         </Card>

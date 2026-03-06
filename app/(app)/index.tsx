@@ -120,20 +120,10 @@ export default function OverviewScreen() {
 
           <CategorySpendingList
             categorySpent={categorySpent}
+            categories={categories}
             error={error?.message}
           />
-          <CategorySpendingList
-            categorySpent={categorySpent}
-            error={error?.message}
-          />
-          <CategorySpendingList
-            categorySpent={categorySpent}
-            error={error?.message}
-          />
-          <CategorySpendingList
-            categorySpent={categorySpent}
-            error={error?.message}
-          />
+
         </View>
       </ScreenWrapper>
       {householdId && currentUser && (

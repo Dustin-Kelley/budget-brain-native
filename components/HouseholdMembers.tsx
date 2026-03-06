@@ -1,3 +1,4 @@
+import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,10 +92,13 @@ export function HouseholdMembers({
               key={member.id}
               className="flex-row items-center justify-between rounded-lg bg-gray-50 px-4 py-3"
             >
-              <Text className="text-gray-700">
-                {member.email ?? "Unknown"}
-                {member.id === currentUserId ? " (you)" : ""}
-              </Text>
+              <View className="flex-row items-center gap-3">
+                <UserAvatar emoji={member.avatar_emoji} size="sm" />
+                <Text className="text-gray-700">
+                  {member.email ?? "Unknown"}
+                  {member.id === currentUserId ? " (you)" : ""}
+                </Text>
+              </View>
               {member.id !== currentUserId && (
                 <Pressable
                   onPress={() => handleRemove(member.id, member.email)}

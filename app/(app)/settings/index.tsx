@@ -14,6 +14,12 @@ const menuItems = [
     route: "/(app)/settings/account",
   },
   {
+    label: "Avatar",
+    description: "Pick your emoji avatar",
+    icon: "happy-outline" as const,
+    route: "/(app)/settings/avatar",
+  },
+  {
     label: "Appearance",
     description: "Dark mode & header theme",
     icon: "color-palette-outline" as const,

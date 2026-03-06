@@ -1,18 +1,37 @@
 import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { formatCurrency } from "@/lib/utils";
+import { useTheme } from "@/contexts/theme-context";
+import { getAppTheme } from "@/lib/themes";
+import { blendHex, formatCurrency } from "@/lib/utils";
+import type { CategoryWithLineItems } from "@/types";
 import { View } from "react-native";
 
-type CategorySpendingListProps = {
+export type CategorySpendingListProps = {
   categorySpent: CategorySpent[];
+  categories?: CategoryWithLineItems[] | null;
   error?: string | null;
 };
 
 export function CategorySpendingList({
   categorySpent,
+  categories,
   error,
 }: CategorySpendingListProps) {
+  const { appTheme } = useTheme();
+  const theme = getAppTheme(appTheme);
+  const barColor = blendHex(theme.colors[0], theme.colors[1]);
+
+  const plannedByCategory = new Map<string, number>();
+  if (categories) {
+    for (const cat of categories) {
+      const planned = (cat.line_items ?? []).reduce(
+        (sum, li) => sum + (li.planned_amount ?? 0),
+        0,
+      );
+      plannedByCategory.set(cat.id, planned);
+    }
+  }
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -44,19 +63,33 @@ export function CategorySpendingList({
           Spending by Category
         </Text>
       </View>
-      {categorySpent.map((item) => (
-        <View
-          key={item.category_id}
-          className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3 last:border-b-0"
-        >
-          <Text className="text-base text-gray-900" numberOfLines={1}>
-            {item.category_name ?? "Uncategorized"}
-          </Text>
-          <Text className="text-base font-medium text-gray-900">
-            {formatCurrency(item.spent)}
-          </Text>
-        </View>
-      ))}
+      {categorySpent.map((item) => {
+        const planned = plannedByCategory.get(item.category_id) ?? 0;
+        const percent = planned > 0 ? Math.min(Math.round((item.spent / planned) * 100), 100) : 0;
+        return (
+          <View
+            key={item.category_id}
+            className="border-b border-gray-100 px-4 py-3 last:border-b-0"
+          >
+            <View className="flex-row items-center justify-between">
+              <Text className="text-base text-gray-900" numberOfLines={1}>
+                {item.category_name ?? "Uncategorized"}
+              </Text>
+              <Text className="text-base font-medium text-gray-900">
+                {formatCurrency(item.spent)}{planned > 0 ? ` / ${formatCurrency(planned)}` : ""}
+              </Text>
+            </View>
+            {planned > 0 && (
+              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                <View
+                  className="h-full rounded-full"
+                  style={{ width: `${percent}%`, backgroundColor: barColor }}
+                />
+              </View>
+            )}
+          </View>
+        );
+      })}
     </Card>
   );
 }
