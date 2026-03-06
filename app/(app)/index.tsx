@@ -4,6 +4,7 @@ import { BudgetProgressCard } from "@/components/BudgetProgressCard";
 import { BudgetSummaryCards } from "@/components/BudgetSummaryCards";
 import { CategoryPieChart } from "@/components/CategoryPieChart";
 import { CategorySpendingList } from "@/components/CategorySpendingList";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,14 +12,12 @@ import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useHousehold } from "@/hooks/useHousehold";
+import { useHasBudgetThisMonth } from "@/hooks/useHasBudgetThisMonth";
 import { Link } from "expo-router";
 import { View } from "react-native";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function OverviewScreen() {
-  const { householdId, isLoading: userLoading } = useHousehold();
-  const { currentUser } = useCurrentUser();
+  const { currentUser, isCurrentUserLoading } = useCurrentUser();
   const { monthKey } = useMonth();
   const {
     categories,
@@ -31,8 +30,11 @@ export default function OverviewScreen() {
     error,
     refetch,
   } = useBudgetOverview();
+  const { hasBudgetThisMonth } = useHasBudgetThisMonth();
 
-  if (userLoading) {
+  const householdId = currentUser?.household_id;
+
+  if (isCurrentUserLoading) {
     return (
       <LoadingSpinner />
     );
@@ -68,6 +70,29 @@ export default function OverviewScreen() {
   if (budgetLoading) {
     return (
       <LoadingSpinner />
+    );
+  }
+
+  if (!hasBudgetThisMonth) {
+    return (
+      <View className="flex-1 p-6">
+        <AppHeader />
+        <View className="flex-1 items-center justify-center">
+          <Card className="max-w-sm gap-4 p-6">
+            <Text className="text-center text-xl font-semibold text-gray-900">
+              Ready to take control?
+            </Text>
+            <Text className="text-center text-gray-600">
+              Set up your first budget and see where your money goes. Head to the Budget tab to get started.
+            </Text>
+            <Link href="/(app)/plan" asChild>
+              <Button className="mt-2">
+                <Text>Go to Budget tab</Text>
+              </Button>
+            </Link>
+          </Card>
+        </View>
+      </View>
     );
   }
 
@@ -108,23 +133,6 @@ export default function OverviewScreen() {
             categorySpent={categorySpent}
             error={error?.message}
           />
-
-          {totalPlanned === 0 && !error && (
-            <Card className="border-amber-200 bg-amber-50 gap-0 p-4">
-              <Text className="font-semibold text-amber-900">
-                Plan your budget
-              </Text>
-              <Text className="mt-1 text-sm text-amber-800">
-                You haven&apos;t set a budget for this month. Open the Plan tab to
-                add income and categories.
-              </Text>
-              <Link href="/(app)/plan" asChild>
-                <Button variant="outline" className="mt-3">
-                  <Text>Go to Plan</Text>
-                </Button>
-              </Link>
-            </Card>
-          )}
         </View>
       </ScreenWrapper>
       {householdId && currentUser && (

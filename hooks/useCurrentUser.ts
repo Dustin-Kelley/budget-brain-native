@@ -13,6 +13,6 @@ export function useCurrentUser() {
 
   return {
     currentUser: data?.currentUser ?? null,
-    isLoading: authLoading || (!!authUser && isLoading),
+    isCurrentUserLoading: authLoading || (!!authUser && isLoading),
   };
 }
