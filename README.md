@@ -69,35 +69,72 @@ budget-brain-native/
 
 - Node.js 18+
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for local Supabase)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (`brew install supabase/tap/supabase`)
 - iOS Simulator (Xcode) and/or Android Emulator (Android Studio)
-- A [Supabase](https://supabase.com) project
 
-### Environment Variables
+### Local Development Setup
 
-Create a `.env` file in the project root:
+1. **Install dependencies**
 
-```
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
+   ```bash
+   npm install
+   ```
 
-### Install & Run
+2. **Start Docker Desktop**
 
-```bash
-# Install dependencies
-npm install
+3. **Start local Supabase**
 
-# Start the dev server
-npx expo start
+   ```bash
+   supabase start
+   ```
 
-# Or run directly on a platform
-npx expo run:ios
-npx expo run:android
-```
+   This spins up a full Supabase stack locally (Postgres, Auth, Storage, etc.) and applies all migrations from `supabase/migrations/`. On first run it will pull Docker images which takes a few minutes.
 
-### Supabase Setup
+4. **Environment variables**
 
-The app expects these tables in your Supabase project:
+   `.env.local` is auto-loaded by Expo during local dev and should point at the local Supabase instance:
+
+   ```
+   EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key-from-supabase-start>
+   ```
+
+   Production env vars are set in `eas.json` under the `production` build profile.
+
+5. **Start the app**
+
+   ```bash
+   npx expo start
+   ```
+
+### Local Supabase Commands
+
+| Command | What it does |
+|---------|-------------|
+| `supabase start` | Start the local Supabase stack |
+| `supabase stop` | Stop the local Supabase stack |
+| `supabase status` | Show local URLs and keys |
+| `supabase db reset` | Wipe local DB and re-apply all migrations |
+| `supabase db diff -f <name>` | Auto-generate a migration from local schema changes |
+| `supabase db push` | Apply migrations to the linked remote (production) database |
+| `supabase db push --dry-run` | Preview what would be applied to production |
+
+### Database Schema Workflow
+
+All schema changes should be made **locally** and version-controlled as migrations:
+
+1. Make changes locally (via SQL, local Studio at http://127.0.0.1:54323, or editing migration files)
+2. Generate a migration: `supabase db diff -f describe_your_change`
+3. Test locally: `supabase db reset`
+4. Commit the migration file to git
+5. Deploy to production: `supabase db push`
+
+**Do not** make structural changes (tables, columns, RLS policies) directly in the production Supabase dashboard. Use the dashboard for read-only debugging and monitoring only.
+
+### Supabase Schema
+
+The app expects these tables (defined in `supabase/migrations/`):
 
 - **users** — user profiles linked to Supabase Auth (email, name, avatar_emoji, household_id)
 - **household** — shared household that users belong to
@@ -107,6 +144,13 @@ The app expects these tables in your Supabase project:
 - **income** — income sources per month/year
 
 Auth is configured for **email OTP** (magic code) — no passwords.
+
+### Environments
+
+| Environment | Supabase | Env vars loaded from |
+|-------------|----------|---------------------|
+| Local dev (`npx expo start`) | Local Docker (`http://127.0.0.1:54321`) | `.env.local` |
+| Production (EAS build) | Remote Supabase project | `eas.json` `production.env` |
 
 ## Architecture Notes
 
