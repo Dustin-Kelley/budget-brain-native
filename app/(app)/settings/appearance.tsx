@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { appThemes } from "@/lib/themes";
@@ -10,6 +11,10 @@ export default function AppearanceScreen() {
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
       <View className="gap-6">
+        <View className="flex-row items-center gap-2">
+          <BackButton />
+          <Text variant="h3" className="items-center">Appearance</Text>
+        </View>
         <View className="flex-row items-center justify-between">
           <Text className="text-base text-gray-900">Dark Mode</Text>
           <Switch value={isDark} onValueChange={toggleTheme} />

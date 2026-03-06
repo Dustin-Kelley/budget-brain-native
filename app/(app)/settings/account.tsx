@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
@@ -27,28 +28,36 @@ export default function AccountScreen() {
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
       <View className="gap-6">
-        <View className="gap-1">
-          <Text className="text-sm text-gray-500">Email</Text>
-          <Text className="text-base font-medium text-gray-900">
-            {user?.email ?? "\u2014"}
-          </Text>
+        <View className="flex-row items-center gap-2">
+          <BackButton />
+          <Text variant="h3" className="items-center">Account Settings</Text>
         </View>
 
-        <View className="gap-3">
-          <Button variant="outline" onPress={() => setShowChangePassword(true)}>
-            <Text>Change Password</Text>
-          </Button>
 
-          <Button variant="destructive" onPress={handleSignOut}>
-            <Text>Sign Out</Text>
-          </Button>
+        <View className="gap-6">
+          <View className="gap-1">
+            <Text className="text-sm text-gray-500">Email</Text>
+            <Text className="text-base font-medium text-gray-900">
+              {user?.email ?? "\u2014"}
+            </Text>
+          </View>
+
+          <View className="gap-3">
+            <Button variant="outline" onPress={() => setShowChangePassword(true)}>
+              <Text>Change Password</Text>
+            </Button>
+
+            <Button variant="destructive" onPress={handleSignOut}>
+              <Text>Sign Out</Text>
+            </Button>
+          </View>
         </View>
+
+        <ChangePasswordForm
+          visible={showChangePassword}
+          onClose={() => setShowChangePassword(false)}
+        />
       </View>
-
-      <ChangePasswordForm
-        visible={showChangePassword}
-        onClose={() => setShowChangePassword(false)}
-      />
     </ScrollView>
   );
 }

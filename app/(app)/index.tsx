@@ -12,6 +12,7 @@ import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useHasBudgetThisMonth } from "@/hooks/useHasBudgetThisMonth";
 import { View } from "react-native";
 
@@ -30,10 +31,11 @@ export default function OverviewScreen() {
     refetch,
   } = useBudgetOverview();
   const { hasBudgetThisMonth } = useHasBudgetThisMonth();
+  const { isRollingOver } = useAutoRollover();
 
   const householdId = currentUser?.household_id;
 
-  if (isCurrentUserLoading) {
+  if (isCurrentUserLoading || isRollingOver) {
     return (
       <LoadingSpinner />
     );

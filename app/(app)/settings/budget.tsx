@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
@@ -79,18 +80,13 @@ export default function BudgetScreen() {
     );
   };
 
-  if (!householdId) {
-    return (
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
-        <Text className="text-base text-gray-500">
-          Join or create a household to manage budgets.
-        </Text>
-      </ScrollView>
-    );
-  }
-
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
+      <View className="gap-6">
+        <View className="flex-row items-center gap-2">
+          <BackButton />
+          <Text variant="h3" className="items-center">Budget</Text>
+        </View>
       <View className="gap-3">
         <Text className="text-base font-semibold text-gray-900">
           Budget for {formatMonthYearForDisplay(monthKey)}
@@ -101,6 +97,7 @@ export default function BudgetScreen() {
         <Button variant="outline" onPress={handleRolloverBudget}>
           <Text>Rollover to Next Month</Text>
         </Button>
+      </View>
       </View>
     </ScrollView>
   );

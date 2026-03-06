@@ -7,6 +7,7 @@ import { TransactionsList } from "@/components/TransactionsList";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
+import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useBudgetPlan } from "@/hooks/useBudgetPlan";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
@@ -34,9 +35,10 @@ export default function PlanScreen() {
     refetch,
   } = useBudgetPlan();
 
+  const { isRollingOver } = useAutoRollover();
   const [activeTab, setActiveTab] = useState("planned");
 
-  if (householdLoading || planLoading) {
+  if (householdLoading || planLoading || isRollingOver) {
     return (
       <LoadingSpinner />
     );
