@@ -13,7 +13,6 @@ import { useMonth } from "@/contexts/month-context";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHasBudgetThisMonth } from "@/hooks/useHasBudgetThisMonth";
-import { Link } from "expo-router";
 import { View } from "react-native";
 
 export default function OverviewScreen() {
@@ -75,23 +74,16 @@ export default function OverviewScreen() {
 
   if (!hasBudgetThisMonth) {
     return (
-      <View className="flex-1 p-6">
-        <AppHeader />
-        <View className="flex-1 items-center justify-center">
-          <Card className="max-w-sm gap-4 p-6">
-            <Text className="text-center text-xl font-semibold text-gray-900">
-              Ready to take control?
-            </Text>
-            <Text className="text-center text-gray-600">
-              Set up your first budget and see where your money goes. Head to the Budget tab to get started.
-            </Text>
-            <Link href="/(app)/plan" asChild>
-              <Button className="mt-2">
-                <Text>Go to Budget tab</Text>
-              </Button>
-            </Link>
-          </Card>
-        </View>
+      <View className="flex-1">
+        <ScreenWrapper>
+          <View className="flex-1 items-center justify-center px-4">
+            <Card className="max-w-sm gap-4 border-2 border-primary/20 bg-card p-8 shadow-md shadow-black/10">
+              <Text className="text-center text-xl font-semibold text-gray-900">
+                No budget set up
+              </Text>
+            </Card>
+          </View>
+        </ScreenWrapper>
       </View>
     );
   }

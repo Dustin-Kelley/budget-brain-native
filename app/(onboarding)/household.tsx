@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/BackButton';
 import { OnboardingBackground } from '@/components/OnboardingBackground';
 import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { useAuth } from '@/contexts/auth-context';
 import { householdSchema, type HouseholdFormData } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -65,9 +65,7 @@ export default function HouseholdScreen() {
     <OnboardingBackground>
       <View className="flex-1 justify-between px-6 pb-12 pt-20">
         <View className="gap-8">
-          <Button onPress={() => router.back()} variant="outline" size="icon">
-            <Ionicons name="arrow-back" size={24} className="text-foreground" />
-          </Button>
+          <BackButton />
           <StepIndicator currentStep={2} totalSteps={3} />
           <View className="gap-4">
             <Text className="text-center text-2xl font-bold">

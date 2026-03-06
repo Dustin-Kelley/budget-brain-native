@@ -1,10 +1,10 @@
 
 import { OnboardingBackground } from '@/components/OnboardingBackground';
+import { BackButton } from '@/components/BackButton';
 import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Image, View } from 'react-native';
@@ -44,9 +44,7 @@ export default function WelcomeScreen() {
   return (
     <OnboardingBackground>
       <View className="flex-1 justify-between px-6 pb-12 pt-20">
-        <Button onPress={() => router.back()} variant="outline" size="icon">
-          <Ionicons name="arrow-back" size={24} className="text-foreground" />
-        </Button>
+        <BackButton />
         <View className="flex-1 items-center justify-center gap-6">
           <StepIndicator currentStep={3} totalSteps={3} />
           <Animated.View style={{ opacity }}>
