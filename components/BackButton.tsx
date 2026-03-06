@@ -10,15 +10,16 @@ type BackButtonProps = Omit<
   onPress?: () => void;
 };
 
-export function BackButton({ onPress, ...buttonProps }: BackButtonProps) {
+export function BackButton({ onPress, className, ...buttonProps }: BackButtonProps) {
   return (
     <Button
       onPress={onPress ?? (() => router.back())}
       variant="outline"
       size="icon"
+      className={`h-8 w-8 ${className ?? ""}`}
       {...buttonProps}
     >
-      <Ionicons name="arrow-back" size={24} className="text-foreground" />
+      <Ionicons name="arrow-back" size={16} className="text-foreground" />
     </Button>
   );
 }
