@@ -36,25 +36,14 @@ export default function PlanScreen() {
     refetch,
   } = useBudgetPlan();
 
-  const { rollover, isRollingOver } = useRolloverBudget();
+  const { rollover, isRollingOver, isError } = useRolloverBudget();
   const [activeTab, setActiveTab] = useState("planned");
   const [wizardDismissed, setWizardDismissed] = useState(false);
-  const [rolloverError, setRolloverError] = useState<string | null>(null);
 
   const hasBudgetThisMonth = totalPlanned > 0;
   const showEmptyState = !hasBudgetThisMonth && !wizardDismissed;
 
-  async function handleRollover() {
-    setRolloverError(null);
-    const result = await rollover();
-    if (!result.success) {
-      setRolloverError(
-        result.reason === "no-source"
-          ? "No previous budget found to roll over."
-          : "Something went wrong. Please try again."
-      );
-    }
-  }
+
 
   if (householdLoading || planLoading || isRollingOver) {
     return <LoadingSpinner />;
@@ -69,17 +58,17 @@ export default function PlanScreen() {
               <CardHeader>
                 <CardTitle className="text-xl">No budget yet</CardTitle>
                 <Text className="text-sm text-muted-foreground">
-                  Looks like you don't have a budget for {monthLabel}. Roll over
+                  Looks like you don&apos;t have a budget for {monthLabel}. Roll over
                   your previous budget or start fresh.
                 </Text>
-              </CardHeader>
-              <CardContent className="gap-3">
-                {rolloverError && (
+                {isError && (
                   <Text className="text-sm text-destructive">
-                    {rolloverError}
+                    {"Something went wrong. Please refresh and try again."}
                   </Text>
                 )}
-                <Button onPress={handleRollover}>
+              </CardHeader>
+              <CardContent className="gap-3">
+                <Button onPress={() => rollover()}>
                   <Text>Roll Over Previous Budget</Text>
                 </Button>
                 <Button

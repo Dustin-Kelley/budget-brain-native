@@ -81,7 +81,7 @@ export default function OverviewScreen() {
               Hey — looks like you don&apos;t have a budget set up yet!
             </Text>
             <Text className="text-center text-gray-600">
-              Don't worry its easy! Head to the Budget tab to start. We'll guide you through the rest there.
+              Don&apos;t worry its easy! Head to the Budget tab to start. We&apos;ll guide you through the rest there.
             </Text>
             <Link href="/(app)/plan" asChild>
               <Button className="mt-1">

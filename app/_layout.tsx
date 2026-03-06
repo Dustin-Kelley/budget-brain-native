@@ -2,11 +2,12 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { MonthProvider } from "@/contexts/month-context";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { queryClient } from "@/lib/query-client";
+import { wrapRootLayout } from "@/lib/sentry";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import "../global.css";
 
-export default function RootLayout() {
+function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -24,3 +25,5 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+export default wrapRootLayout(RootLayout);
