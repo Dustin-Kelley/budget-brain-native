@@ -1,18 +1,19 @@
+import { OnboardingBackground } from '@/components/OnboardingBackground';
 import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useAuth } from '@/contexts/auth-context';
 import { updateUserProfile } from '@/lib/mutations/updateUserProfile';
 import { profileSchema, type ProfileFormData } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 export default function ProfileScreen() {
-  const { currentUser } = useCurrentUser();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const form = useForm<ProfileFormData>({
@@ -22,11 +23,11 @@ export default function ProfileScreen() {
   });
 
   async function onSubmit(data: ProfileFormData) {
-    if (!currentUser) return;
+    if (!user) return;
     const { error } = await updateUserProfile({
-      userId: currentUser.id,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      userId: user.id,
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
     });
     if (error) return;
     await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
@@ -34,15 +35,14 @@ export default function ProfileScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <OnboardingBackground>
       <View className="flex-1 justify-between px-6 pb-12 pt-20">
         <View className="gap-8">
           <StepIndicator currentStep={1} totalSteps={3} />
           <View className="gap-4">
-            <Text className="text-center text-2xl font-bold">What's your name?</Text>
+            <Text className="text-center text-2xl font-bold">
+              What's your name?
+            </Text>
             <Controller
               control={form.control}
               name="firstName"
@@ -81,6 +81,6 @@ export default function ProfileScreen() {
           </Button>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </OnboardingBackground>
   );
 }

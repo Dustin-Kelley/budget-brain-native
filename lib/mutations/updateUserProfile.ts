@@ -11,8 +11,7 @@ export async function updateUserProfile({
 }): Promise<{ error: Error | null }> {
   const { error } = await supabase
     .from('users')
-    .update({ first_name: firstName, last_name: lastName })
-    .eq('id', userId);
+    .upsert({ id: userId, first_name: firstName, last_name: lastName });
 
   if (error) return { error: error as Error };
   return { error: null };

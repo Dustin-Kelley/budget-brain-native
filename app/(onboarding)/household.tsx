@@ -1,19 +1,40 @@
+import { OnboardingBackground } from '@/components/OnboardingBackground';
 import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useHousehold } from '@/hooks/useHousehold';
-import { updateHouseholdName } from '@/lib/mutations/updateHouseholdName';
+import { useAuth } from '@/contexts/auth-context';
 import { householdSchema, type HouseholdFormData } from '@/lib/validations';
+import { supabase } from '@/lib/supabase';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
+
+async function createHouseholdForUser(userId: string, name: string | null) {
+  const { data: household, error: hError } = await supabase
+    .from('household')
+    .insert({ name })
+    .select('id')
+    .single();
+  if (hError) return { error: hError as Error };
+
+  const { error: uError } = await supabase
+    .from('users')
+    .update({ household_id: household.id })
+    .eq('id', userId);
+  if (uError) return { error: uError as Error };
+
+  return { error: null };
+}
 
 export default function HouseholdScreen() {
-  const { householdId } = useHousehold();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [skipping, setSkipping] = useState(false);
 
   const form = useForm<HouseholdFormData>({
     resolver: zodResolver(householdSchema),
@@ -22,54 +43,64 @@ export default function HouseholdScreen() {
   });
 
   async function onSubmit(data: HouseholdFormData) {
-    if (!householdId) return;
-    const { error } = await updateHouseholdName({
-      householdId,
-      name: data.name,
-    });
+    if (!user) return;
+    const { error } = await createHouseholdForUser(user.id, data.name.trim());
     if (error) return;
+    await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     await queryClient.invalidateQueries({ queryKey: ['household'] });
     router.push('/(onboarding)/welcome');
   }
 
+  async function handleSkip() {
+    if (!user) return;
+    setSkipping(true);
+    const { error } = await createHouseholdForUser(user.id, null);
+    setSkipping(false);
+    if (error) return;
+    await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    router.push('/(onboarding)/welcome');
+  }
+
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <OnboardingBackground>
       <View className="flex-1 justify-between px-6 pb-12 pt-20">
         <View className="gap-8">
+          <Button onPress={() => router.back()} variant="outline" size="icon">
+            <Ionicons name="arrow-back" size={24} className="text-foreground" />
+          </Button>
           <StepIndicator currentStep={2} totalSteps={3} />
-          <View className="gap-2">
-            <Text className="text-center text-2xl font-bold">Name your household</Text>
+          <View className="gap-4">
+            <Text className="text-center text-2xl font-bold">
+              Name your household
+            </Text>
             <Text className="text-center text-muted-foreground">
               This helps you organize your budget
             </Text>
+            <Controller
+              control={form.control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="Household name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoFocus
+                  autoCapitalize="words"
+                />
+              )}
+            />
           </View>
-          <Controller
-            control={form.control}
-            name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                placeholder="Household name"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                autoFocus
-                autoCapitalize="words"
-              />
-            )}
-          />
         </View>
         <View className="gap-3">
           <Button onPress={form.handleSubmit(onSubmit)} disabled={!form.formState.isValid || form.formState.isSubmitting}>
             <Text>Next</Text>
           </Button>
-          <Button variant="ghost" onPress={() => router.push('/(onboarding)/welcome')}>
+          <Button variant="ghost" onPress={handleSkip} disabled={skipping}>
             <Text>Skip</Text>
           </Button>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </OnboardingBackground>
   );
 }

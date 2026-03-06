@@ -5,36 +5,35 @@ import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   Text as RNText,
   View,
 } from "react-native";
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { sendOtp } = useAuth();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "" },
     mode: "onBlur",
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    const { error } = await signIn(data.email, data.password);
+    const { error } = await sendOtp(data.email.toLowerCase());
 
     if (error) {
-      Alert.alert("Login failed", "Invalid credentials. Please try again.");
+      Alert.alert("Error", error.message);
       return;
     }
 
-    router.replace("/");
+    router.push({ pathname: "/(auth)/verify-otp", params: { email: data.email.toLowerCase() } });
   };
 
   return (
@@ -46,7 +45,7 @@ export default function LoginScreen() {
         <Logo />
         <Text className="mt-4 text-center text-3xl font-bold">Budget Brain</Text>
         <Text className="mb-8 text-center text-lg text-muted-foreground">
-          Welcome back
+          Enter your email to get started
         </Text>
 
         <View className="gap-4">
@@ -73,54 +72,13 @@ export default function LoginScreen() {
             )}
           />
 
-          <Controller
-            control={form.control}
-            name="password"
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-              <View>
-                <Input
-                  placeholder="Password"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  secureTextEntry
-                  autoComplete="password"
-                  editable={!form.formState.isSubmitting}
-                  className={error ? "border-destructive" : ""}
-                />
-                {error?.message && (
-                  <RNText className="mt-1 text-sm text-destructive">{error.message}</RNText>
-                )}
-              </View>
-            )}
-          />
-
           <Button variant="secondary" onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting} className="mt-2">
             {form.formState.isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text>Login</Text>
+              <Text>Continue</Text>
             )}
           </Button>
-        </View>
-
-        <View className="mt-4 items-center">
-          <Link href="/(auth)/forgot-password" asChild>
-            <Pressable>
-              <Text className="text-sm font-semibold">Forgot Password?</Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        <View className="mt-6 flex-row items-center justify-center">
-          <Text className="text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-          </Text>
-          <Link href="/(auth)/sign-up" asChild>
-            <Pressable>
-              <Text className="text-sm font-semibold">Sign up</Text>
-            </Pressable>
-          </Link>
         </View>
       </View>
     </KeyboardAvoidingView>
