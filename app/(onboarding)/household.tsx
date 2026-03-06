@@ -3,30 +3,55 @@ import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useHousehold } from '@/hooks/useHousehold';
-import { updateHouseholdName } from '@/lib/mutations/updateHouseholdName';
+import { useAuth } from '@/contexts/auth-context';
+import { supabase } from '@/lib/supabase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
+async function createHouseholdForUser(userId: string, name: string | null) {
+  const { data: household, error: hError } = await supabase
+    .from('household')
+    .insert({ name })
+    .select('id')
+    .single();
+  if (hError) return { error: hError as Error };
+
+  const { error: uError } = await supabase
+    .from('users')
+    .update({ household_id: household.id })
+    .eq('id', userId);
+  if (uError) return { error: uError as Error };
+
+  return { error: null };
+}
+
 export default function HouseholdScreen() {
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
-  const { householdId } = useHousehold();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   async function handleNext() {
-    if (!name.trim() || !householdId) return;
+    if (!name.trim() || !user) return;
     setSaving(true);
-    const { error } = await updateHouseholdName({
-      householdId,
-      name: name.trim(),
-    });
+    const { error } = await createHouseholdForUser(user.id, name.trim());
     setSaving(false);
     if (error) return;
+    await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     await queryClient.invalidateQueries({ queryKey: ['household'] });
+    router.push('/(onboarding)/welcome');
+  }
+
+  async function handleSkip() {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await createHouseholdForUser(user.id, null);
+    setSaving(false);
+    if (error) return;
+    await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     router.push('/(onboarding)/welcome');
   }
 
@@ -58,7 +83,7 @@ export default function HouseholdScreen() {
           <Button onPress={handleNext} disabled={!name.trim() || saving}>
             <Text>Next</Text>
           </Button>
-          <Button variant="ghost" onPress={() => router.push('/(onboarding)/welcome')}>
+          <Button variant="ghost" onPress={handleSkip} disabled={saving}>
             <Text>Skip</Text>
           </Button>
         </View>

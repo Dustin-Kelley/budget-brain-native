@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Image, View } from 'react-native';
@@ -38,8 +37,7 @@ export default function WelcomeScreen() {
     return () => animation.stop();
   }, [opacity]);
 
-  async function handleGetStarted() {
-    await AsyncStorage.setItem('budget-brain-onboarding-completed', 'true');
+  function handleGetStarted() {
     router.replace('/(app)');
   }
 
