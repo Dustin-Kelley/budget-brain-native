@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
-import { useAutoRollover } from "@/hooks/useAutoRollover";
 import { useBudgetOverview } from "@/hooks/useBudgetOverview";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHasBudgetThisMonth } from "@/hooks/useHasBudgetThisMonth";
@@ -32,11 +31,9 @@ export default function OverviewScreen() {
     refetch,
   } = useBudgetOverview();
   const { hasBudgetThisMonth } = useHasBudgetThisMonth();
-  const { isRollingOver } = useAutoRollover();
-
   const householdId = currentUser?.household_id;
 
-  if (isCurrentUserLoading || isRollingOver) {
+  if (isCurrentUserLoading) {
     return (
       <LoadingSpinner />
     );

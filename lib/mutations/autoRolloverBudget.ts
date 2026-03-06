@@ -67,7 +67,6 @@ export async function autoRolloverBudget({
         household_id: householdId,
         month: to.monthNumber,
         year: to.yearNumber,
-        created_by: userId,
       })
       .select('id')
       .single();

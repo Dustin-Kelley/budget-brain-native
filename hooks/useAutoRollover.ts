@@ -1,64 +1,52 @@
 import { useMonth } from '@/contexts/month-context';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHousehold } from '@/hooks/useHousehold';
-import { useBudgetOverview } from '@/hooks/useBudgetOverview';
-import { findMostRecentBudgetMonth } from '@/lib/queries/findMostRecentBudgetMonth';
 import { autoRolloverBudget } from '@/lib/mutations/autoRolloverBudget';
+import { findMostRecentBudgetMonth } from '@/lib/queries/findMostRecentBudgetMonth';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-export function useAutoRollover() {
+type RolloverResult =
+  | { success: true }
+  | { success: false; reason: 'no-source' | 'error' };
+
+export function useRolloverBudget() {
   const { monthKey } = useMonth();
   const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
-  const { totalPlanned, isLoading: budgetLoading } = useBudgetOverview();
   const queryClient = useQueryClient();
 
   const [isRollingOver, setIsRollingOver] = useState(false);
-  const attemptedMonths = useRef(new Set<string>());
 
-  useEffect(() => {
-    if (
-      budgetLoading ||
-      !householdId ||
-      !currentUser?.id ||
-      totalPlanned > 0 ||
-      attemptedMonths.current.has(monthKey)
-    ) {
-      return;
+  async function rollover(): Promise<RolloverResult> {
+    if (!householdId || !currentUser?.id) {
+      return { success: false, reason: 'error' };
     }
 
-    attemptedMonths.current.add(monthKey);
-
-    let cancelled = false;
-
-    async function run() {
-      setIsRollingOver(true);
-      try {
-        const sourceMonth = await findMostRecentBudgetMonth(householdId!, monthKey);
-        if (!sourceMonth || cancelled) return;
-
-        const { error } = await autoRolloverBudget({
-          householdId: householdId!,
-          fromMonthKey: sourceMonth,
-          toMonthKey: monthKey,
-          userId: currentUser!.id,
-        });
-
-        if (error || cancelled) return;
-
-        await queryClient.invalidateQueries();
-      } finally {
-        if (!cancelled) setIsRollingOver(false);
+    setIsRollingOver(true);
+    try {
+      const sourceMonth = await findMostRecentBudgetMonth(householdId, monthKey);
+      if (!sourceMonth) {
+        return { success: false, reason: 'no-source' };
       }
+
+      const { error } = await autoRolloverBudget({
+        householdId,
+        fromMonthKey: sourceMonth,
+        toMonthKey: monthKey,
+        userId: currentUser.id,
+      });
+
+      if (error) {
+        return { success: false, reason: 'error' };
+      }
+
+      await queryClient.invalidateQueries();
+      return { success: true };
+    } finally {
+      setIsRollingOver(false);
     }
+  }
 
-    run();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [monthKey, budgetLoading, householdId, currentUser?.id, totalPlanned, queryClient]);
-
-  return { isRollingOver };
+  return { rollover, isRollingOver };
 }

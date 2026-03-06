@@ -5,8 +5,11 @@ import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
 import { ScreenWrapper } from "@/components/ScreenWrapper";
 import { TransactionsList } from "@/components/TransactionsList";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Text } from "@/components/ui/text";
 import { useMonth } from "@/contexts/month-context";
-import { useAutoRollover } from "@/hooks/useAutoRollover";
+import { useRolloverBudget } from "@/hooks/useAutoRollover";
 import { useBudgetPlan } from "@/hooks/useBudgetPlan";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
@@ -33,21 +36,67 @@ export default function PlanScreen() {
     refetch,
   } = useBudgetPlan();
 
-  const { isRollingOver } = useAutoRollover();
+  const { rollover, isRollingOver } = useRolloverBudget();
   const [activeTab, setActiveTab] = useState("planned");
   const [wizardDismissed, setWizardDismissed] = useState(false);
+  const [rolloverError, setRolloverError] = useState<string | null>(null);
 
   const hasBudgetThisMonth = totalPlanned > 0;
-  const showWizard = !hasBudgetThisMonth && !wizardDismissed;
+  const showEmptyState = !hasBudgetThisMonth && !wizardDismissed;
+
+  async function handleRollover() {
+    setRolloverError(null);
+    const result = await rollover();
+    if (!result.success) {
+      setRolloverError(
+        result.reason === "no-source"
+          ? "No previous budget found to roll over."
+          : "Something went wrong. Please try again."
+      );
+    }
+  }
 
   if (householdLoading || planLoading || isRollingOver) {
+    return <LoadingSpinner />;
+  }
+
+  if (showEmptyState && householdId && currentUser?.id) {
     return (
-      <LoadingSpinner />
+      <View className="flex-1">
+        <ScreenWrapper header="plan">
+          <View className="gap-4 pt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">No budget yet</CardTitle>
+                <Text className="text-sm text-muted-foreground">
+                  Looks like you don't have a budget for {monthLabel}. Roll over
+                  your previous budget or start fresh.
+                </Text>
+              </CardHeader>
+              <CardContent className="gap-3">
+                {rolloverError && (
+                  <Text className="text-sm text-destructive">
+                    {rolloverError}
+                  </Text>
+                )}
+                <Button onPress={handleRollover}>
+                  <Text>Roll Over Previous Budget</Text>
+                </Button>
+                <Button
+                  variant="outline"
+                  onPress={() => setWizardDismissed(true)}
+                >
+                  <Text>Start From Scratch</Text>
+                </Button>
+              </CardContent>
+            </Card>
+          </View>
+        </ScreenWrapper>
+      </View>
     );
   }
 
-
-  if (showWizard && householdId && currentUser?.id) {
+  if (!hasBudgetThisMonth && wizardDismissed && householdId && currentUser?.id) {
     return (
       <BudgetSetupWizard
         householdId={householdId}
@@ -59,7 +108,7 @@ export default function PlanScreen() {
         totalPlanned={totalPlanned}
         monthLabel={monthLabel}
         refetch={refetch}
-        onComplete={() => setWizardDismissed(true)}
+        onComplete={() => setWizardDismissed(false)}
       />
     );
   }
