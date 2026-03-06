@@ -4,25 +4,29 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useHousehold } from '@/hooks/useHousehold';
 import { updateHouseholdName } from '@/lib/mutations/updateHouseholdName';
+import { householdSchema, type HouseholdFormData } from '@/lib/validations';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
 export default function HouseholdScreen() {
-  const [name, setName] = useState('');
-  const [saving, setSaving] = useState(false);
   const { householdId } = useHousehold();
   const queryClient = useQueryClient();
 
-  async function handleNext() {
-    if (!name.trim() || !householdId) return;
-    setSaving(true);
+  const form = useForm<HouseholdFormData>({
+    resolver: zodResolver(householdSchema),
+    defaultValues: { name: '' },
+    mode: 'onChange',
+  });
+
+  async function onSubmit(data: HouseholdFormData) {
+    if (!householdId) return;
     const { error } = await updateHouseholdName({
       householdId,
-      name: name.trim(),
+      name: data.name,
     });
-    setSaving(false);
     if (error) return;
     await queryClient.invalidateQueries({ queryKey: ['household'] });
     router.push('/(onboarding)/welcome');
@@ -42,16 +46,23 @@ export default function HouseholdScreen() {
               This helps you organize your budget
             </Text>
           </View>
-          <Input
-            placeholder="Household name"
-            value={name}
-            onChangeText={setName}
-            autoFocus
-            autoCapitalize="words"
+          <Controller
+            control={form.control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                placeholder="Household name"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                autoFocus
+                autoCapitalize="words"
+              />
+            )}
           />
         </View>
         <View className="gap-3">
-          <Button onPress={handleNext} disabled={!name.trim() || saving}>
+          <Button onPress={form.handleSubmit(onSubmit)} disabled={!form.formState.isValid || form.formState.isSubmitting}>
             <Text>Next</Text>
           </Button>
           <Button variant="ghost" onPress={() => router.push('/(onboarding)/welcome')}>

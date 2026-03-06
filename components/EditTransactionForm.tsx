@@ -1,21 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { deleteTransaction } from "@/lib/mutations/deleteTransaction";
 import { updateTransaction } from "@/lib/mutations/updateTransaction";
+import { editTransactionSchema, type EditTransactionFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
   Modal,
   Pressable,
   ScrollView,
+  Text as RNText,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type TransactionItem = {
   id?: string;
@@ -60,56 +64,48 @@ export function EditTransactionForm({
   onSuccess,
 }: EditTransactionFormProps) {
   const lineItems = flattenLineItems(categories);
-  const [amount, setAmount] = useState(String(transaction.amount ?? 0));
-  const [description, setDescription] = useState(
-    transaction.description ?? ""
-  );
-  const [lineItemId, setLineItemId] = useState<string | null>(
-    transaction.line_item_id ?? null
-  );
-  const [date, setDate] = useState(
-    transaction.date?.split("T")[0] ?? new Date().toISOString().split("T")[0]
-  );
   const insets = useSafeAreaInsets();
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const getDefaults = () => ({
+    amount: String(transaction.amount ?? 0),
+    description: transaction.description ?? "",
+    lineItemId: transaction.line_item_id ?? "",
+    date: transaction.date?.split("T")[0] ?? new Date().toISOString().split("T")[0],
+  });
+
+  const form = useForm<EditTransactionFormData>({
+    resolver: zodResolver(editTransactionSchema),
+    defaultValues: getDefaults(),
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    form.reset(getDefaults());
+  }, [transaction, form]);
+
+  const lineItemId = form.watch("lineItemId");
   const selectedLineItem = lineItems.find(({ item }) => item.id === lineItemId);
 
   const handleClose = () => {
     onClose();
-    setAmount(String(transaction.amount ?? 0));
-    setDescription(transaction.description ?? "");
-    setLineItemId(transaction.line_item_id ?? null);
-    setDate(
-      transaction.date?.split("T")[0] ?? new Date().toISOString().split("T")[0]
-    );
+    form.reset(getDefaults());
   };
 
-  const handleUpdate = async () => {
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive number.");
-      return;
-    }
-    if (!lineItemId) {
-      Alert.alert("Budget item required", "Please select a budget item.");
-      return;
-    }
+  const onSubmit = async (data: EditTransactionFormData) => {
     if (!transaction.id) return;
 
-    setIsSubmitting(true);
     const { error } = await updateTransaction({
       transactionId: transaction.id,
-      amount: amountNum,
-      description: description.trim() || undefined,
-      lineItemId,
-      dateOfTransaction: date.trim(),
+      amount: parseFloat(data.amount),
+      description: data.description?.trim() || undefined,
+      lineItemId: data.lineItemId,
+      dateOfTransaction: data.date,
       monthKey,
       householdId,
       userId,
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -131,9 +127,9 @@ export function EditTransactionForm({
           style: "destructive",
           onPress: async () => {
             if (!transaction.id) return;
-            setIsSubmitting(true);
+            setIsDeleting(true);
             const { error } = await deleteTransaction({ transactionId: transaction.id });
-            setIsSubmitting(false);
+            setIsDeleting(false);
             if (error) {
               Alert.alert("Error", error.message);
               return;
@@ -145,6 +141,8 @@ export function EditTransactionForm({
       ]
     );
   };
+
+  const isSubmitting = form.formState.isSubmitting || isDeleting;
 
   return (
     <Modal
@@ -168,86 +166,86 @@ export function EditTransactionForm({
 
           <ScrollView className="max-h-96 px-4 py-4">
             <View className="gap-4">
-              <View className="gap-2">
-                <Label>Amount *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="0.00"
-                  value={amount}
-                  onChangeText={setAmount}
-                  keyboardType="decimal-pad"
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="amount"
+                label="Amount *"
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
 
-              <View className="gap-2">
-                <Label>Description</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="Optional"
-                  value={description}
-                  onChangeText={setDescription}
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="description"
+                label="Description"
+                placeholder="Optional"
+                editable={!isSubmitting}
+              />
 
-              <View className="gap-2">
-                <Label>Budget Item *</Label>
-                <Pressable
-                  onPress={() => setShowLineItemPicker((prev) => !prev)}
-                  className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
-                >
-                  <Text
-                    className={
-                      selectedLineItem ? "text-gray-900" : "text-gray-400"
-                    }
-                  >
-                    {selectedLineItem
-                      ? `${selectedLineItem.categoryName} → ${selectedLineItem.item.name ?? "Item"}`
-                      : "Select budget item"}
-                  </Text>
-                </Pressable>
-                {showLineItemPicker && (
-                  <View className="mt-2 max-h-40 rounded-lg border border-gray-200 bg-gray-50">
-                    <ScrollView className="max-h-40">
-                      {lineItems.length === 0 ? (
-                        <Text className="p-4 text-center text-sm text-gray-500">
-                          No budget items.
-                        </Text>
-                      ) : (
-                        lineItems.map(({ item, categoryName }) => (
-                          <Pressable
-                            key={item.id}
-                            onPress={() => {
-                              setLineItemId(item.id);
-                              setShowLineItemPicker(false);
-                            }}
-                            className="border-b border-gray-100 px-4 py-3 last:border-b-0"
-                          >
-                            <Text className="font-medium text-gray-900">
-                              {item.name ?? "Item"}
+              <Controller
+                control={form.control}
+                name="lineItemId"
+                render={({ fieldState: { error } }) => (
+                  <View className="gap-2">
+                    <Label>Budget Item *</Label>
+                    <Pressable
+                      onPress={() => setShowLineItemPicker((prev) => !prev)}
+                      className={`rounded-lg border bg-gray-50 px-4 py-3 ${error ? "border-destructive" : "border-gray-200"}`}
+                    >
+                      <Text
+                        className={
+                          selectedLineItem ? "text-gray-900" : "text-gray-400"
+                        }
+                      >
+                        {selectedLineItem
+                          ? `${selectedLineItem.categoryName} → ${selectedLineItem.item.name ?? "Item"}`
+                          : "Select budget item"}
+                      </Text>
+                    </Pressable>
+                    {showLineItemPicker && (
+                      <View className="mt-2 max-h-40 rounded-lg border border-gray-200 bg-gray-50">
+                        <ScrollView className="max-h-40">
+                          {lineItems.length === 0 ? (
+                            <Text className="p-4 text-center text-sm text-gray-500">
+                              No budget items.
                             </Text>
-                            <Text className="text-xs text-gray-500">
-                              {categoryName}
-                            </Text>
-                          </Pressable>
-                        ))
-                      )}
-                    </ScrollView>
+                          ) : (
+                            lineItems.map(({ item, categoryName }) => (
+                              <Pressable
+                                key={item.id}
+                                onPress={() => {
+                                  form.setValue("lineItemId", item.id, { shouldValidate: true });
+                                  setShowLineItemPicker(false);
+                                }}
+                                className="border-b border-gray-100 px-4 py-3 last:border-b-0"
+                              >
+                                <Text className="font-medium text-gray-900">
+                                  {item.name ?? "Item"}
+                                </Text>
+                                <Text className="text-xs text-gray-500">
+                                  {categoryName}
+                                </Text>
+                              </Pressable>
+                            ))
+                          )}
+                        </ScrollView>
+                      </View>
+                    )}
+                    {error?.message && (
+                      <RNText className="text-sm text-destructive">{error.message}</RNText>
+                    )}
                   </View>
                 )}
-              </View>
+              />
 
-              <View className="gap-2">
-                <Label>Date *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="YYYY-MM-DD"
-                  value={date}
-                  onChangeText={setDate}
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="date"
+                label="Date *"
+                placeholder="YYYY-MM-DD"
+                editable={!isSubmitting}
+              />
             </View>
           </ScrollView>
 
@@ -262,8 +260,8 @@ export function EditTransactionForm({
             >
               <Ionicons name="trash-outline" size={20} color="#dc2626" />
             </Pressable>
-            <Button className="flex-1" onPress={handleUpdate} disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button className="flex-1" onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+              {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Text>Save Changes</Text>

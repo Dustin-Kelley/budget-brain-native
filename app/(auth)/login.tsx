@@ -3,32 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
+import { loginSchema, type LoginFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  Text as RNText,
   View,
 } from "react-native";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter email and password");
-      return;
-    }
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+    mode: "onBlur",
+  });
 
-    setIsSubmitting(true);
-    const { error } = await signIn(email, password);
-    setIsSubmitting(false);
+  const onSubmit = async (data: LoginFormData) => {
+    const { error } = await signIn(data.email, data.password);
 
     if (error) {
       Alert.alert("Login failed", "Invalid credentials. Please try again.");
@@ -51,27 +50,53 @@ export default function LoginScreen() {
         </Text>
 
         <View className="gap-4">
-          <Input
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-            editable={!isSubmitting}
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View>
+                <Input
+                  placeholder="Email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  editable={!form.formState.isSubmitting}
+                  className={error ? "border-destructive" : ""}
+                />
+                {error?.message && (
+                  <RNText className="mt-1 text-sm text-destructive">{error.message}</RNText>
+                )}
+              </View>
+            )}
           />
 
-          <Input
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoComplete="password"
-            editable={!isSubmitting}
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View>
+                <Input
+                  placeholder="Password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  secureTextEntry
+                  autoComplete="password"
+                  editable={!form.formState.isSubmitting}
+                  className={error ? "border-destructive" : ""}
+                />
+                {error?.message && (
+                  <RNText className="mt-1 text-sm text-destructive">{error.message}</RNText>
+                )}
+              </View>
+            )}
           />
 
-          <Button variant="secondary" onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
-            {isSubmitting ? (
+          <Button variant="secondary" onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting} className="mt-2">
+            {form.formState.isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <Text>Login</Text>

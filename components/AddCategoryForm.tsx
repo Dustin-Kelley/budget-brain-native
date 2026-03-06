@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { addCategory } from "@/lib/mutations/addCategory";
+import { addCategorySchema, type AddCategoryFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -14,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState } from "react";
 
 type AddCategoryFormProps = {
   householdId: string;
@@ -28,32 +30,24 @@ export function AddCategoryForm({
 }: AddCategoryFormProps) {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
-  const [categoryName, setCategoryName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
-    setCategoryName("");
-  };
+  const form = useForm<AddCategoryFormData>({
+    resolver: zodResolver(addCategorySchema),
+    defaultValues: { categoryName: "" },
+    mode: "onBlur",
+  });
 
   const handleClose = () => {
     setVisible(false);
-    resetForm();
+    form.reset();
   };
 
-  const handleSubmit = async () => {
-    const name = categoryName.trim();
-    if (!name) {
-      Alert.alert("Name required", "Please enter a category name.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: AddCategoryFormData) => {
     const { error } = await addCategory({
-      categoryName: name,
+      categoryName: data.categoryName,
       monthKey,
       householdId,
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -99,25 +93,22 @@ export function AddCategoryForm({
             </View>
 
             <ScrollView className="px-4 py-4">
-              <View className="gap-2">
-                <Label>Name *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="e.g. Groceries, Rent"
-                  value={categoryName}
-                  onChangeText={setCategoryName}
-                  editable={!isSubmitting}
-                  autoCapitalize="words"
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="categoryName"
+                label="Name *"
+                placeholder="e.g. Groceries, Rent"
+                editable={!form.formState.isSubmitting}
+                autoCapitalize="words"
+              />
             </ScrollView>
 
             <View
               className="border-t border-gray-200 px-4 pt-4"
               style={{ paddingBottom: 16 + insets.bottom }}
             >
-              <Button onPress={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <Text>Save Category</Text>

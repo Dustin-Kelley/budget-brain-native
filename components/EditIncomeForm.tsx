@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { updateIncome } from "@/lib/mutations/updateIncome";
 import { deleteIncome } from "@/lib/mutations/deleteIncome";
+import { editIncomeSchema, type EditIncomeFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -30,39 +33,38 @@ export function EditIncomeForm({
   onSuccess,
 }: EditIncomeFormProps) {
   const insets = useSafeAreaInsets();
-  const [name, setName] = useState(income.name ?? "");
-  const [amount, setAmount] = useState(String(income.amount ?? 0));
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const resetForm = () => {
-    setName(income.name ?? "");
-    setAmount(String(income.amount ?? 0));
-  };
+  const form = useForm<EditIncomeFormData>({
+    resolver: zodResolver(editIncomeSchema),
+    defaultValues: {
+      name: income.name ?? "",
+      amount: String(income.amount ?? 0),
+    },
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    form.reset({
+      name: income.name ?? "",
+      amount: String(income.amount ?? 0),
+    });
+  }, [income, form]);
 
   const handleClose = () => {
     onClose();
-    resetForm();
+    form.reset({
+      name: income.name ?? "",
+      amount: String(income.amount ?? 0),
+    });
   };
 
-  const handleSubmit = async () => {
-    const trimmed = name.trim();
-    if (!trimmed) {
-      Alert.alert("Name required", "Please enter an income name.");
-      return;
-    }
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive amount.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: EditIncomeFormData) => {
     const { error } = await updateIncome({
       incomeId: income.id,
-      name: trimmed,
-      amount: amountNum,
+      name: data.name,
+      amount: parseFloat(data.amount),
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -83,9 +85,9 @@ export function EditIncomeForm({
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            setIsSubmitting(true);
+            setIsDeleting(true);
             const { error } = await deleteIncome({ incomeId: income.id });
-            setIsSubmitting(false);
+            setIsDeleting(false);
             if (error) {
               Alert.alert("Error", error.message);
               return;
@@ -97,6 +99,8 @@ export function EditIncomeForm({
       ]
     );
   };
+
+  const isSubmitting = form.formState.isSubmitting || isDeleting;
 
   return (
     <Modal
@@ -120,29 +124,23 @@ export function EditIncomeForm({
 
           <ScrollView className="px-4 py-4">
             <View className="gap-4">
-              <View className="gap-2">
-                <Label>Name *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="Income name"
-                  value={name}
-                  onChangeText={setName}
-                  editable={!isSubmitting}
-                  autoCapitalize="words"
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="name"
+                label="Name *"
+                placeholder="Income name"
+                editable={!isSubmitting}
+                autoCapitalize="words"
+              />
 
-              <View className="gap-2">
-                <Label>Amount *</Label>
-                <Input
-                  className="rounded-lg px-4 py-3"
-                  placeholder="0"
-                  value={amount}
-                  onChangeText={setAmount}
-                  keyboardType="decimal-pad"
-                  editable={!isSubmitting}
-                />
-              </View>
+              <FormField
+                control={form.control}
+                name="amount"
+                label="Amount *"
+                placeholder="0"
+                keyboardType="decimal-pad"
+                editable={!isSubmitting}
+              />
             </View>
           </ScrollView>
 
@@ -159,8 +157,8 @@ export function EditIncomeForm({
             >
               <Ionicons name="trash-outline" size={20} color="#fff" />
             </Button>
-            <Button className="flex-1" onPress={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button className="flex-1" onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+              {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Text>Save Changes</Text>

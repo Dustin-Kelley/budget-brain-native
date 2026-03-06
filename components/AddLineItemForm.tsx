@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { addLineItem } from "@/lib/mutations/addLineItem";
+import { addLineItemSchema, type AddLineItemFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -32,41 +34,26 @@ export function AddLineItemForm({
 }: AddLineItemFormProps) {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
-  const [lineItemName, setLineItemName] = useState("");
-  const [plannedAmount, setPlannedAmount] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
-    setLineItemName("");
-    setPlannedAmount("");
-  };
+  const form = useForm<AddLineItemFormData>({
+    resolver: zodResolver(addLineItemSchema),
+    defaultValues: { name: "", plannedAmount: "" },
+    mode: "onBlur",
+  });
 
   const handleClose = () => {
     setVisible(false);
-    resetForm();
+    form.reset();
   };
 
-  const handleSubmit = async () => {
-    const name = lineItemName.trim();
-    if (!name) {
-      Alert.alert("Name required", "Please enter an item name.");
-      return;
-    }
-    const amountNum = parseFloat(plannedAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert("Invalid amount", "Please enter a positive planned amount.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: AddLineItemFormData) => {
     const { error } = await addLineItem({
-      lineItemName: name,
+      lineItemName: data.name,
       categoryId,
-      plannedAmount: amountNum,
+      plannedAmount: parseFloat(data.plannedAmount),
       monthKey,
       userId,
     });
-    setIsSubmitting(false);
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -115,29 +102,23 @@ export function AddLineItemForm({
 
             <ScrollView className="px-4 py-4">
               <View className="gap-4">
-                <View className="gap-2">
-                  <Label>Name *</Label>
-                  <Input
-                    className="rounded-lg px-4 py-3"
-                    placeholder="e.g. Coffee, Gas"
-                    value={lineItemName}
-                    onChangeText={setLineItemName}
-                    editable={!isSubmitting}
-                    autoCapitalize="words"
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  label="Name *"
+                  placeholder="e.g. Coffee, Gas"
+                  editable={!form.formState.isSubmitting}
+                  autoCapitalize="words"
+                />
 
-                <View className="gap-2">
-                  <Label>Planned Amount *</Label>
-                  <Input
-                    className="rounded-lg px-4 py-3"
-                    placeholder="0"
-                    value={plannedAmount}
-                    onChangeText={setPlannedAmount}
-                    keyboardType="decimal-pad"
-                    editable={!isSubmitting}
-                  />
-                </View>
+                <FormField
+                  control={form.control}
+                  name="plannedAmount"
+                  label="Planned Amount *"
+                  placeholder="0"
+                  keyboardType="decimal-pad"
+                  editable={!form.formState.isSubmitting}
+                />
               </View>
             </ScrollView>
 
@@ -145,8 +126,8 @@ export function AddLineItemForm({
               className="border-t border-gray-200 px-4 pt-4"
               style={{ paddingBottom: 16 + insets.bottom }}
             >
-              <Button onPress={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
                   <ActivityIndicator color="white" />
                 ) : (
                   <Text>Save Item</Text>

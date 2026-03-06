@@ -2,31 +2,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { supabase } from "@/lib/supabase";
+import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  Text as RNText,
   View,
 } from "react-native";
 
 export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const form = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
+    mode: "onBlur",
+  });
 
-  const handleSubmit = async () => {
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed) {
-      Alert.alert("Error", "Please enter your email address.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(trimmed);
-    setIsSubmitting(false);
+  const onSubmit = async (data: ForgotPasswordFormData) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      data.email.toLowerCase()
+    );
 
     if (error) {
       Alert.alert("Error", error.message);
@@ -51,18 +51,31 @@ export default function ForgotPasswordScreen() {
         </Text>
 
         <View className="gap-4">
-          <Input
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-            editable={!isSubmitting}
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              <View>
+                <Input
+                  placeholder="Email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoComplete="email"
+                  editable={!form.formState.isSubmitting}
+                  className={error ? "border-destructive" : ""}
+                />
+                {error?.message && (
+                  <RNText className="mt-1 text-sm text-destructive">{error.message}</RNText>
+                )}
+              </View>
+            )}
           />
 
-          <Button onPress={handleSubmit} disabled={isSubmitting} className="mt-2">
-            {isSubmitting ? (
+          <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting} className="mt-2">
+            {form.formState.isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <Text>Send Reset Link</Text>
