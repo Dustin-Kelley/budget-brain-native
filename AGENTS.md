@@ -87,3 +87,11 @@ const { data, isLoading } = useQuery({
 - Fetch logic lives in `@/lib/queries/`; hooks in `hooks/` only orchestrate `useQuery` and shape the return value.
 
 Reference implementations: `hooks/useHousehold.ts`, `hooks/useCurrentUser.ts`.
+
+### Mutations and error handling
+
+- **Throw errors in server queries and mutations** (e.g. in `@/lib/queries/` and `@/lib/mutations/`). Return values for “expected” outcomes (e.g. no data) are fine; for real failures, throw so React Query can treat them as errors.
+- **Catch and handle errors with React Query’s `onError`** where the mutation is consumed (e.g. in the hook that uses `useMutation`). Do not rely on a global `onError` on the QueryClient; log or report errors at the call site so you have feature-specific context (tags, extra) and can decide what to log.
+- In the mutation’s `onError`, use the project’s logging (e.g. `logError` / `useLogError`) with appropriate tags and extra data (e.g. `feature: 'rollover'`, `monthKey`).
+
+Reference: `hooks/useAutoRollover.ts` (rollover mutation with `onError` and `useLogError`).
