@@ -1,26 +1,27 @@
+import { OnboardingBackground } from '@/components/OnboardingBackground';
 import { StepIndicator } from '@/components/StepIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useAuth } from '@/contexts/auth-context';
 import { updateUserProfile } from '@/lib/mutations/updateUserProfile';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 export default function ProfileScreen() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [saving, setSaving] = useState(false);
-  const { currentUser } = useCurrentUser();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   async function handleNext() {
-    if (!firstName.trim() || !currentUser) return;
+    if (!firstName.trim() || !user) return;
     setSaving(true);
     const { error } = await updateUserProfile({
-      userId: currentUser.id,
+      userId: user.id,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
     });
@@ -31,15 +32,14 @@ export default function ProfileScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <OnboardingBackground>
       <View className="flex-1 justify-between px-6 pb-12 pt-20">
         <View className="gap-8">
           <StepIndicator currentStep={1} totalSteps={3} />
           <View className="gap-4">
-            <Text className="text-center text-2xl font-bold">What's your name?</Text>
+            <Text className="text-center text-2xl font-bold">
+              What's your name?
+            </Text>
             <Input
               placeholder="First name"
               value={firstName}
@@ -64,6 +64,6 @@ export default function ProfileScreen() {
           </Button>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </OnboardingBackground>
   );
 }

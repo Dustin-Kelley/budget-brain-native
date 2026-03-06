@@ -20,7 +20,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
           key={i}
           className="h-2 w-2 rounded-full"
           style={{
-            backgroundColor: i + 1 === currentStep ? accentColor : '#9ca3af',
+            backgroundColor: i + 1 === currentStep ? accentColor : '#d1d5db',
           }}
         />
       ))}
