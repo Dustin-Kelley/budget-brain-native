@@ -123,8 +123,8 @@ export function AddExpenseForm({
         onRequestClose={handleClose}
       >
         <View className="flex-1 justify-end bg-black/50">
-          <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
-            <View className="border-b border-gray-200 px-4 py-3">
+          <View className="h-[90%] flex flex-col rounded-t-2xl bg-white shadow-none">
+            <View className="shrink-0 border-b border-gray-200 px-4 py-3">
               <View className="flex-row items-center justify-between">
                 <Text className="text-lg font-semibold text-gray-900">
                   Add New Expense
@@ -138,7 +138,7 @@ export function AddExpenseForm({
               </Text>
             </View>
 
-            <ScrollView className="max-h-96 px-4 py-4">
+            <ScrollView className="flex-1 px-4 py-4">
               <View className="gap-4">
                 <FormField
                   control={form.control}
@@ -229,7 +229,7 @@ export function AddExpenseForm({
             </ScrollView>
 
             <View
-              className="border-t border-gray-200 px-4 pt-4"
+              className="shrink-0 border-t border-gray-200 px-4 pt-4"
               style={{ paddingBottom: 16 + insets.bottom }}
             >
               <Button
