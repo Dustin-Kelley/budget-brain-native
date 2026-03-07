@@ -6,13 +6,13 @@ import { BlurView } from "expo-blur";
 import { useCallback, useEffect, useState } from "react";
 import { type LayoutChangeEvent, Pressable, View } from "react-native";
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 
 const PLAN_TABS = [
-  { value: "planned" as const, label: "Planned" },
+  { value: "planned" as const, label: "Plan" },
   { value: "remaining" as const, label: "Remaining" },
   { value: "transactions" as const, label: "Transactions" },
 ] as const;
