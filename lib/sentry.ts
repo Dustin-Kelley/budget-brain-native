@@ -7,7 +7,7 @@ import type { ComponentType } from "react";
  */
 Sentry.init({
   dsn: "https://51edd1dba19cc8368f65d2f9780af064@o4510999365812224.ingest.us.sentry.io/4510999369220097",
-  enabled: true,
+  enabled: !__DEV__,
   environment: __DEV__ ? "development" : "production",
 
   // Adds more context data to events (IP address, cookies, user, etc.)
