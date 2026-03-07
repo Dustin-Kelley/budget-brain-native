@@ -53,7 +53,7 @@ function describeArc(
 }
 
 type BudgetAllocationChartProps = {
-  categories: CategoryWithLineItems[];
+  categories: CategoryWithLineItems[] | null;
   totalIncome: number;
 };
 
@@ -61,7 +61,7 @@ export function BudgetAllocationChart({
   categories,
   totalIncome,
 }: BudgetAllocationChartProps) {
-  if (totalIncome <= 0 || categories.length === 0) return null;
+  if (!categories || totalIncome <= 0 || categories.length === 0) return null;
 
   const categoryData = categories.map((cat, i) => {
     const planned = cat.line_items.reduce(
