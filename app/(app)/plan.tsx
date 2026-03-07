@@ -1,4 +1,5 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
+import { BudgetAllocationChart } from "@/components/BudgetAllocationChart";
 import { BudgetSetupWizard } from "@/components/BudgetSetupWizard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
@@ -112,7 +113,11 @@ export default function PlanScreen() {
       >
         <View className="gap-6">
           {activeTab === "planned" && (
-            <Animated.View key="planned" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+            <Animated.View key="planned" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)} className="gap-6">
+              <BudgetAllocationChart
+                categories={categories}
+                totalIncome={totalIncome}
+              />
               <PlanCategoryCards
                 categories={categories}
                 totalIncome={totalIncome}
