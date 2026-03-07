@@ -11,9 +11,13 @@ import { useHouseholdInvitations } from "@/hooks/useHouseholdInvitations";
 import { useRemoveHouseholdMember } from "@/hooks/useRemoveHouseholdMember";
 import { useSendInvitation } from "@/hooks/useSendInvitation";
 import { getHouseholdMembers } from "@/lib/queries/getHouseholdMembers";
+import { updateHouseholdName } from "@/lib/mutations/updateHouseholdName";
+import { householdSchema, type HouseholdFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,6 +41,28 @@ export default function HouseholdScreen() {
   const cancelInvitation = useCancelInvitation();
   const sendInvitation = useSendInvitation();
   const [email, setEmail] = useState("");
+  const queryClient = useQueryClient();
+
+  const { control, handleSubmit, formState } = useForm<HouseholdFormData>({
+    resolver: zodResolver(householdSchema),
+    values: { name: household?.name ?? "" },
+  });
+
+  const updateName = useMutation({
+    mutationFn: async (data: HouseholdFormData) => {
+      const { error } = await updateHouseholdName({
+        householdId: householdId!,
+        name: data.name,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["household"] });
+    },
+    onError: (error) => {
+      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
+    },
+  });
 
   const members = membersData?.members ?? [];
 
@@ -140,6 +166,44 @@ export default function HouseholdScreen() {
           </Text>
         ) : (
           <View className="gap-6">
+            {/* Household Name */}
+            <View className="gap-2">
+              <Label>Household Name</Label>
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                  <View className="gap-2">
+                    <View className="flex-row gap-2">
+                      <Input
+                        className="flex-1 rounded-lg px-4 py-3"
+                        placeholder="Household name"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        autoCapitalize="words"
+                        editable={!updateName.isPending}
+                      />
+                      <Button
+                        onPress={handleSubmit((data) => updateName.mutate(data))}
+                        disabled={!formState.isDirty || !formState.isValid || updateName.isPending}
+                        className="px-4"
+                      >
+                        {updateName.isPending ? (
+                          <ActivityIndicator color="white" />
+                        ) : (
+                          <Text>Save</Text>
+                        )}
+                      </Button>
+                    </View>
+                    {error?.message && (
+                      <Text className="text-sm text-destructive">{error.message}</Text>
+                    )}
+                  </View>
+                )}
+              />
+            </View>
+
             {/* Members */}
             <View className="gap-2">
               <Text className="text-base font-semibold text-gray-800">Members</Text>

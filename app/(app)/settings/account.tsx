@@ -1,17 +1,40 @@
 import { BackButton } from "@/components/BackButton";
 import { UserAvatar } from "@/components/UserAvatar";
+import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
+import { profileSchema, type ProfileFormData } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
+import { useForm } from "react-hook-form";
 import { Alert, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AccountScreen() {
   const { user, signOut } = useAuth();
   const { currentUser } = useCurrentUser();
+  const { updateUserProfile, isUpdatingUserProfile } = useUpdateUserProfile();
   const insets = useSafeAreaInsets();
+
+  const { control, handleSubmit, formState } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    values: {
+      firstName: currentUser?.first_name ?? "",
+      lastName: currentUser?.last_name ?? "",
+    },
+  });
+
+  const onSubmit = (data: ProfileFormData) => {
+    if (!user?.id) return;
+    updateUserProfile({
+      userId: user.id,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+  };
 
   const handleSignOut = () => {
     Alert.alert("Sign out", "Are you sure you want to sign out?", [
@@ -59,18 +82,20 @@ export default function AccountScreen() {
         </View>
 
         <View className="bg-card rounded-2xl px-5 py-4 gap-4">
-          <View>
-            <Text className="text-sm text-gray-500">First Name</Text>
-            <Text className="mt-1 text-base font-medium text-gray-800">
-              {currentUser?.first_name ?? "\u2014"}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-sm text-gray-500">Last Name</Text>
-            <Text className="mt-1 text-base font-medium text-gray-800">
-              {currentUser?.last_name ?? "\u2014"}
-            </Text>
-          </View>
+          <FormField
+            control={control}
+            name="firstName"
+            label="First Name"
+            placeholder="First name"
+            autoCapitalize="words"
+          />
+          <FormField
+            control={control}
+            name="lastName"
+            label="Last Name"
+            placeholder="Last name"
+            autoCapitalize="words"
+          />
           <View>
             <Text className="text-sm text-gray-500">Email</Text>
             <Text className="mt-1 text-base font-medium text-gray-800">
@@ -78,11 +103,20 @@ export default function AccountScreen() {
             </Text>
           </View>
         </View>
+
       </View>
 
-      <Button variant="destructive" onPress={handleSignOut}>
-        <Text>Sign Out</Text>
-      </Button>
+      <View className="gap-3">
+        <Button
+          onPress={handleSubmit(onSubmit)}
+          disabled={!formState.isDirty || !formState.isValid || isUpdatingUserProfile}
+        >
+          <Text>{isUpdatingUserProfile ? "Saving..." : "Save Changes"}</Text>
+        </Button>
+        <Button variant="destructive" onPress={handleSignOut}>
+          <Text>Sign Out</Text>
+        </Button>
+      </View>
     </View>
   );
 }
