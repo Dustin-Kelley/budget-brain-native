@@ -1,10 +1,12 @@
 import { EditTransactionForm } from "@/components/EditTransactionForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import type { CategoryWithLineItems } from "@/types";
 import { formatCurrency } from "@/lib/utils";
-import { useState } from "react";
+import type { CategoryWithLineItems } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 
 type TransactionItem = {
@@ -54,6 +56,27 @@ export function TransactionsList({
 }: TransactionsListProps) {
   const [editingTransaction, setEditingTransaction] =
     useState<TransactionItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { filteredDates, filteredGrouped } = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return { filteredDates: sortedDates, filteredGrouped: groupedTransactions };
+    }
+    const query = searchQuery.trim().toLowerCase();
+    const filteredGrouped: Record<string, TransactionItem[]> = {};
+    const filteredDates: string[] = [];
+    for (const date of sortedDates) {
+      const matches = (groupedTransactions[date] ?? []).filter((tx) =>
+        (tx.line_items?.name ?? "Uncategorized").toLowerCase().includes(query)
+      );
+      if (matches.length > 0) {
+        filteredGrouped[date] = matches;
+        filteredDates.push(date);
+      }
+    }
+    return { filteredDates, filteredGrouped };
+  }, [searchQuery, sortedDates, groupedTransactions]);
+
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -78,7 +101,31 @@ export function TransactionsList({
       <Text className="-mt-2 text-sm text-gray-500">
         Your latest spending activities
       </Text>
-      {sortedDates.map((dateKey) => (
+      <View className="relative">
+        <View className="absolute left-4 top-0 bottom-0 z-10 justify-center">
+          <Ionicons name="search" size={18} color="#9CA3AF" />
+        </View>
+        <Input
+          className="rounded-full pl-12"
+          placeholder="Search by line item..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <Pressable
+            onPress={() => setSearchQuery("")}
+            className="absolute right-4 top-0 bottom-0 justify-center"
+          >
+            <Text className="text-lg text-gray-400">✕</Text>
+          </Pressable>
+        )}
+      </View>
+      {filteredDates.length === 0 && searchQuery.trim().length > 0 && (
+        <Card className="gap-0 p-4">
+          <Text className="text-sm text-gray-500">No matching transactions found.</Text>
+        </Card>
+      )}
+      {filteredDates.map((dateKey) => (
         <Card
           key={dateKey}
           className="gap-0 overflow-hidden py-0"
@@ -88,7 +135,7 @@ export function TransactionsList({
               {formatDate(dateKey)}
             </Text>
           </View>
-          {(groupedTransactions[dateKey] ?? []).map((tx) => (
+          {(filteredGrouped[dateKey] ?? []).map((tx) => (
             <Pressable
               key={tx.id ?? `${dateKey}-${tx.date}-${tx.amount}`}
               onPress={() =>
