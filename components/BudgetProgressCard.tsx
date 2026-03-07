@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { getAppTheme } from "@/lib/themes";
-import { blendHex, hexToRgba } from "@/lib/utils";
-import { formatCurrency } from "@/lib/utils";
+import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
 import { View } from "react-native";
 
 type BudgetProgressCardProps = {
@@ -20,6 +19,8 @@ export function BudgetProgressCard({
   percentSpent,
   error,
 }: BudgetProgressCardProps) {
+  const { appTheme } = useTheme();
+
   if (error) {
     return (
       <Card className="gap-0 p-4">
@@ -31,7 +32,6 @@ export function BudgetProgressCard({
     );
   }
 
-  const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
   const progressWidth = Math.min(percentSpent, 100);
 
@@ -55,7 +55,7 @@ export function BudgetProgressCard({
             Spent: {formatCurrency(spentAmount)} ({percentSpent}%)
           </Text>
           <Text className="text-sm text-gray-600">
-            {formatCurrency(0)} – {formatCurrency(totalPlanned)}
+            {formatCurrency(totalPlanned)}
           </Text>
         </View>
       </View>
