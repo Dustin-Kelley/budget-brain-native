@@ -7,36 +7,21 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
 import { appThemes } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
-import { getAppTheme } from "@/lib/themes";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
-import { Alert, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppearanceScreen() {
   const { appTheme, setAppTheme } = useTheme();
   const { currentUser } = useCurrentUser();
-  const updateProfile = useUpdateUserProfile();
-  const [saving, setSaving] = useState(false);
+  const { updateUserProfile, isUpdatingUserProfile } = useUpdateUserProfile();
   const insets = useSafeAreaInsets();
-  const theme = getAppTheme(appTheme);
-  const accentColor = blendHex(theme.colors[0], theme.colors[1]);
 
-  const handleSelect = async (emoji: string) => {
-    if (!currentUser || saving) return;
-    setSaving(true);
-    try {
-      await updateProfile.mutateAsync({
-        userId: currentUser.id,
-        firstName: currentUser.first_name ?? "",
-        lastName: currentUser.last_name ?? "",
-        avatarEmoji: emoji,
-      });
-    } catch {
-      Alert.alert("Error", "Failed to save avatar.");
-    } finally {
-      setSaving(false);
-    }
+  const handleSelect = (emoji: string) => {
+    if (!currentUser || isUpdatingUserProfile) return;
+    updateUserProfile(
+      { userId: currentUser.id, firstName: currentUser.first_name ?? "", lastName: currentUser.last_name ?? "", avatarEmoji: emoji },
+    );
   };
 
   return (
@@ -91,11 +76,11 @@ export default function AppearanceScreen() {
                       borderColor: isSelected ? selectedBorder : "transparent",
                       ...(isSelected
                         ? {
-                            shadowColor: selectedBorder,
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 4,
-                          }
+                          shadowColor: selectedBorder,
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 4,
+                        }
                         : {}),
                     }}
                   />

@@ -6,15 +6,24 @@ export function useUpdateUserProfile() {
   const { logError } = useLogError();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (params: {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async ({
+      userId,
+      firstName,
+      lastName,
+      avatarEmoji,
+    }: {
       userId: string;
       firstName: string;
       lastName: string;
       avatarEmoji?: string | null;
     }) => {
-      const { error } = await updateUserProfile(params);
-      if (error) throw error;
+      await updateUserProfile({
+        userId,
+        firstName,
+        lastName,
+        avatarEmoji,
+      });
     },
     onError: (error) => {
       logError(error, { tags: { feature: 'user-profile' } });
@@ -23,4 +32,13 @@ export function useUpdateUserProfile() {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
+
+  return { updateUserProfile: mutate, isUpdatingUserProfile: isPending };
+}
+
+export function useInvalidateUserProfile() {
+  const queryClient = useQueryClient();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+  };
 }

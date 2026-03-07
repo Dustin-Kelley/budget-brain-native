@@ -10,7 +10,7 @@ export async function updateUserProfile({
   firstName: string;
   lastName: string;
   avatarEmoji?: string | null;
-}): Promise<{ error: Error | null }> {
+}) {
   const payload: Record<string, unknown> = {
     id: userId,
     first_name: firstName,
@@ -19,10 +19,8 @@ export async function updateUserProfile({
   if (avatarEmoji !== undefined) {
     payload.avatar_emoji = avatarEmoji;
   }
-  const { error } = await supabase
-    .from('users')
-    .upsert(payload);
+  const { error } = await supabase.from('users').upsert(payload);
 
-  if (error) return { error: error as Error };
-  return { error: null };
+  if (error) throw error;
+  return;
 }
