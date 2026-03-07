@@ -1,3 +1,4 @@
+import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,15 +10,21 @@ import { useAddTransaction } from "@/hooks/useAddTransaction";
 import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  type LayoutChangeEvent,
   Modal,
   Pressable,
   ScrollView,
   View,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type RemainingSpentCardsProps = {
@@ -235,6 +242,51 @@ export function RemainingSpentCards({
   const [categoryForModal, setCategoryForModal] =
     useState<CategoryWithLineItems | null>(null);
 
+  const [tabWidths, setTabWidths] = useState<number[]>([0, 0]);
+  const [tabOffsets, setTabOffsets] = useState<number[]>([0, 0]);
+  const indicatorX = useSharedValue(0);
+  const indicatorW = useSharedValue(0);
+
+  const handleTabLayout = useCallback(
+    (index: number) => (e: LayoutChangeEvent) => {
+      const { x, width } = e.nativeEvent.layout;
+      setTabOffsets((prev) => {
+        const next = [...prev];
+        next[index] = x;
+        return next;
+      });
+      setTabWidths((prev) => {
+        const next = [...prev];
+        next[index] = width;
+        return next;
+      });
+    },
+    []
+  );
+
+  const activeToggleIndex = viewMode === "spent" ? 0 : 1;
+
+  useEffect(() => {
+    if (tabWidths[activeToggleIndex] > 0) {
+      indicatorX.value = withTiming(tabOffsets[activeToggleIndex], { duration: 250 });
+      indicatorW.value = withTiming(tabWidths[activeToggleIndex], { duration: 250 });
+    }
+  }, [activeToggleIndex, tabOffsets, tabWidths]);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    position: "absolute" as const,
+    left: indicatorX.value,
+    width: indicatorW.value,
+    top: 2,
+    bottom: 2,
+    borderRadius: 6,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  }));
+
   const canAddExpense =
     householdId && userId && monthKey && onSuccess;
 
@@ -273,17 +325,20 @@ export function RemainingSpentCards({
           {isSpentView ? "Spent" : "Remaining"}
         </Text>
         <View className="flex-row rounded-lg bg-gray-100 p-0.5">
+          <Animated.View style={indicatorStyle} />
           <Pressable
+            onLayout={handleTabLayout(0)}
             onPress={() => setViewMode("spent")}
-            className={`rounded-md px-3 py-1.5 ${isSpentView ? "bg-white shadow-sm" : ""}`}
+            className="rounded-md px-3 py-1.5"
           >
             <Text className={`text-xs font-semibold ${isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Spent
             </Text>
           </Pressable>
           <Pressable
+            onLayout={handleTabLayout(1)}
             onPress={() => setViewMode("remaining")}
-            className={`rounded-md px-3 py-1.5 ${!isSpentView ? "bg-white shadow-sm" : ""}`}
+            className="rounded-md px-3 py-1.5"
           >
             <Text className={`text-xs font-semibold ${!isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Remaining
@@ -333,15 +388,12 @@ export function RemainingSpentCards({
             </View>
             {planned > 0 && (
               <View className="px-4 pt-2">
-                <View className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                  <View
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${catBarPercent}%`,
-                      backgroundColor: barColor,
-                    }}
-                  />
-                </View>
+                <AnimatedProgressBar
+                  percent={catBarPercent}
+                  height={8}
+                  color={barColor}
+                  className="h-2 w-full overflow-hidden rounded-full bg-gray-100"
+                />
               </View>
             )}
             <Text className="px-4 py-1 text-xs text-gray-500">
@@ -382,15 +434,12 @@ export function RemainingSpentCards({
                     </Text>
                   </View>
                   {itemPlanned > 0 && (
-                    <View className="mt-1.5 ml-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                      <View
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${itemBarPercent}%`,
-                          backgroundColor: barColor,
-                        }}
-                      />
-                    </View>
+                    <AnimatedProgressBar
+                      percent={itemBarPercent}
+                      height={6}
+                      color={barColor}
+                      className="mt-1.5 ml-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+                    />
                   )}
                 </View>
               );

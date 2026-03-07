@@ -16,6 +16,7 @@ import { useHousehold } from "@/hooks/useHousehold";
 import { formatMonthYearForDisplay } from "@/lib/utils";
 import { useState } from "react";
 import { View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 export default function PlanScreen() {
   const { householdId, isLoading: householdLoading } = useHousehold();
@@ -111,41 +112,47 @@ export default function PlanScreen() {
       >
         <View className="gap-6">
           {activeTab === "planned" && (
-            <PlanCategoryCards
-              categories={categories}
-              totalIncome={totalIncome}
-              totalPlanned={totalPlanned}
-              income={income}
-              monthLabel={monthLabel}
-              error={error?.message}
-              householdId={householdId ?? undefined}
-              userId={currentUser?.id}
-              monthKey={monthKey}
-              onRefetch={refetch}
-            />
+            <Animated.View key="planned" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+              <PlanCategoryCards
+                categories={categories}
+                totalIncome={totalIncome}
+                totalPlanned={totalPlanned}
+                income={income}
+                monthLabel={monthLabel}
+                error={error?.message}
+                householdId={householdId ?? undefined}
+                userId={currentUser?.id}
+                monthKey={monthKey}
+                onRefetch={refetch}
+              />
+            </Animated.View>
           )}
           {activeTab === "remaining" && (
-            <RemainingSpentCards
-              categories={categories}
-              spentByLineItem={spentByLineItem}
-              error={error?.message}
-              householdId={householdId ?? undefined}
-              userId={currentUser?.id}
-              monthKey={monthKey}
-              onSuccess={refetch}
-            />
+            <Animated.View key="remaining" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+              <RemainingSpentCards
+                categories={categories}
+                spentByLineItem={spentByLineItem}
+                error={error?.message}
+                householdId={householdId ?? undefined}
+                userId={currentUser?.id}
+                monthKey={monthKey}
+                onSuccess={refetch}
+              />
+            </Animated.View>
           )}
           {activeTab === "transactions" && (
-            <TransactionsList
-              groupedTransactions={groupedTransactions}
-              sortedDates={sortedDates}
-              categories={categories}
-              householdId={householdId ?? undefined}
-              userId={currentUser?.id}
-              monthKey={monthKey}
-              onRefetch={refetch}
-              error={error?.message}
-            />
+            <Animated.View key="transactions" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+              <TransactionsList
+                groupedTransactions={groupedTransactions}
+                sortedDates={sortedDates}
+                categories={categories}
+                householdId={householdId ?? undefined}
+                userId={currentUser?.id}
+                monthKey={monthKey}
+                onRefetch={refetch}
+                error={error?.message}
+              />
+            </Animated.View>
           )}
         </View>
       </ScreenWrapper>

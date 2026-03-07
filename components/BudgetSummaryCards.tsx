@@ -1,3 +1,4 @@
+import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
@@ -61,12 +62,12 @@ export function BudgetSummaryCards({
           <Text className="mt-1 text-xl font-bold text-gray-800">
             {formatCurrency(spentAmount)}
           </Text>
-          <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-            <View
-              className="h-full rounded-full"
-              style={{ width: `${spentWidth}%`, backgroundColor: barColor }}
-            />
-          </View>
+          <AnimatedProgressBar
+            percent={spentWidth}
+            height={6}
+            color={barColor}
+            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+          />
           <Text className="mt-1 text-xs text-gray-500">
             {percentSpent}% of budget used
           </Text>
@@ -78,12 +79,12 @@ export function BudgetSummaryCards({
           <Text className="mt-1 text-xl font-bold text-gray-800">
             {formatCurrency(remaining)}
           </Text>
-          <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-            <View
-              className="h-full rounded-full"
-              style={{ width: `${Math.max(remainingWidth, 0)}%`, backgroundColor: barColor }}
-            />
-          </View>
+          <AnimatedProgressBar
+            percent={Math.max(remainingWidth, 0)}
+            height={6}
+            color={barColor}
+            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+          />
           <Text className="mt-1 text-xs text-gray-500">
             {100 - percentSpent}% left
           </Text>

@@ -1,4 +1,5 @@
 import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
+import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
@@ -80,12 +81,12 @@ export function CategorySpendingList({
               </Text>
             </View>
             {planned > 0 && (
-              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                <View
-                  className="h-full rounded-full"
-                  style={{ width: `${percent}%`, backgroundColor: barColor }}
-                />
-              </View>
+              <AnimatedProgressBar
+                percent={percent}
+                height={6}
+                color={barColor}
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+              />
             )}
           </View>
         );

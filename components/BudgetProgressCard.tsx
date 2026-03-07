@@ -1,3 +1,4 @@
+import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
@@ -43,12 +44,12 @@ export function BudgetProgressCard({
         Your spending progress for this month
       </Text>
       <View className="mt-4">
-        <View className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100/80">
-          <View
-            className="h-full rounded-full"
-            style={{ width: `${progressWidth}%`, backgroundColor: hexToRgba(blendHex(theme.colors[0], theme.colors[1]), 0.65) }}
-          />
-        </View>
+        <AnimatedProgressBar
+          percent={progressWidth}
+          height={10}
+          color={hexToRgba(blendHex(theme.colors[0], theme.colors[1]), 0.65)}
+          className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100/80"
+        />
         <View className="mt-2 flex-row justify-between">
           <Text className="text-sm text-gray-600">
             Spent: {formatCurrency(spentAmount)} ({percentSpent}%)
