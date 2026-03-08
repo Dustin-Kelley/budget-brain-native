@@ -140,9 +140,11 @@ export function PlanCategoryCards({
                     <Text className="pl-3 text-lg text-gray-700" numberOfLines={1}>
                       {item.name ?? "Line item"}
                     </Text>
-                    <Text className="text-md font-medium text-gray-800">
-                      {formatCurrency(item.planned_amount ?? 0)}
-                    </Text>
+                    <View className="rounded-md bg-gray-100 px-2.5 py-1">
+                      <Text className="text-md font-medium text-gray-800">
+                        {formatCurrency(item.planned_amount ?? 0)}
+                      </Text>
+                    </View>
                   </Pressable>
                   <Separator />
                 </View>

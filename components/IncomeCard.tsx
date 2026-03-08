@@ -68,9 +68,11 @@ export function IncomeCard({
                 <Text className="text-lg text-gray-700" numberOfLines={1}>
                   {entry.name ?? "Income"}
                 </Text>
-                <Text className="font-medium text-gray-800">
-                  {formatCurrency(entry.amount, { fractionDigits: 2 })}
-                </Text>
+                <View className="rounded-md bg-gray-100 px-2.5 py-1">
+                  <Text className="font-medium text-gray-800">
+                    {formatCurrency(entry.amount, { fractionDigits: 2 })}
+                  </Text>
+                </View>
               </Pressable>
               <Separator />
             </View>
