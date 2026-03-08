@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/text";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useHousehold } from "@/hooks/useHousehold";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -38,6 +39,7 @@ export default function SettingsMenuScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { currentUser } = useCurrentUser();
+  const { household } = useHousehold();
 
   const fullName = [currentUser?.first_name, currentUser?.last_name]
     .filter(Boolean)
@@ -61,6 +63,11 @@ export default function SettingsMenuScreen() {
           <Text className="text-sm text-muted-foreground">
             {user?.email ?? "\u2014"}
           </Text>
+          {household?.name ? (
+            <Text className="text-xs text-muted-foreground">
+              {household.name}
+            </Text>
+          ) : null}
         </View>
         <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
       </Pressable>

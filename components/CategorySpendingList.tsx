@@ -1,8 +1,8 @@
-import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
 import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { CATEGORY_COLORS } from "@/lib/constants";
+import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
 import { formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { View } from "react-native";
@@ -55,7 +55,7 @@ export function CategorySpendingList({
   }
 
   return (
-    <Card className="gap-0 overflow-hidden py-0">
+    <Card className="gap-0 overflow-hidden py-2">
       <View className="border-b border-gray-100 px-4 pb-2.5">
         <Text className="text-base font-semibold text-gray-800">
           Spending by Category
