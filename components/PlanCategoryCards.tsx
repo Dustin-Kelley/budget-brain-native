@@ -127,9 +127,8 @@ export function PlanCategoryCards({
             </CardHeader>
             <CardContent className="px-4 py-0">
               {(category.line_items ?? []).map((item) => (
-                <>
+                <View key={item.id}>
                   <Pressable
-                    key={item.id}
                     onPress={() =>
                       userId &&
                       monthKey &&
@@ -146,7 +145,7 @@ export function PlanCategoryCards({
                     </Text>
                   </Pressable>
                   <Separator />
-                </>
+                </View>
               ))}
               {userId && monthKey && onRefetch && (
                 <View className="border-t border-gray-100 py-4">
