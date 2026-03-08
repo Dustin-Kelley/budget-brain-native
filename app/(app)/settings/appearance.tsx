@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppearanceScreen() {
   const { appTheme, setAppTheme } = useTheme();
@@ -28,14 +28,7 @@ export default function AppearanceScreen() {
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingBottom: 40,
-        paddingTop: insets.top + 16,
-      }}
-    >
+    <SafeAreaView className="flex-1 px-5" edges={["top"]}>
       <View className="gap-4">
         <View className="flex-row items-center gap-3">
           <BackButton />
@@ -136,6 +129,6 @@ export default function AppearanceScreen() {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }

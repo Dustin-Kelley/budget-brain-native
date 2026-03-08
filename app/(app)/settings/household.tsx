@@ -18,13 +18,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ActivityIndicator, Alert, Pressable, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HouseholdScreen() {
   const { currentUser } = useCurrentUser();
   const { householdId, household } = useHousehold();
-  const insets = useSafeAreaInsets();
 
   const { data: membersData, isLoading: membersLoading } = useQuery({
     queryKey: ["householdMembers", householdId],
@@ -146,14 +145,7 @@ export default function HouseholdScreen() {
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingBottom: 40,
-        paddingTop: insets.top + 16,
-      }}
-    >
+    <SafeAreaView className="flex-1 px-5" edges={["top"]}>
       <View className="gap-4">
         <View className="flex-row items-center gap-3">
           <BackButton />
@@ -299,6 +291,6 @@ export default function HouseholdScreen() {
           </View>
         )}
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }

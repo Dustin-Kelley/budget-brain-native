@@ -1,9 +1,10 @@
 import { EditTransactionForm } from "@/components/EditTransactionForm";
 import { UserAvatar } from "@/components/UserAvatar";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
-import { formatCurrency } from "@/lib/utils";
+import { CATEGORY_COLORS } from "@/lib/constants";
+import { cn, formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
@@ -57,6 +58,18 @@ export function TransactionsList({
   const [editingTransaction, setEditingTransaction] =
     useState<TransactionItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const lineItemColorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (!categories) return map;
+    categories.forEach((cat, catIndex) => {
+      const color = cat.color ?? CATEGORY_COLORS[catIndex % CATEGORY_COLORS.length];
+      for (const item of cat.line_items ?? []) {
+        map[item.id] = color;
+      }
+    });
+    return map;
+  }, [categories]);
 
   const { filteredDates, filteredGrouped } = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -126,48 +139,60 @@ export function TransactionsList({
         </Card>
       )}
       {filteredDates.map((dateKey) => (
-        <Card
-          key={dateKey}
-          className="gap-0 overflow-hidden py-0"
-        >
-          <View className="px-4 py-2">
-            <Text className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <Card key={dateKey} className="gap-0">
+          <CardHeader className="border-b border-gray-100 py-4">
+            <Text className="text-xs font-bold uppercase tracking-wide text-gray-800">
               {formatDate(dateKey)}
             </Text>
-          </View>
-          {(filteredGrouped[dateKey] ?? []).map((tx) => (
-            <Pressable
-              key={tx.id ?? `${dateKey}-${tx.date}-${tx.amount}`}
-              onPress={() =>
-                householdId &&
-                userId &&
-                monthKey &&
-                onRefetch &&
-                setEditingTransaction(tx)
-              }
-              className="flex-row items-center justify-between border-b border-gray-50 px-4 py-3.5 last:border-b-0 active:bg-gray-50"
-            >
-              <View className="mr-3">
-                <UserAvatar emoji={tx.users?.avatar_emoji} size="sm" />
-              </View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-800" numberOfLines={1}>
-                  {tx.line_items?.name ?? "Uncategorized"}
-                </Text>
-                {tx.description && (
-                  <Text
-                    className="mt-0.5 text-sm text-gray-500"
-                    numberOfLines={1}
-                  >
-                    {tx.description}
-                  </Text>
+          </CardHeader>
+          <CardContent className="py-0">
+            {(filteredGrouped[dateKey] ?? []).map((tx, index, arr) => (
+              <Pressable
+                key={tx.id ?? `${dateKey}-${tx.date}-${tx.amount}`}
+                onPress={() =>
+                  householdId &&
+                  userId &&
+                  monthKey &&
+                  onRefetch &&
+                  setEditingTransaction(tx)
+                }
+                className={cn(
+                  "flex-row items-center justify-between py-3.5 active:bg-gray-50",
+                  index < arr.length - 1 && "border-b border-gray-50"
                 )}
-              </View>
-              <Text className="ml-2 font-medium text-gray-800">
-                {formatCurrency(tx.amount ?? 0, { fractionDigits: 2 })}
-              </Text>
-            </Pressable>
-          ))}
+              >
+                <View className="mr-3">
+                  <UserAvatar emoji={tx.users?.avatar_emoji} size="sm" />
+                </View>
+                <View className="flex-1">
+                  <View className="flex-row items-center gap-2">
+                    <View
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{
+                        backgroundColor: tx.line_item_id
+                          ? lineItemColorMap[tx.line_item_id] ?? "#9CA3AF"
+                          : "#9CA3AF",
+                      }}
+                    />
+                    <Text className="font-medium text-gray-800" numberOfLines={1}>
+                      {tx.line_items?.name ?? "Uncategorized"}
+                    </Text>
+                  </View>
+                  {tx.description && (
+                    <Text
+                      className="mt-0.5 text-sm text-gray-500"
+                      numberOfLines={1}
+                    >
+                      {tx.description}
+                    </Text>
+                  )}
+                </View>
+                <Text className="ml-2 font-medium text-gray-800">
+                  {formatCurrency(tx.amount ?? 0, { fractionDigits: 2 })}
+                </Text>
+              </Pressable>
+            ))}
+          </CardContent>
         </Card>
       ))}
       {editingTransaction &&

@@ -16,7 +16,7 @@ export function BackButton({ onPress, className, ...buttonProps }: BackButtonPro
       onPress={onPress ?? (() => router.back())}
       variant="outline"
       size="icon"
-      className={`h-8 w-8 ${className ?? ""}`}
+      className={`h-12 w-12 ${className ?? ""}`}
       {...buttonProps}
     >
       <Ionicons name="arrow-back" size={16} className="text-foreground" />
