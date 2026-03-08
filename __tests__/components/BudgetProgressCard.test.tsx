@@ -47,7 +47,7 @@ describe("BudgetProgressCard", () => {
     // ASSERT: check that the key text is visible
     expect(screen.getByText("Overall Budget Progress")).toBeTruthy();
     expect(screen.getByText(/Spent: \$750 \(38%\)/)).toBeTruthy();
-    expect(screen.getByText(/\$0 – \$2,000/)).toBeTruthy();
+    expect(screen.getByText("$2,000")).toBeTruthy();
   });
 
   it("shows an error message when error prop is set", () => {
