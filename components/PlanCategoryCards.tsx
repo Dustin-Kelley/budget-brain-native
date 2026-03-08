@@ -8,6 +8,7 @@ import { CATEGORY_COLORS } from "@/lib/constants";
 import { useDeleteCategory } from "@/hooks/useDeleteCategory";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 import { IncomeCard } from "./IncomeCard";
@@ -45,42 +46,7 @@ export function PlanCategoryCards({
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const handleCategoryPress = (category: Category) => {
-    Alert.alert(
-      category.name ?? "Category",
-      undefined,
-      [
-        {
-          text: "Edit Name",
-          onPress: () => setEditingCategory(category),
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            Alert.alert(
-              "Delete category?",
-              "This will also delete all budget items in this category. This cannot be undone.",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: async () => {
-                    try {
-                      await deleteCategoryMutation.mutateAsync({ categoryId: category.id });
-                      onRefetch?.();
-                    } catch (error) {
-                      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
-                    }
-                  },
-                },
-              ]
-            );
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]
-    );
+    setEditingCategory(category);
   };
 
   if (error) {
@@ -153,6 +119,7 @@ export function PlanCategoryCards({
                 <Text className="font-semibold text-gray-800" numberOfLines={1}>
                   {category.name ?? "Category"}
                 </Text>
+                <Ionicons name="pencil" size={12} color="#9ca3af" />
               </View>
               <Text className="text-gray-600">
                 {formatCurrency(categoryPlanned)} ({percent}%)
