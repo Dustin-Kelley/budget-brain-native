@@ -41,8 +41,8 @@ export default function SettingsMenuScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: insets.top + 16 }}>
-      <Text className="text-lg font-semibold mb-4">Settings</Text>
+    <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: insets.top + 8 }}>
+      <Text className="text-lg font-semibold mb-3">Settings</Text>
       <View className="rounded-2xl overflow-hidden bg-card">
         {menuItems.map((item, index) => (
           <Pressable

@@ -54,8 +54,8 @@ export function PlanHeader({
           alignItems: "center",
           justifyContent: "center",
           gap: 8,
-          paddingHorizontal: 16,
-          paddingBottom: 8,
+          paddingHorizontal: 20,
+          paddingBottom: 16,
           paddingTop: top,
         }}
       >

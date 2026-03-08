@@ -1,4 +1,6 @@
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
+import { CalendarPicker } from "@/components/CalendarPicker";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
@@ -8,7 +10,7 @@ import { editTransactionSchema, type EditTransactionFormData } from "@/lib/valid
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems, LineItem } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -65,8 +67,9 @@ export function EditTransactionForm({
   const lineItems = flattenLineItems(categories);
   const insets = useSafeAreaInsets();
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
-  const updateTransactionMutation = useUpdateTransaction();
-  const deleteTransactionMutation = useDeleteTransaction();
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const { mutateAsync: updateTransaction } = useUpdateTransaction();
+  const { mutateAsync: deleteTransaction, isPending: isDeleting } = useDeleteTransaction();
 
   const getDefaults = () => ({
     amount: String(transaction.amount ?? 0),
@@ -81,23 +84,21 @@ export function EditTransactionForm({
     mode: "onBlur",
   });
 
-  useEffect(() => {
-    form.reset(getDefaults());
-  }, [transaction, form]);
-
   const lineItemId = form.watch("lineItemId");
   const selectedLineItem = lineItems.find(({ item }) => item.id === lineItemId);
 
   const handleClose = () => {
-    onClose();
+    setShowDatePicker(false);
+    setShowLineItemPicker(false);
     form.reset(getDefaults());
+    onClose();
   };
 
   const onSubmit = async (data: EditTransactionFormData) => {
     if (!transaction.id) return;
 
     try {
-      await updateTransactionMutation.mutateAsync({
+      await updateTransaction({
         transactionId: transaction.id,
         amount: parseFloat(data.amount),
         description: data.description?.trim() || undefined,
@@ -126,7 +127,7 @@ export function EditTransactionForm({
           onPress: async () => {
             if (!transaction.id) return;
             try {
-              await deleteTransactionMutation.mutateAsync({ transactionId: transaction.id });
+              await deleteTransaction({ transactionId: transaction.id });
               onSuccess();
               handleClose();
             } catch (error) {
@@ -138,7 +139,54 @@ export function EditTransactionForm({
     );
   };
 
-  const isSubmitting = form.formState.isSubmitting || deleteTransactionMutation.isPending;
+  const isSubmitting = form.formState.isSubmitting || isDeleting;
+
+  if (showDatePicker) {
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        onRequestClose={handleClose}
+      >
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="h-[90%] rounded-t-2xl bg-white shadow-none">
+            <View className="items-center mt-2 mb-1">
+              <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+            </View>
+            <View className="border-b border-gray-100 px-4 py-3">
+              <View className="flex-row items-center justify-between">
+                <BackButton onPress={() => setShowDatePicker(false)} />
+                <Pressable
+                  onPress={handleClose}
+                  hitSlop={8}
+                  className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200"
+                >
+                  <Ionicons name="close" size={16} color="#6B7280" />
+                </Pressable>
+              </View>
+              <Text className="mt-2 text-lg font-semibold text-gray-800">Select date</Text>
+            </View>
+            <ScrollView className="flex-1 px-4 py-3">
+              <Controller
+                control={form.control}
+                name="date"
+                render={({ field: { value, onChange } }) => (
+                  <CalendarPicker
+                    value={value}
+                    onSelect={(date) => {
+                      onChange(date);
+                      setShowDatePicker(false);
+                    }}
+                  />
+                )}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   return (
     <Modal
@@ -238,27 +286,51 @@ export function EditTransactionForm({
                 )}
               />
 
-              <FormField
+              <Controller
                 control={form.control}
                 name="date"
-                label="Date *"
-                placeholder="YYYY-MM-DD"
-                editable={!isSubmitting}
+                render={({ field: { value, onChange }, fieldState: { error } }) => (
+                  <View className="gap-2">
+                    <Label>Date *</Label>
+                    <Pressable
+                      onPress={() => setShowDatePicker(true)}
+                      disabled={isSubmitting}
+                      className={`flex-row items-center justify-between rounded-lg border bg-gray-50 px-4 py-3 ${error ? "border-destructive" : "border-gray-200"}`}
+                    >
+                      <Text className={value ? "text-gray-800" : "text-gray-400"}>
+                        {value
+                          ? new Date(value + "T12:00:00").toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "Select date"}
+                      </Text>
+                      <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                    </Pressable>
+                    {error?.message && (
+                      <Text className="text-sm text-destructive">{error.message}</Text>
+                    )}
+                  </View>
+                )}
               />
             </View>
           </ScrollView>
 
           <View
-            className="flex-row gap-3 border-t border-gray-200 px-4 pt-4"
+            className="flex-row items-center gap-3 border-t border-gray-200 px-4 pt-4"
             style={{ paddingBottom: 16 + insets.bottom }}
           >
-            <Pressable
+            <Button
+              variant="destructive"
+              size="icon"
+              className="h-14 w-14"
               onPress={handleDelete}
               disabled={isSubmitting}
-              className="h-10 w-10 items-center justify-center rounded-full bg-red-100 active:bg-red-200"
             >
-              <Ionicons name="trash-outline" size={20} color="#dc2626" />
-            </Pressable>
+              <Ionicons name="trash-outline" size={20} color="#fff" />
+            </Button>
             <Button className="flex-1" onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
               {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />

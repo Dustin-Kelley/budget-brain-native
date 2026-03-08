@@ -70,7 +70,7 @@ export function OverviewHeader({
             opacity: 0.6,
           }}
         />
-        <Text variant="h1" className="text-left m-4 font-bold text-white">
+        <Text variant="h1" className="text-left font-bold text-white">
           Hi, {displayName || "there"} 👋
         </Text>
       </BlurView>
