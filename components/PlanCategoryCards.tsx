@@ -4,7 +4,6 @@ import { EditCategoryForm } from "@/components/EditCategoryForm";
 import { EditLineItemForm } from "@/components/EditLineItemForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useDeleteCategory } from "@/hooks/useDeleteCategory";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
@@ -39,7 +38,6 @@ export function PlanCategoryCards({
   monthKey,
   onRefetch,
 }: PlanCategoryCardsProps) {
-  const deleteCategoryMutation = useDeleteCategory();
   const [editingLineItem, setEditingLineItem] = useState<{
     item: LineItem;
     categoryId: string;

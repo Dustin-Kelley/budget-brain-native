@@ -3,12 +3,12 @@ import { ColorPicker } from "@/components/ColorPicker";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { CATEGORY_COLORS } from "@/lib/constants";
+import { useDeleteCategory } from "@/hooks/useDeleteCategory";
 import { useUpdateCategory } from "@/hooks/useUpdateCategory";
 import { editCategorySchema, type EditCategoryFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Category } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -34,17 +34,14 @@ export function EditCategoryForm({
   onSuccess,
 }: EditCategoryFormProps) {
   const insets = useSafeAreaInsets();
-  const updateCategoryMutation = useUpdateCategory();
+  const { mutateAsync: updateCategory } = useUpdateCategory();
+  const { mutateAsync: deleteCategory, isPending: isDeleting } = useDeleteCategory();
 
   const form = useForm<EditCategoryFormData>({
     resolver: zodResolver(editCategorySchema),
     defaultValues: { name: category.name ?? "", color: category.color ?? CATEGORY_COLORS[0] },
     mode: "onBlur",
   });
-
-  useEffect(() => {
-    form.reset({ name: category.name ?? "", color: category.color ?? CATEGORY_COLORS[0] });
-  }, [category, form]);
 
   const handleClose = () => {
     onClose();
@@ -53,7 +50,7 @@ export function EditCategoryForm({
 
   const onSubmit = async (data: EditCategoryFormData) => {
     try {
-      await updateCategoryMutation.mutateAsync({
+      await updateCategory({
         categoryId: category.id,
         name: data.name,
         color: data.color,
@@ -64,6 +61,31 @@ export function EditCategoryForm({
       Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
   };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Category",
+      `Are you sure you want to delete "${category.name}"? This will also delete all line items in this category.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteCategory({ categoryId: category.id });
+              onSuccess();
+              handleClose();
+            } catch (error) {
+              Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const isSubmitting = form.formState.isSubmitting || isDeleting;
 
   return (
     <Modal
@@ -95,7 +117,7 @@ export function EditCategoryForm({
                 name="name"
                 label="Name *"
                 placeholder="Category name"
-                editable={!form.formState.isSubmitting}
+                editable={!isSubmitting}
                 autoCapitalize="words"
               />
               <View className="gap-2">
@@ -109,10 +131,19 @@ export function EditCategoryForm({
           </ScrollView>
 
           <View
-            className="border-t border-gray-200 px-4 pt-4"
+            className="flex-row items-center gap-3 border-t border-gray-200 px-4 pt-4"
             style={{ paddingBottom: 16 + insets.bottom }}
           >
-            <Button onPress={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+            <Button
+              variant="destructive"
+              size="icon"
+              className="h-14 w-14"
+              onPress={handleDelete}
+              disabled={isSubmitting}
+            >
+              <Ionicons name="trash-outline" size={20} color="#fff" />
+            </Button>
+            <Button className="flex-1" onPress={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
               {form.formState.isSubmitting ? (
                 <ActivityIndicator color="white" />
               ) : (
