@@ -4,6 +4,7 @@ import { EditCategoryForm } from "@/components/EditCategoryForm";
 import { EditLineItemForm } from "@/components/EditLineItemForm";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import { useDeleteCategory } from "@/hooks/useDeleteCategory";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
@@ -126,7 +127,7 @@ export function PlanCategoryCards({
         monthKey={monthKey}
         onRefetch={onRefetch}
       />
-      {categories.map((category) => {
+      {categories.map((category, catIndex) => {
         const categoryPlanned =
           category.line_items?.reduce(
             (sum, item) => sum + (item.planned_amount ?? 0),
@@ -144,9 +145,15 @@ export function PlanCategoryCards({
               onPress={() => handleCategoryPress(category)}
               className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3.5 active:bg-gray-50"
             >
-              <Text className="font-semibold text-gray-800" numberOfLines={1}>
-                {category.name ?? "Category"}
-              </Text>
+              <View className="flex-row items-center gap-2">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: category.color ?? CATEGORY_COLORS[catIndex % CATEGORY_COLORS.length] }}
+                />
+                <Text className="font-semibold text-gray-800" numberOfLines={1}>
+                  {category.name ?? "Category"}
+                </Text>
+              </View>
               <Text className="text-gray-600">
                 {formatCurrency(categoryPlanned)} ({percent}%)
               </Text>

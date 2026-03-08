@@ -372,9 +372,15 @@ export function RemainingSpentCards({
             className="gap-0 overflow-hidden py-0"
           >
             <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3.5">
-              <Text className="font-semibold text-gray-800" numberOfLines={1}>
-                {category.name ?? "Category"}
-              </Text>
+              <View className="flex-row items-center gap-2">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: barColor }}
+                />
+                <Text className="font-semibold text-gray-800" numberOfLines={1}>
+                  {category.name ?? "Category"}
+                </Text>
+              </View>
               <Text
                 className={
                   isSpentView
