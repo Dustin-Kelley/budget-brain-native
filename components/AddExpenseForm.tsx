@@ -135,9 +135,9 @@ export function AddExpenseForm({
                     <Pressable
                       onPress={handleClose}
                       hitSlop={8}
-                      className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+                      className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
                     >
-                      <Ionicons name="close" size={16} color="#6B7280" />
+                      <Ionicons name="close" size={20} color="#6B7280" />
                     </Pressable>
                   </View>
                   <Text className="mt-2 text-lg font-semibold text-gray-900">
@@ -165,8 +165,8 @@ export function AddExpenseForm({
                 <View className="shrink-0 border-b border-gray-200 px-4 py-3">
                   <View className="flex-row items-center justify-between">
                     <BackButton onPress={() => setShowLineItemPicker(false)} />
-                    <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                      <Ionicons name="close" size={16} color="#6B7280" />
+                    <Pressable onPress={handleClose} hitSlop={8} className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                      <Ionicons name="close" size={20} color="#6B7280" />
                     </Pressable>
                   </View>
                   <Text className="mt-2 text-lg font-semibold text-gray-900">
@@ -174,7 +174,7 @@ export function AddExpenseForm({
                   </Text>
                 </View>
 
-                <ScrollView className="flex-1 px-4 py-3">
+                <ScrollView className="flex-1 px-4 py-3" contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}>
                   {!categories || categories.length === 0 ? (
                     <Text className="p-4 text-center text-sm text-gray-500">
                       No budget items yet. Add categories and line items in your budget plan.
@@ -222,8 +222,8 @@ export function AddExpenseForm({
                     <Text className="text-lg font-semibold text-gray-900">
                       Add New Expense
                     </Text>
-                    <Pressable onPress={handleClose} hitSlop={8} className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                      <Ionicons name="close" size={16} color="#6B7280" />
+                    <Pressable onPress={handleClose} hitSlop={8} className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                      <Ionicons name="close" size={20} color="#6B7280" />
                     </Pressable>
                   </View>
                   <Text className="mt-1 text-sm text-gray-500">

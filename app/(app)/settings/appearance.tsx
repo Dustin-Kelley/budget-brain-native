@@ -67,9 +67,9 @@ export default function AppearanceScreen() {
                   <Pressable
                     onPress={() => setEmojiModalVisible(false)}
                     hitSlop={8}
-                    className="h-9 w-9 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200"
+                    className="h-12 w-12 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200"
                   >
-                    <Ionicons name="close" size={16} color="#6B7280" />
+                    <Ionicons name="close" size={20} color="#6B7280" />
                   </Pressable>
                 </View>
               </View>
