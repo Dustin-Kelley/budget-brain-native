@@ -2,14 +2,14 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
+import { useAddLineItem } from "@/hooks/useAddLineItem";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
-import { useAddLineItem } from "@/hooks/useAddLineItem";
 import { addLineItemSchema, type AddLineItemFormData } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
-import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -76,12 +76,12 @@ export function AddLineItemForm({
         className="flex-row items-center gap-2 active:opacity-90"
       >
         <View
-          className="items-center justify-center rounded-full"
+          className="items-center justify-center p-1 rounded-full"
           style={{ backgroundColor: accentColor + "20" }}
         >
           <Ionicons name="add" size={20} color={accentColor} />
         </View>
-        <Text className="text-sm font-medium" style={{ color: accentColor }}>
+        <Text className="text-md font-medium" style={{ color: accentColor }}>
           Add item to {categoryName}
         </Text>
       </Pressable>
