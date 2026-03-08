@@ -64,7 +64,7 @@ export function ScreenWrapper({
     );
 
   return (
-    <View className="flex-1 px-5">
+    <View className="flex-1 bg-background px-5">
       {headerElement}
       <Animated.ScrollView
         onScroll={scrollHandler}

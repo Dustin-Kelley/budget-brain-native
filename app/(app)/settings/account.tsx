@@ -56,7 +56,7 @@ export default function AccountScreen() {
 
   return (
     <View
-      className="flex-1 justify-between"
+      className="flex-1 justify-between bg-background"
       style={{
         paddingHorizontal: 20,
         paddingBottom: insets.bottom + 49 + 20,

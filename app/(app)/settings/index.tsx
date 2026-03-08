@@ -46,7 +46,7 @@ export default function SettingsMenuScreen() {
     .join(" ");
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: insets.top + 8 }}>
+    <ScrollView className="flex-1 bg-background" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: insets.top + 8 }}>
       <Text className="text-lg font-semibold mb-3">Settings</Text>
 
       <Pressable

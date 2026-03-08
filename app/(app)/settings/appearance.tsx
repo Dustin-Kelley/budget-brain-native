@@ -28,7 +28,7 @@ export default function AppearanceScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 px-5" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background px-5" edges={["top"]}>
       <View className="gap-4">
         <View className="flex-row items-center gap-3">
           <BackButton />
