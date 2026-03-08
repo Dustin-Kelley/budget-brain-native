@@ -139,7 +139,7 @@ export function RemainingSpentCards({
   return (
     <View className="gap-4">
       <View className="flex-row items-center justify-between">
-        <Text className="font-semibold text-gray-800">
+        <Text className="text-lg font-semibold text-gray-800">
           {isSpentView ? "Spent so far" : "Left to spend"}
         </Text>
         <View className="flex-row rounded-lg bg-gray-100 p-0.5">
@@ -149,7 +149,7 @@ export function RemainingSpentCards({
             onPress={() => setViewMode("spent")}
             className="rounded-md px-3 py-1.5"
           >
-            <Text className={`text-xs font-semibold ${isSpentView ? "text-gray-800" : "text-gray-500"}`}>
+            <Text className={`text-sm font-semibold ${isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Spent
             </Text>
           </Pressable>
@@ -158,7 +158,7 @@ export function RemainingSpentCards({
             onPress={() => setViewMode("remaining")}
             className="rounded-md px-3 py-1.5"
           >
-            <Text className={`text-xs font-semibold ${!isSpentView ? "text-gray-800" : "text-gray-500"}`}>
+            <Text className={`text-sm font-semibold ${!isSpentView ? "text-gray-800" : "text-gray-500"}`}>
               Remaining
             </Text>
           </Pressable>
@@ -193,15 +193,15 @@ export function RemainingSpentCards({
                     className="h-3 w-3 rounded-full"
                     style={{ backgroundColor: barColor }}
                   />
-                  <Text className="font-semibold text-gray-800" numberOfLines={1}>
+                  <Text className="text-lg font-semibold text-gray-800" numberOfLines={1}>
                     {category.name ?? "Category"}
                   </Text>
                 </View>
                 <Text
                   className={
                     isSpentView
-                      ? "font-medium text-gray-800"
-                      : remaining >= 0 ? "font-medium text-green-600" : "font-medium text-red-600"
+                      ? "text-base font-medium text-gray-800"
+                      : remaining >= 0 ? "text-base font-medium text-green-600" : "text-base font-medium text-red-600"
                   }
                 >
                   {isSpentView
@@ -217,7 +217,7 @@ export function RemainingSpentCards({
                   className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-100"
                 />
               )}
-              <Text className="text-xs text-gray-500">
+              <Text className="text-sm text-gray-500">
                 {isSpentView
                   ? `Spent: ${formatCurrency(spent)} / ${formatCurrency(planned)}`
                   : `Remaining: ${formatCurrency(remaining)} / ${formatCurrency(planned)}`}
@@ -238,18 +238,18 @@ export function RemainingSpentCards({
                 return (
                   <View
                     key={item.id}
-                    className="border-t border-gray-50 py-3 gap-4"
+                    className="border-t border-gray-50 py-3 gap-2"
                   >
                     <View className="flex-row items-center justify-between">
                       <View className="flex-1">
-                        <Text className="text-gray-700" numberOfLines={1}>
+                        <Text className="text-lg text-gray-700" numberOfLines={1}>
                           {item.name ?? "Line item"}
                         </Text>
                         <Text
                           className={
                             isSpentView
-                              ? "text-sm text-gray-500"
-                              : itemRemaining >= 0 ? "text-sm text-green-600" : "text-sm text-red-600"
+                              ? "text-base text-gray-500"
+                              : itemRemaining >= 0 ? "text-base text-green-600" : "text-base text-red-600"
                           }
                         >
                           {isSpentView
@@ -276,7 +276,7 @@ export function RemainingSpentCards({
                         percent={itemBarPercent}
                         height={6}
                         color={barColor}
-                        className=" h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+                        className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
                       />
                     )}
                   </View>
