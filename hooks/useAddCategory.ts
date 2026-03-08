@@ -11,9 +11,9 @@ export function useAddCategory() {
       categoryName: string;
       monthKey: string;
       householdId: string;
+      color?: string;
     }) => {
-      const { error } = await addCategory(params);
-      if (error) throw error;
+      await addCategory(params);
     },
     onError: (error) => {
       logError(error, { tags: { feature: 'categories' } });

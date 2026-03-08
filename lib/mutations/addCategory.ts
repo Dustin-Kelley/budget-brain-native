@@ -5,11 +5,13 @@ export async function addCategory({
   categoryName,
   monthKey,
   householdId,
+  color,
 }: {
   categoryName: string;
   monthKey: string;
   householdId: string;
-}): Promise<{ error: Error | null }> {
+  color?: string;
+}) {
   const { monthNumber, yearNumber } = getMonthAndYearNumberFromDate(monthKey);
 
   const { error } = await supabase.from('categories').insert({
@@ -17,8 +19,8 @@ export async function addCategory({
     household_id: householdId,
     month: monthNumber,
     year: yearNumber,
+    ...(color ? { color } : {}),
   });
 
-  if (error) return { error: error as Error };
-  return { error: null };
+  if (error) throw error;
 }

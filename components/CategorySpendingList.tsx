@@ -2,9 +2,8 @@ import type { CategorySpent } from "@/lib/queries/getSpentByCategory";
 import { AnimatedProgressBar } from "@/components/AnimatedProgressBar";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useTheme } from "@/contexts/theme-context";
-import { getAppTheme } from "@/lib/themes";
-import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
+import { CATEGORY_COLORS } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { View } from "react-native";
 
@@ -19,11 +18,8 @@ export function CategorySpendingList({
   categories,
   error,
 }: CategorySpendingListProps) {
-  const { appTheme } = useTheme();
-  const theme = getAppTheme(appTheme);
-  const barColor = hexToRgba(blendHex(theme.colors[0], theme.colors[1]), 0.65);
-
   const plannedByCategory = new Map<string, number>();
+  const colorByCategory = new Map<string, string | null>();
   if (categories) {
     for (const cat of categories) {
       const planned = (cat.line_items ?? []).reduce(
@@ -31,6 +27,7 @@ export function CategorySpendingList({
         0,
       );
       plannedByCategory.set(cat.id, planned);
+      colorByCategory.set(cat.id, cat.color ?? null);
     }
   }
   if (error) {
@@ -64,9 +61,10 @@ export function CategorySpendingList({
           Spending by Category
         </Text>
       </View>
-      {categorySpent.map((item) => {
+      {categorySpent.map((item, i) => {
         const planned = plannedByCategory.get(item.category_id) ?? 0;
         const percent = planned > 0 ? Math.min(Math.round((item.spent / planned) * 100), 100) : 0;
+        const barColor = item.color ?? colorByCategory.get(item.category_id) ?? CATEGORY_COLORS[i % CATEGORY_COLORS.length];
         return (
           <View
             key={item.category_id}

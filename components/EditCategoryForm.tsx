@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { ColorPicker } from "@/components/ColorPicker";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import { useUpdateCategory } from "@/hooks/useUpdateCategory";
 import { editCategorySchema, type EditCategoryFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,17 +38,17 @@ export function EditCategoryForm({
 
   const form = useForm<EditCategoryFormData>({
     resolver: zodResolver(editCategorySchema),
-    defaultValues: { name: category.name ?? "" },
+    defaultValues: { name: category.name ?? "", color: category.color ?? CATEGORY_COLORS[0] },
     mode: "onBlur",
   });
 
   useEffect(() => {
-    form.reset({ name: category.name ?? "" });
+    form.reset({ name: category.name ?? "", color: category.color ?? CATEGORY_COLORS[0] });
   }, [category, form]);
 
   const handleClose = () => {
     onClose();
-    form.reset({ name: category.name ?? "" });
+    form.reset({ name: category.name ?? "", color: category.color ?? CATEGORY_COLORS[0] });
   };
 
   const onSubmit = async (data: EditCategoryFormData) => {
@@ -54,6 +56,7 @@ export function EditCategoryForm({
       await updateCategoryMutation.mutateAsync({
         categoryId: category.id,
         name: data.name,
+        color: data.color,
       });
       onSuccess();
       handleClose();
@@ -95,6 +98,13 @@ export function EditCategoryForm({
                 editable={!form.formState.isSubmitting}
                 autoCapitalize="words"
               />
+              <View className="gap-2">
+                <Text className="text-sm font-medium text-gray-700">Color</Text>
+                <ColorPicker
+                  selectedColor={form.watch("color")}
+                  onSelectColor={(c) => form.setValue("color", c)}
+                />
+              </View>
             </View>
           </ScrollView>
 

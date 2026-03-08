@@ -1,22 +1,10 @@
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import type { CategoryWithLineItems } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { View } from "react-native";
 import Svg, { Circle, G, Path, Text as SvgText } from "react-native-svg";
-
-const COLORS = [
-  "#3b82f6", // blue
-  "#10b981", // emerald
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#8b5cf6", // violet
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#f97316", // orange
-  "#14b8a6", // teal
-  "#6366f1", // indigo
-];
 
 const UNALLOCATED_COLOR = "#d1d5db"; // gray-300
 
@@ -73,7 +61,7 @@ export function BudgetAllocationChart({
       name: cat.name ?? "Category",
       planned,
       percentage: (planned / totalIncome) * 100,
-      color: COLORS[i % COLORS.length],
+      color: cat.color ?? CATEGORY_COLORS[i % CATEGORY_COLORS.length],
     };
   }).filter((c) => c.planned > 0);
 

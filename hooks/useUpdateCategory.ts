@@ -10,6 +10,7 @@ export function useUpdateCategory() {
     mutationFn: async (params: {
       categoryId: string;
       name: string;
+      color?: string;
     }) => {
       const { error } = await updateCategory(params);
       if (error) throw error;

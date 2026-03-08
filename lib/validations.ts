@@ -46,11 +46,13 @@ export type HouseholdFormData = z.infer<typeof householdSchema>;
 
 export const addCategorySchema = z.object({
   categoryName: requiredString("Category name"),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
 });
 export type AddCategoryFormData = z.infer<typeof addCategorySchema>;
 
 export const editCategorySchema = z.object({
   name: requiredString("Category name"),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
 });
 export type EditCategoryFormData = z.infer<typeof editCategorySchema>;
 

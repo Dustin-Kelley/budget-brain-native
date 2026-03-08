@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import { getAppTheme } from "@/lib/themes";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
-import { blendHex, formatCurrency, hexToRgba } from "@/lib/utils";
+import { blendHex, formatCurrency } from "@/lib/utils";
 import type { CategoryWithLineItems } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
@@ -235,7 +236,6 @@ export function RemainingSpentCards({
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
   const accentHex = blendHex(theme.colors[0], theme.colors[1]);
-  const barColor = hexToRgba(accentHex, 0.65);
   const accentColor = accentHex;
 
   const [viewMode, setViewMode] = useState<"spent" | "remaining">("spent");
@@ -346,7 +346,7 @@ export function RemainingSpentCards({
           </Pressable>
         </View>
       </View>
-      {categories.map((category) => {
+      {categories.map((category, catIndex) => {
         const planned =
           category.line_items?.reduce(
             (sum, item) => sum + (item.planned_amount ?? 0),
@@ -364,6 +364,7 @@ export function RemainingSpentCards({
         const catBarPercent = isSpentView
           ? Math.min(percentSpent, 100)
           : Math.min(Math.max(percentRemaining, 0), 100);
+        const barColor = category.color ?? CATEGORY_COLORS[catIndex % CATEGORY_COLORS.length];
 
         return (
           <Card
