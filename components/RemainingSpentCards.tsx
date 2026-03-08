@@ -186,7 +186,7 @@ export function RemainingSpentCards({
 
         return (
           <Card key={category.id} className="gap-0 py-3">
-            <CardHeader className="border-b px-4 py-2 border-gray-100">
+            <CardHeader className="border-b px-6 py-2 border-gray-100">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
                   <View
@@ -241,35 +241,35 @@ export function RemainingSpentCards({
                     className="border-t border-gray-50 py-3 gap-4"
                   >
                     <View className="flex-row items-center justify-between">
-                      <Text className="flex-1 text-gray-700 " numberOfLines={1}>
-                        {item.name ?? "Line item"}
-                      </Text>
-                      <View className="flex-row items-center gap-3">
+                      <View className="flex-1">
+                        <Text className="text-gray-700" numberOfLines={1}>
+                          {item.name ?? "Line item"}
+                        </Text>
                         <Text
                           className={
                             isSpentView
-                              ? "text-gray-800"
-                              : itemRemaining >= 0 ? "text-green-600" : "text-red-600"
+                              ? "text-sm text-gray-500"
+                              : itemRemaining >= 0 ? "text-sm text-green-600" : "text-sm text-red-600"
                           }
                         >
                           {isSpentView
                             ? `${formatCurrency(itemSpent)} (${itemSpentPercent}%)`
                             : `${formatCurrency(itemRemaining)} (${itemRemainingPercent}%)`}
                         </Text>
-                        {canAddExpense && (
-                          <Pressable
-                            onPress={() => {
-                              setPreselectedLineItemId(item.id);
-                              setCategoryForModal(category);
-                            }}
-                            hitSlop={6}
-                            className="items-center justify-center p-1 rounded-full active:opacity-70"
-                            style={{ backgroundColor: accentColor + "20" }}
-                          >
-                            <Ionicons name="add" size={20} color={accentColor} />
-                          </Pressable>
-                        )}
                       </View>
+                      {canAddExpense && (
+                        <Pressable
+                          onPress={() => {
+                            setPreselectedLineItemId(item.id);
+                            setCategoryForModal(category);
+                          }}
+                          hitSlop={6}
+                          className="items-center justify-center p-1 rounded-full active:opacity-70"
+                          style={{ backgroundColor: accentColor + "20" }}
+                        >
+                          <Ionicons name="add" size={20} color={accentColor} />
+                        </Pressable>
+                      )}
                     </View>
                     {itemPlanned > 0 && (
                       <AnimatedProgressBar
