@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { ColorPicker } from "@/components/ColorPicker";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import { useAddCategory } from "@/hooks/useAddCategory";
@@ -40,7 +42,7 @@ export function AddCategoryForm({
 
   const form = useForm<AddCategoryFormData>({
     resolver: zodResolver(addCategorySchema),
-    defaultValues: { categoryName: "" },
+    defaultValues: { categoryName: "", color: CATEGORY_COLORS[0] },
     mode: "onBlur",
   });
 
@@ -53,6 +55,7 @@ export function AddCategoryForm({
     try {
       await addCategory.mutateAsync({
         categoryName: data.categoryName,
+        color: data.color,
         monthKey,
         householdId,
       });
@@ -104,14 +107,23 @@ export function AddCategoryForm({
             </View>
 
             <ScrollView className="px-4 py-4">
-              <FormField
-                control={form.control}
-                name="categoryName"
-                label="Name *"
-                placeholder="e.g. Groceries, Rent"
-                editable={!form.formState.isSubmitting}
-                autoCapitalize="words"
-              />
+              <View className="gap-4">
+                <FormField
+                  control={form.control}
+                  name="categoryName"
+                  label="Name *"
+                  placeholder="e.g. Groceries, Rent"
+                  editable={!form.formState.isSubmitting}
+                  autoCapitalize="words"
+                />
+                <View className="gap-2">
+                  <Text className="text-sm font-medium text-gray-700">Color</Text>
+                  <ColorPicker
+                    selectedColor={form.watch("color")}
+                    onSelectColor={(c) => form.setValue("color", c)}
+                  />
+                </View>
+              </View>
             </ScrollView>
 
             <View

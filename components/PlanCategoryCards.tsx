@@ -2,14 +2,16 @@ import { AddCategoryForm } from "@/components/AddCategoryForm";
 import { AddLineItemForm } from "@/components/AddLineItemForm";
 import { EditCategoryForm } from "@/components/EditCategoryForm";
 import { EditLineItemForm } from "@/components/EditLineItemForm";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { useDeleteCategory } from "@/hooks/useDeleteCategory";
+import { CATEGORY_COLORS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, CategoryWithLineItems, LineItem } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { IncomeCard } from "./IncomeCard";
+import { Separator } from "./ui/separator";
 
 type PlanCategoryCardsProps = {
   categories: CategoryWithLineItems[] | null;
@@ -36,7 +38,6 @@ export function PlanCategoryCards({
   monthKey,
   onRefetch,
 }: PlanCategoryCardsProps) {
-  const deleteCategoryMutation = useDeleteCategory();
   const [editingLineItem, setEditingLineItem] = useState<{
     item: LineItem;
     categoryId: string;
@@ -44,42 +45,7 @@ export function PlanCategoryCards({
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const handleCategoryPress = (category: Category) => {
-    Alert.alert(
-      category.name ?? "Category",
-      undefined,
-      [
-        {
-          text: "Edit Name",
-          onPress: () => setEditingCategory(category),
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            Alert.alert(
-              "Delete category?",
-              "This will also delete all budget items in this category. This cannot be undone.",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: async () => {
-                    try {
-                      await deleteCategoryMutation.mutateAsync({ categoryId: category.id });
-                      onRefetch?.();
-                    } catch (error) {
-                      Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
-                    }
-                  },
-                },
-              ]
-            );
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]
-    );
+    setEditingCategory(category);
   };
 
   if (error) {
@@ -126,7 +92,7 @@ export function PlanCategoryCards({
         monthKey={monthKey}
         onRefetch={onRefetch}
       />
-      {categories.map((category) => {
+      {categories.map((category, catIndex) => {
         const categoryPlanned =
           category.line_items?.reduce(
             (sum, item) => sum + (item.planned_amount ?? 0),
@@ -136,51 +102,63 @@ export function PlanCategoryCards({
           totalIncome > 0 ? Math.round((categoryPlanned / totalIncome) * 100) : 0;
 
         return (
-          <Card
-            key={category.id}
-            className="gap-0 overflow-hidden py-0"
-          >
-            <Pressable
-              onPress={() => handleCategoryPress(category)}
-              className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3.5 active:bg-gray-50"
-            >
-              <Text className="font-semibold text-gray-800" numberOfLines={1}>
-                {category.name ?? "Category"}
-              </Text>
-              <Text className="text-gray-600">
-                {formatCurrency(categoryPlanned)} ({percent}%)
-              </Text>
-            </Pressable>
-            {(category.line_items ?? []).map((item) => (
+          <Card key={category.id} className="gap-0">
+            <CardHeader className="border-b border-gray-100">
               <Pressable
-                key={item.id}
-                onPress={() =>
-                  userId &&
-                  monthKey &&
-                  onRefetch &&
-                  setEditingLineItem({ item, categoryId: category.id })
-                }
-                className="flex-row items-center justify-between border-b border-gray-50 px-4 py-2.5 last:border-b-0 active:bg-gray-50"
+                onPress={() => handleCategoryPress(category)}
+                className="flex-row items-center justify-between py-4 active:bg-gray-50"
               >
-                <Text className="text-gray-700 pl-3" numberOfLines={1}>
-                  {item.name ?? "Line item"}
-                </Text>
-                <Text className="font-medium text-gray-800">
-                  {formatCurrency(item.planned_amount ?? 0)}
+                <View className="flex-row items-center gap-2">
+                  <View
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: category.color ?? CATEGORY_COLORS[catIndex % CATEGORY_COLORS.length] }}
+                  />
+                  <CardTitle className="text-lg text-gray-800" numberOfLines={1}>
+                    {category.name ?? "Category"}
+                  </CardTitle>
+                  <Ionicons name="pencil" size={12} color="#9ca3af" />
+                </View>
+                <Text className="text-gray-600">
+                  {formatCurrency(categoryPlanned)} ({percent}%)
                 </Text>
               </Pressable>
-            ))}
-            {userId && monthKey && onRefetch && (
-              <View className="border-t border-gray-100 px-4 py-2">
-                <AddLineItemForm
-                  categoryId={category.id}
-                  categoryName={category.name ?? "Category"}
-                  monthKey={monthKey}
-                  userId={userId}
-                  onSuccess={onRefetch}
-                />
-              </View>
-            )}
+            </CardHeader>
+            <CardContent className="px-4 py-0">
+              {(category.line_items ?? []).map((item) => (
+                <View key={item.id}>
+                  <Pressable
+                    onPress={() =>
+                      userId &&
+                      monthKey &&
+                      onRefetch &&
+                      setEditingLineItem({ item, categoryId: category.id })
+                    }
+                    className="flex-row items-center justify-between border-b border-gray-50 py-2.5 last:border-b-0 active:bg-gray-50"
+                  >
+                    <Text className="pl-3 text-lg text-gray-700" numberOfLines={1}>
+                      {item.name ?? "Line item"}
+                    </Text>
+                    <View className="rounded-md bg-gray-100 px-2.5 py-1">
+                      <Text className="text-md font-medium text-gray-800">
+                        {formatCurrency(item.planned_amount ?? 0)}
+                      </Text>
+                    </View>
+                  </Pressable>
+                  <Separator />
+                </View>
+              ))}
+              {userId && monthKey && onRefetch && (
+                <View className="border-t border-gray-100 py-4">
+                  <AddLineItemForm
+                    categoryId={category.id}
+                    categoryName={category.name ?? "Category"}
+                    monthKey={monthKey}
+                    userId={userId}
+                    onSuccess={onRefetch}
+                  />
+                </View>
+              )}
+            </CardContent>
           </Card>
         );
       })}

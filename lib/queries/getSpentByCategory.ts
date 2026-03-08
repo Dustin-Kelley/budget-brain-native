@@ -2,7 +2,7 @@ import { logError } from "@/hooks/useLogError";
 import { supabase } from "@/lib/supabase";
 import { getMonthAndYearNumberFromDate } from "@/lib/utils";
 
-export type CategorySpent = { category_id: string; category_name: string | null; spent: number };
+export type CategorySpent = { category_id: string; category_name: string | null; color: string | null; spent: number };
 
 export async function getSpentByCategory({
   date,
@@ -55,13 +55,15 @@ export async function getSpentByCategory({
     (lineItems ?? []).map((li) => [li.id, li.category_id])
   );
 
+  const categoryIds = [...new Set(lineItemToCategory.values())];
+
   const { data: categories } = await supabase
     .from("categories")
-    .select("id, name")
-    .in("id", [...new Set(lineItemToCategory.values())]);
+    .select("*")
+    .in("id", categoryIds);
 
-  const categoryNames = new Map(
-    (categories ?? []).map((c) => [c.id, c.name])
+  const categoryMap = new Map(
+    (categories ?? []).map((c) => [c.id, { name: c.name, color: c.color ?? null }])
   );
 
   const spentByCategory = new Map<string, number>();
@@ -80,11 +82,15 @@ export async function getSpentByCategory({
   }
 
   const categorySpent: CategorySpent[] = [...spentByCategory.entries()].map(
-    ([category_id, spent]) => ({
-      category_id,
-      category_name: categoryNames.get(category_id) ?? null,
-      spent,
-    })
+    ([category_id, spent]) => {
+      const cat = categoryMap.get(category_id);
+      return {
+        category_id,
+        category_name: cat?.name ?? null,
+        color: cat?.color ?? null,
+        spent,
+      };
+    }
   );
 
   return { categorySpent, error: null };

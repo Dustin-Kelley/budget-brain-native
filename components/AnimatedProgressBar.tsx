@@ -23,7 +23,8 @@ export function AnimatedProgressBar({
   const width = useSharedValue(0);
 
   useEffect(() => {
-    width.value = withTiming(percent, {
+    const safePercent = Number.isFinite(percent) ? percent : 0;
+    width.value = withTiming(safePercent, {
       duration: 500,
       easing: Easing.out(Easing.cubic),
     });
