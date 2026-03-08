@@ -10,7 +10,11 @@ module.exports = {
         border: '#e2e8f0',
         input: '#e2e8f0',
         ring: '#94a3b8',
-        background: '#ffffff',
+        background: '#f4f4f5',
+        card: {
+          DEFAULT: '#ffffff',
+          foreground: '#1e293b',
+        },
         foreground: '#1e293b',
         primary: {
           DEFAULT: '#1e293b',
