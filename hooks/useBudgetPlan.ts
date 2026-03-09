@@ -6,6 +6,7 @@ import { getCategories } from "@/lib/queries/getCategories";
 import { getTotalIncome } from "@/lib/queries/getTotalIncome";
 import { getTransactions } from "@/lib/queries/getTransactions";
 import { getTransactionsList } from "@/lib/queries/getTransactionsList";
+import { getIncomeTransactions } from "@/lib/queries/getIncomeTransactions";
 
 function totalPlannedFromCategories(
   categories: { line_items?: { planned_amount: number | null }[] }[] | null
@@ -66,6 +67,16 @@ export function useBudgetPlan() {
     enabled: !!householdId,
   });
 
+  const incomeTransactionsQuery = useQuery({
+    queryKey: ["plan-income-transactions", householdId, monthKey],
+    queryFn: async () => {
+      const { incomeTransactions, totalReceived, receivedByIncomeId, error } = await getIncomeTransactions({ date: monthKey, householdId });
+      if (error) throw error;
+      return { incomeTransactions, totalReceived, receivedByIncomeId };
+    },
+    enabled: !!householdId,
+  });
+
   const categories = categoriesQuery.data?.categories ?? null;
   const income = incomeQuery.data?.income ?? [];
   const totalIncome = incomeQuery.data?.totalIncome ?? 0;
@@ -93,17 +104,23 @@ export function useBudgetPlan() {
       sortedDates: [] as string[],
     };
 
+  const incomeTransactions = incomeTransactionsQuery.data?.incomeTransactions ?? [];
+  const totalReceived = incomeTransactionsQuery.data?.totalReceived ?? 0;
+  const receivedByIncomeId = incomeTransactionsQuery.data?.receivedByIncomeId ?? {};
+
   const isLoading =
     categoriesQuery.isLoading ||
     incomeQuery.isLoading ||
     transactionsQuery.isLoading ||
-    transactionsListQuery.isLoading;
+    transactionsListQuery.isLoading ||
+    incomeTransactionsQuery.isLoading;
 
   const error =
     categoriesQuery.error ??
     incomeQuery.error ??
     transactionsQuery.error ??
-    transactionsListQuery.error;
+    transactionsListQuery.error ??
+    incomeTransactionsQuery.error;
 
   return {
     categories,
@@ -117,6 +134,9 @@ export function useBudgetPlan() {
       { id?: string; amount: number | null; date: string | null; description: string | null; line_items?: { name?: string | null } }[]
     >,
     sortedDates,
+    incomeTransactions,
+    totalReceived,
+    receivedByIncomeId,
     isLoading,
     error: error instanceof Error ? error : null,
     refetch: () => {
@@ -124,6 +144,7 @@ export function useBudgetPlan() {
       incomeQuery.refetch();
       transactionsQuery.refetch();
       transactionsListQuery.refetch();
+      incomeTransactionsQuery.refetch();
     },
   };
 }

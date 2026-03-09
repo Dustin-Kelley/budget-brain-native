@@ -1,6 +1,7 @@
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { BudgetAllocationChart } from "@/components/BudgetAllocationChart";
 import { BudgetSetupWizard } from "@/components/BudgetSetupWizard";
+import { IncomeTrackingCard } from "@/components/IncomeTrackingCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PlanCategoryCards } from "@/components/PlanCategoryCards";
 import { RemainingSpentCards } from "@/components/RemainingSpentCards";
@@ -33,6 +34,9 @@ export default function PlanScreen() {
     spentByLineItem,
     groupedTransactions,
     sortedDates,
+    incomeTransactions,
+    totalReceived,
+    receivedByIncomeId,
     isLoading: planLoading,
     error,
     refetch,
@@ -114,6 +118,8 @@ export default function PlanScreen() {
         <View className="gap-6">
           {activeTab === "planned" && (
             <Animated.View key="planned" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)} className="gap-6">
+              <Text className="text-lg font-semibold text-gray-800">Plan your budget</Text>
+
               <BudgetAllocationChart
                 categories={categories}
                 totalIncome={totalIncome}
@@ -133,7 +139,20 @@ export default function PlanScreen() {
             </Animated.View>
           )}
           {activeTab === "remaining" && (
-            <Animated.View key="remaining" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+            <Animated.View key="remaining" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)} className="gap-6">
+              <Text className="text-lg font-semibold text-gray-800">Track your spending</Text>
+              <IncomeTrackingCard
+                income={income}
+                totalIncome={totalIncome}
+                totalReceived={totalReceived}
+                receivedByIncomeId={receivedByIncomeId}
+                incomeTransactions={incomeTransactions}
+                error={error?.message}
+                householdId={householdId ?? undefined}
+                userId={currentUser?.id}
+                monthKey={monthKey}
+                onRefetch={refetch}
+              />
               <RemainingSpentCards
                 categories={categories}
                 spentByLineItem={spentByLineItem}
@@ -147,6 +166,10 @@ export default function PlanScreen() {
           )}
           {activeTab === "transactions" && (
             <Animated.View key="transactions" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)}>
+              <Text className="text-lg font-semibold text-gray-800">Transaction history</Text>
+              <Text className="mb-4 text-sm text-gray-500">
+                Your latest spending activities
+              </Text>
               <TransactionsList
                 groupedTransactions={groupedTransactions}
                 sortedDates={sortedDates}

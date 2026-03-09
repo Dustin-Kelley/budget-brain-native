@@ -201,6 +201,70 @@ export type Database = {
           },
         ]
       }
+      income_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          date: string | null
+          description: string | null
+          household_id: string
+          id: string
+          income_id: string
+          month: number | null
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          date?: string | null
+          description?: string | null
+          household_id: string
+          id?: string
+          income_id: string
+          month?: number | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          date?: string | null
+          description?: string | null
+          household_id?: string
+          id?: string
+          income_id?: string
+          month?: number | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "income_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "income_transactions_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "income_transactions_income_id_fkey"
+            columns: ["income_id"]
+            isOneToOne: false
+            referencedRelation: "income"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       line_items: {
         Row: {
           category_id: string

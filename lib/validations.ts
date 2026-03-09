@@ -96,6 +96,20 @@ export const editTransactionSchema = z.object({
 });
 export type EditTransactionFormData = z.infer<typeof editTransactionSchema>;
 
+export const addIncomeTransactionSchema = z.object({
+  amount: positiveAmountString("Amount"),
+  description: z.string().trim(),
+  date: requiredString("Date"),
+});
+export type AddIncomeTransactionFormData = z.infer<typeof addIncomeTransactionSchema>;
+
+export const editIncomeTransactionSchema = z.object({
+  amount: positiveAmountString("Amount"),
+  description: z.string().trim(),
+  date: requiredString("Date"),
+});
+export type EditIncomeTransactionFormData = z.infer<typeof editIncomeTransactionSchema>;
+
 export const changePasswordSchema = z
   .object({
     newPassword: z.string().min(6, "Password must be at least 6 characters"),

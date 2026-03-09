@@ -110,10 +110,6 @@ export function TransactionsList({
 
   return (
     <View className="gap-4">
-      <Text className="font-semibold text-gray-800">Recent Transactions</Text>
-      <Text className="-mt-2 text-sm text-gray-500">
-        Your latest spending activities
-      </Text>
       <View className="relative">
         <View className="absolute left-4 top-0 bottom-0 z-10 justify-center">
           <Ionicons name="search" size={18} color="#9CA3AF" />
