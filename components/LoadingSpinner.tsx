@@ -1,45 +1,13 @@
-import { useEffect, useRef } from "react";
-import { Animated, Easing, Image, View } from "react-native";
-
-const logoDarkSource = require("../assets/images/logo-dark.png");
+import { ActivityIndicator, View } from "react-native";
 
 interface LoadingSpinnerProps {
-  size?: number;
+  size?: "small" | "large";
 }
 
-export function LoadingSpinner({ size = 64 }: LoadingSpinnerProps) {
-  const opacity = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 0.3,
-          duration: 800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    animation.start();
-    return () => animation.stop();
-  }, [opacity]);
-
+export function LoadingSpinner({ size = "large" }: LoadingSpinnerProps) {
   return (
     <View className="flex-1 items-center justify-center">
-      <Animated.View style={{ opacity }}>
-        <Image
-          source={logoDarkSource}
-          style={{ width: size, height: size }}
-          resizeMode="contain"
-        />
-      </Animated.View>
+      <ActivityIndicator size={size} />
     </View>
   );
 }
