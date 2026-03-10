@@ -20,7 +20,9 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
+        "EXPO_PUBLIC_DEMO_EMAIL": "review@budgetbrain.app",
+        "EXPO_PUBLIC_DEMO_PASSWORD": "Review123!"
       }
     }
   },

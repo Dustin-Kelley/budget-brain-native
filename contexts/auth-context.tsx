@@ -16,9 +16,13 @@ type AuthContextValue = {
   sendOtp: (email: string) => Promise<{ error: Error | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+const DEMO_EMAIL = process.env.EXPO_PUBLIC_DEMO_EMAIL?.toLowerCase();
+const DEMO_PASSWORD = process.env.EXPO_PUBLIC_DEMO_PASSWORD;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -40,16 +44,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const sendOtp = useCallback(async (email: string) => {
+    if (DEMO_EMAIL && email.toLowerCase() === DEMO_EMAIL) {
+      return { error: null };
+    }
     const { error } = await supabase.auth.signInWithOtp({ email });
     return { error: error as Error | null };
   }, []);
 
   const verifyOtp = useCallback(async (email: string, token: string) => {
+    if (DEMO_EMAIL && DEMO_PASSWORD && email.toLowerCase() === DEMO_EMAIL) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      return { error: error as Error | null };
+    }
     const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
     return { error: error as Error | null };
   }, []);
 
   const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+  }, []);
+
+  const deleteAccount = useCallback(async () => {
+    await supabase.rpc("delete_user");
     await supabase.auth.signOut();
   }, []);
 
@@ -60,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sendOtp,
     verifyOtp,
     signOut,
+    deleteAccount,
   };
 
   return (

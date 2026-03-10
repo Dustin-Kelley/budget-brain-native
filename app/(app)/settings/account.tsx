@@ -14,7 +14,7 @@ import { Alert, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AccountScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
   const { currentUser } = useCurrentUser();
   const { updateUserProfile, isUpdatingUserProfile } = useUpdateUserProfile();
   const insets = useSafeAreaInsets();
@@ -48,6 +48,24 @@ export default function AccountScreen() {
         },
       },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteAccount();
+            router.replace("/(auth)/login");
+          },
+        },
+      ]
+    );
   };
 
   const fullName = [currentUser?.first_name, currentUser?.last_name]
@@ -115,6 +133,9 @@ export default function AccountScreen() {
         </Button>
         <Button variant="destructive" onPress={handleSignOut}>
           <Text>Sign Out</Text>
+        </Button>
+        <Button variant="ghost" onPress={handleDeleteAccount}>
+          <Text className="text-destructive">Delete Account</Text>
         </Button>
       </View>
     </View>
