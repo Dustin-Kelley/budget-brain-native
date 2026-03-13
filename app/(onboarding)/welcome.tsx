@@ -38,7 +38,7 @@ export default function WelcomeScreen() {
   }, [opacity]);
 
   function handleGetStarted() {
-    router.replace('/(app)');
+    router.replace({ pathname: '/(app)/plan', params: { fromOnboarding: '1' } });
   }
 
   return (

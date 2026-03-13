@@ -3,7 +3,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useHousehold } from '@/hooks/useHousehold';
 import { autoRolloverBudget } from '@/lib/mutations/autoRolloverBudget';
 import { findMostRecentBudgetMonth } from '@/lib/queries/findMostRecentBudgetMonth';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLogError } from './useLogError';
 
 export type RolloverResult =
@@ -16,6 +16,12 @@ export function useRolloverBudget() {
   const { currentUser } = useCurrentUser();
   const { householdId } = useHousehold();
   const queryClient = useQueryClient();
+
+  const { data: previousBudgetMonth } = useQuery({
+    queryKey: ['previousBudgetMonth', householdId, monthKey],
+    queryFn: () => findMostRecentBudgetMonth(householdId!, monthKey),
+    enabled: !!householdId,
+  });
 
   const { mutateAsync, isPending, isError } = useMutation({
     mutationFn: async (): Promise<void> => {
@@ -52,5 +58,5 @@ export function useRolloverBudget() {
     },
   });
 
-  return { rollover: mutateAsync, isRollingOver: isPending, isError };
+  return { rollover: mutateAsync, isRollingOver: isPending, isError, hasPreviousBudget: !!previousBudgetMonth };
 }

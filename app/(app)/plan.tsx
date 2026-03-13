@@ -16,6 +16,7 @@ import { useBudgetPlan } from "@/hooks/useBudgetPlan";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useHousehold } from "@/hooks/useHousehold";
 import { formatMonthYearForDisplay } from "@/lib/utils";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -42,12 +43,13 @@ export default function PlanScreen() {
     refetch,
   } = useBudgetPlan();
 
-  const { rollover, isRollingOver, isError } = useRolloverBudget();
+  const { fromOnboarding } = useLocalSearchParams<{ fromOnboarding?: string }>();
+  const { rollover, isRollingOver, isError, hasPreviousBudget } = useRolloverBudget();
   const [activeTab, setActiveTab] = useState("planned");
-  const [wizardDismissed, setWizardDismissed] = useState(false);
+  const [showWizard, setShowWizard] = useState(!!fromOnboarding);
 
   const hasBudgetThisMonth = totalPlanned > 0;
-  const showEmptyState = !hasBudgetThisMonth && !wizardDismissed;
+  const showEmptyState = !hasBudgetThisMonth && !showWizard && hasPreviousBudget;
 
 
 
@@ -60,7 +62,7 @@ export default function PlanScreen() {
       <View className="flex-1">
         <ScreenWrapper header="plan">
           <View className="gap-4 pt-4">
-            <Card>
+            <Card className="p-4">
               <CardHeader>
                 <CardTitle className="text-xl">No budget yet</CardTitle>
                 <Text className="text-sm text-muted-foreground">
@@ -74,37 +76,22 @@ export default function PlanScreen() {
                 )}
               </CardHeader>
               <CardContent className="gap-3">
-                <Button onPress={() => rollover()}>
-                  <Text>Roll Over Previous Budget</Text>
-                </Button>
+                {hasPreviousBudget && (
+                  <Button onPress={() => rollover()}>
+                    <Text>Roll Over Previous Budget</Text>
+                  </Button>
+                )}
                 <Button
                   variant="outline"
-                  onPress={() => setWizardDismissed(true)}
+                  onPress={() => setShowWizard(true)}
                 >
-                  <Text>Start From Scratch</Text>
+                  <Text>{hasPreviousBudget ? 'Start From Scratch' : 'Create Your First Budget'}</Text>
                 </Button>
               </CardContent>
             </Card>
           </View>
         </ScreenWrapper>
       </View>
-    );
-  }
-
-  if (!hasBudgetThisMonth && wizardDismissed && householdId && currentUser?.id) {
-    return (
-      <BudgetSetupWizard
-        householdId={householdId}
-        userId={currentUser.id}
-        monthKey={monthKey}
-        income={income}
-        totalIncome={totalIncome}
-        categories={categories}
-        totalPlanned={totalPlanned}
-        monthLabel={monthLabel}
-        refetch={refetch}
-        onComplete={() => setWizardDismissed(false)}
-      />
     );
   }
 
@@ -118,24 +105,39 @@ export default function PlanScreen() {
         <View className="gap-6">
           {activeTab === "planned" && (
             <Animated.View key="planned" entering={FadeIn.duration(200)} exiting={FadeOut.duration(100)} className="gap-6">
-              <Text className="text-lg font-semibold text-gray-800">Plan your budget</Text>
-
-              <BudgetAllocationChart
-                categories={categories}
-                totalIncome={totalIncome}
-              />
-              <PlanCategoryCards
-                categories={categories}
-                totalIncome={totalIncome}
-                totalPlanned={totalPlanned}
-                income={income}
-                monthLabel={monthLabel}
-                error={error?.message}
-                householdId={householdId ?? undefined}
-                userId={currentUser?.id}
-                monthKey={monthKey}
-                onRefetch={refetch}
-              />
+              {showWizard && !hasBudgetThisMonth && householdId && currentUser?.id ? (
+                <BudgetSetupWizard
+                  householdId={householdId}
+                  userId={currentUser.id}
+                  monthKey={monthKey}
+                  income={income}
+                  totalIncome={totalIncome}
+                  categories={categories}
+                  totalPlanned={totalPlanned}
+                  monthLabel={monthLabel}
+                  onComplete={() => setShowWizard(false)}
+                />
+              ) : (
+                <>
+                  <Text className="text-lg font-semibold text-gray-800">Plan your budget</Text>
+                  <BudgetAllocationChart
+                    categories={categories}
+                    totalIncome={totalIncome}
+                  />
+                  <PlanCategoryCards
+                    categories={categories}
+                    totalIncome={totalIncome}
+                    totalPlanned={totalPlanned}
+                    income={income}
+                    monthLabel={monthLabel}
+                    error={error?.message}
+                    householdId={householdId ?? undefined}
+                    userId={currentUser?.id}
+                    monthKey={monthKey}
+                    onRefetch={refetch}
+                  />
+                </>
+              )}
             </Animated.View>
           )}
           {activeTab === "remaining" && (
