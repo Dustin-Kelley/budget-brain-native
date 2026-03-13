@@ -6,7 +6,7 @@ export async function getCurrentUser(authUserId: string) {
     .from('users')
     .select('*')
     .eq('id', authUserId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     logError(error, { tags: { query: 'getCurrentUser' } });
