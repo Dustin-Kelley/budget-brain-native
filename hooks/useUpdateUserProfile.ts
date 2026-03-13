@@ -6,7 +6,7 @@ export function useUpdateUserProfile() {
   const { logError } = useLogError();
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, mutateAsync, isPending } = useMutation({
     mutationFn: async ({
       userId,
       firstName,
@@ -33,7 +33,7 @@ export function useUpdateUserProfile() {
     },
   });
 
-  return { updateUserProfile: mutate, isUpdatingUserProfile: isPending };
+  return { updateUserProfile: mutate, updateUserProfileAsync: mutateAsync, isUpdatingUserProfile: isPending };
 }
 
 export function useInvalidateUserProfile() {

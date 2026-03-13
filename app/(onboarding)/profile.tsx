@@ -13,7 +13,7 @@ import { View } from 'react-native';
 
 export default function ProfileScreen() {
   const { user } = useAuth();
-  const updateProfile = useUpdateUserProfile();
+  const { updateUserProfileAsync } = useUpdateUserProfile();
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -24,7 +24,7 @@ export default function ProfileScreen() {
   async function onSubmit(data: ProfileFormData) {
     if (!user) return;
     try {
-      await updateProfile.mutateAsync({
+      await updateUserProfileAsync({
         userId: user.id,
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
