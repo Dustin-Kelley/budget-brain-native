@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ColorPicker";
+import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
+import { useAddCategory } from "@/hooks/useAddCategory";
 import { CATEGORY_COLORS } from "@/lib/constants";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
-import { useAddCategory } from "@/hooks/useAddCategory";
 import { addCategorySchema, type AddCategoryFormData } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -20,7 +21,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
 
 type AddCategoryFormProps = {
   householdId: string;
@@ -78,7 +78,7 @@ export function AddCategoryForm({
         >
           <Ionicons name="add" size={20} color={accentColor} />
         </View>
-        <Text className="text-sm font-medium" style={{ color: accentColor }}>Add category</Text>
+        <Text className="text-md font-medium" style={{ color: accentColor }}>Add category</Text>
       </Pressable>
 
       <Modal
