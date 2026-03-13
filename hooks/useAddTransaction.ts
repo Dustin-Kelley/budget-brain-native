@@ -10,6 +10,7 @@ export function useAddTransaction() {
     mutationFn: async (params: {
       amount: number;
       description?: string;
+      note?: string;
       lineItemId: string;
       dateOfTransaction: string;
       householdId: string;

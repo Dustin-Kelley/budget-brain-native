@@ -11,6 +11,7 @@ export function useUpdateTransaction() {
       transactionId: string;
       amount: number;
       description?: string;
+      note?: string;
       lineItemId: string;
       dateOfTransaction: string;
       monthKey: string;

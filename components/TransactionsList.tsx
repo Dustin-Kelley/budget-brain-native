@@ -15,6 +15,7 @@ type TransactionItem = {
   amount: number | null;
   date: string | null;
   description: string | null;
+  note?: string | null;
   line_item_id?: string | null;
   line_items?: { name?: string | null } | null;
   users?: { avatar_emoji?: string | null; first_name?: string | null } | null;
@@ -180,6 +181,11 @@ export function TransactionsList({
                       numberOfLines={1}
                     >
                       {tx.description}
+                    </Text>
+                  )}
+                  {tx.note && (
+                    <Text className="mt-0.5 text-xs text-gray-400 italic" numberOfLines={1}>
+                      {tx.note}
                     </Text>
                   )}
                 </View>

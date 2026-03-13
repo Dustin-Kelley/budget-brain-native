@@ -68,6 +68,7 @@ export function AddExpenseForm({
       description: "",
       lineItemId: "",
       date: new Date().toISOString().split("T")[0],
+      note: "",
     },
     mode: "onBlur",
   });
@@ -84,6 +85,7 @@ export function AddExpenseForm({
       description: "",
       lineItemId: "",
       date: new Date().toISOString().split("T")[0],
+      note: "",
     });
   };
 
@@ -92,6 +94,7 @@ export function AddExpenseForm({
       await addTransaction.mutateAsync({
         amount: parseFloat(data.amount),
         description: data.description?.trim() || undefined,
+        note: data.note?.trim() || undefined,
         lineItemId: data.lineItemId,
         dateOfTransaction: data.date,
         householdId,
@@ -246,6 +249,14 @@ export function AddExpenseForm({
                       control={form.control}
                       name="description"
                       label="Description"
+                      placeholder="Optional"
+                      editable={!form.formState.isSubmitting}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="note"
+                      label="Note"
                       placeholder="Optional"
                       editable={!form.formState.isSubmitting}
                     />

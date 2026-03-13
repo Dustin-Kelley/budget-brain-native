@@ -5,6 +5,7 @@ export async function updateTransaction({
   transactionId,
   amount,
   description,
+  note,
   lineItemId,
   dateOfTransaction,
   monthKey,
@@ -14,6 +15,7 @@ export async function updateTransaction({
   transactionId: string;
   amount: number;
   description?: string;
+  note?: string;
   lineItemId: string;
   dateOfTransaction: string;
   monthKey: string;
@@ -27,6 +29,7 @@ export async function updateTransaction({
     .update({
       amount,
       description: description ?? null,
+      note: note ?? null,
       date: dateOfTransaction,
       line_item_id: lineItemId,
       year: yearNumber,

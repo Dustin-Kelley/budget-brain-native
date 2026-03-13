@@ -4,6 +4,7 @@ import { getMonthAndYearNumberFromDate } from '@/lib/utils';
 export async function addTransaction({
   amount,
   description,
+  note,
   lineItemId,
   dateOfTransaction,
   householdId,
@@ -12,6 +13,7 @@ export async function addTransaction({
 }: {
   amount: number;
   description?: string;
+  note?: string;
   lineItemId: string;
   dateOfTransaction: string;
   householdId: string;
@@ -23,6 +25,7 @@ export async function addTransaction({
   const { error } = await supabase.from('transactions').insert({
     amount,
     description: description ?? null,
+    note: note ?? null,
     date: dateOfTransaction,
     line_item_id: lineItemId,
     year: yearNumber,

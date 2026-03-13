@@ -1,3 +1,4 @@
+Connecting to db 5432
 export type Json =
   | string
   | number
@@ -327,6 +328,7 @@ export type Database = {
           id: string
           line_item_id: string | null
           month: number | null
+          note: string | null
           type: string | null
           updated_at: string | null
           year: number | null
@@ -341,6 +343,7 @@ export type Database = {
           id?: string
           line_item_id?: string | null
           month?: number | null
+          note?: string | null
           type?: string | null
           updated_at?: string | null
           year?: number | null
@@ -355,6 +358,7 @@ export type Database = {
           id?: string
           line_item_id?: string | null
           month?: number | null
+          note?: string | null
           type?: string | null
           updated_at?: string | null
           year?: number | null
@@ -426,7 +430,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -85,6 +85,7 @@ export const addExpenseSchema = z.object({
   description: z.string().trim(),
   lineItemId: z.string().min(1, "Please select a budget item"),
   date: requiredString("Date"),
+  note: z.string().trim(),
 });
 export type AddExpenseFormData = z.infer<typeof addExpenseSchema>;
 
@@ -93,6 +94,7 @@ export const editTransactionSchema = z.object({
   description: z.string().trim(),
   lineItemId: z.string().min(1, "Please select a budget item"),
   date: requiredString("Date"),
+  note: z.string().trim(),
 });
 export type EditTransactionFormData = z.infer<typeof editTransactionSchema>;
 

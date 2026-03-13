@@ -27,6 +27,7 @@ type TransactionItem = {
   amount: number | null;
   date: string | null;
   description: string | null;
+  note?: string | null;
   line_item_id?: string | null;
   line_items?: { name?: string | null } | null;
 };
@@ -74,6 +75,7 @@ export function EditTransactionForm({
   const getDefaults = () => ({
     amount: String(transaction.amount ?? 0),
     description: transaction.description ?? "",
+    note: transaction.note ?? "",
     lineItemId: transaction.line_item_id ?? "",
     date: transaction.date?.split("T")[0] ?? new Date().toISOString().split("T")[0],
   });
@@ -102,6 +104,7 @@ export function EditTransactionForm({
         transactionId: transaction.id,
         amount: parseFloat(data.amount),
         description: data.description?.trim() || undefined,
+        note: data.note?.trim() || undefined,
         lineItemId: data.lineItemId,
         dateOfTransaction: data.date,
         monthKey,
@@ -226,6 +229,14 @@ export function EditTransactionForm({
                 control={form.control}
                 name="description"
                 label="Description"
+                placeholder="Optional"
+                editable={!isSubmitting}
+              />
+
+              <FormField
+                control={form.control}
+                name="note"
+                label="Note"
                 placeholder="Optional"
                 editable={!isSubmitting}
               />
