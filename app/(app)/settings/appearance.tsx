@@ -5,13 +5,14 @@ import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
-import { appThemes } from "@/lib/themes";
+import { appThemes, getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppearanceScreen() {
   const { appTheme, setAppTheme } = useTheme();
@@ -19,6 +20,7 @@ export default function AppearanceScreen() {
   const { updateUserProfile, isUpdatingUserProfile } = useUpdateUserProfile();
   const insets = useSafeAreaInsets();
   const [emojiModalVisible, setEmojiModalVisible] = useState(false);
+  const theme = getAppTheme(appTheme);
 
   const handleSelect = (emoji: string) => {
     if (!currentUser || isUpdatingUserProfile) return;
@@ -28,13 +30,51 @@ export default function AppearanceScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background px-5" edges={["top"]}>
-      <View className="gap-4">
-        <View className="flex-row items-center gap-3">
-          <BackButton />
-          <Text className="text-lg font-semibold">Appearance</Text>
-        </View>
+    <View className="flex-1 bg-background">
+      {/* Gradient header — live theme preview */}
+      <View style={{ overflow: "hidden" }}>
+        <BlurView
+          tint="prominent"
+          intensity={60}
+          style={{
+            paddingTop: insets.top,
+            paddingBottom: 16,
+            paddingHorizontal: 20,
+          }}
+        >
+          <LinearGradient
+            colors={theme.colors}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.6,
+            }}
+          />
+          <View className="flex-row items-center gap-3">
+            <BackButton className="border-white/40 bg-white/20" />
+            <Text variant="h1" className="font-bold text-white">Appearance</Text>
+          </View>
+        </BlurView>
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            borderBottomWidth: 0.5,
+            borderBottomColor: "rgba(255,255,255,0.2)",
+          }}
+        />
+      </View>
 
+      <ScrollView
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 96, paddingHorizontal: 20, gap: 16 }}
+      >
         <View className="gap-2">
           <Text className="text-base font-semibold text-gray-800">Avatar</Text>
           <Pressable
@@ -128,7 +168,7 @@ export default function AppearanceScreen() {
             })}
           </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </ScrollView>
+    </View>
   );
 }
