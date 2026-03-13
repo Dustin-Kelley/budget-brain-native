@@ -86,6 +86,7 @@ export const addExpenseSchema = z.object({
   lineItemId: z.string().min(1, "Please select a budget item"),
   date: requiredString("Date"),
   note: z.string().trim(),
+  recurrenceFrequency: z.enum(['never', 'weekly', 'biweekly', 'monthly', 'yearly']),
 });
 export type AddExpenseFormData = z.infer<typeof addExpenseSchema>;
 
@@ -102,6 +103,7 @@ export const addIncomeTransactionSchema = z.object({
   amount: positiveAmountString("Amount"),
   description: z.string().trim(),
   date: requiredString("Date"),
+  recurrenceFrequency: z.enum(['never', 'weekly', 'biweekly', 'monthly', 'yearly']),
 });
 export type AddIncomeTransactionFormData = z.infer<typeof addIncomeTransactionSchema>;
 

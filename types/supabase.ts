@@ -1,4 +1,3 @@
-Connecting to db 5432
 export type Json =
   | string
   | number
@@ -212,7 +211,11 @@ export type Database = {
           household_id: string
           id: string
           income_id: string
+          is_recurring_instance: boolean
           month: number | null
+          recurrence_frequency: string
+          recurring_next_date: string | null
+          recurring_parent_id: string | null
           updated_at: string | null
           year: number | null
         }
@@ -225,7 +228,11 @@ export type Database = {
           household_id: string
           id?: string
           income_id: string
+          is_recurring_instance?: boolean
           month?: number | null
+          recurrence_frequency?: string
+          recurring_next_date?: string | null
+          recurring_parent_id?: string | null
           updated_at?: string | null
           year?: number | null
         }
@@ -238,7 +245,11 @@ export type Database = {
           household_id?: string
           id?: string
           income_id?: string
+          is_recurring_instance?: boolean
           month?: number | null
+          recurrence_frequency?: string
+          recurring_next_date?: string | null
+          recurring_parent_id?: string | null
           updated_at?: string | null
           year?: number | null
         }
@@ -262,6 +273,13 @@ export type Database = {
             columns: ["income_id"]
             isOneToOne: false
             referencedRelation: "income"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "income_transactions_recurring_parent_id_fkey"
+            columns: ["recurring_parent_id"]
+            isOneToOne: false
+            referencedRelation: "income_transactions"
             referencedColumns: ["id"]
           },
         ]
@@ -326,9 +344,13 @@ export type Database = {
           description: string | null
           household_id: string
           id: string
+          is_recurring_instance: boolean
           line_item_id: string | null
           month: number | null
           note: string | null
+          recurrence_frequency: string
+          recurring_next_date: string | null
+          recurring_parent_id: string | null
           type: string | null
           updated_at: string | null
           year: number | null
@@ -341,9 +363,13 @@ export type Database = {
           description?: string | null
           household_id: string
           id?: string
+          is_recurring_instance?: boolean
           line_item_id?: string | null
           month?: number | null
           note?: string | null
+          recurrence_frequency?: string
+          recurring_next_date?: string | null
+          recurring_parent_id?: string | null
           type?: string | null
           updated_at?: string | null
           year?: number | null
@@ -356,9 +382,13 @@ export type Database = {
           description?: string | null
           household_id?: string
           id?: string
+          is_recurring_instance?: boolean
           line_item_id?: string | null
           month?: number | null
           note?: string | null
+          recurrence_frequency?: string
+          recurring_next_date?: string | null
+          recurring_parent_id?: string | null
           type?: string | null
           updated_at?: string | null
           year?: number | null
@@ -383,6 +413,13 @@ export type Database = {
             columns: ["line_item_id"]
             isOneToOne: false
             referencedRelation: "line_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_recurring_parent_id_fkey"
+            columns: ["recurring_parent_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]

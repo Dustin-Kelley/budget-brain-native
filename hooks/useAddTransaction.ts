@@ -16,6 +16,7 @@ export function useAddTransaction() {
       householdId: string;
       userId: string;
       monthKey: string;
+      recurrenceFrequency?: string;
     }) => {
       const { error } = await addTransaction(params);
       if (error) throw error;

@@ -1,10 +1,12 @@
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { CalendarPicker } from "@/components/CalendarPicker";
+import { RecurrencePicker } from "@/components/RecurrencePicker";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
+import { RECURRENCE_OPTIONS } from "@/lib/constants";
 import { addExpenseSchema, type AddExpenseFormData } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CategoryWithLineItems } from "@/types";
@@ -46,6 +48,7 @@ export function QuickAddExpenseModal({
 
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
 
   const form = useForm<AddExpenseFormData>({
     resolver: zodResolver(addExpenseSchema),
@@ -54,6 +57,7 @@ export function QuickAddExpenseModal({
       description: "",
       lineItemId: defaultLineItemId,
       date: new Date().toISOString().split("T")[0],
+      recurrenceFrequency: "never",
     },
     mode: "onBlur",
   });
@@ -64,11 +68,13 @@ export function QuickAddExpenseModal({
   const handleClose = () => {
     setShowLineItemPicker(false);
     setShowDatePicker(false);
+    setShowRecurrencePicker(false);
     form.reset({
       amount: "",
       description: "",
       lineItemId: defaultLineItemId,
       date: new Date().toISOString().split("T")[0],
+      recurrenceFrequency: "never",
     });
     onClose();
   };
@@ -83,6 +89,7 @@ export function QuickAddExpenseModal({
         householdId,
         userId,
         monthKey,
+        recurrenceFrequency: data.recurrenceFrequency,
       });
       onSuccess();
       handleClose();
@@ -90,6 +97,44 @@ export function QuickAddExpenseModal({
       Alert.alert("Error", error instanceof Error ? error.message : "An error occurred");
     }
   };
+
+  if (showRecurrencePicker) {
+    return (
+      <>
+        <View className="items-center mt-2 mb-1">
+          <View className="h-[5px] w-9 rounded-full bg-gray-300" />
+        </View>
+        <View className="border-b border-gray-100 px-4 py-3">
+          <View className="flex-row items-center justify-between">
+            <BackButton onPress={() => setShowRecurrencePicker(false)} />
+            <Pressable
+              onPress={handleClose}
+              hitSlop={8}
+              className="h-12 w-12 items-center justify-center rounded-full bg-gray-100/80 active:bg-gray-200"
+            >
+              <Ionicons name="close" size={20} color="#6B7280" />
+            </Pressable>
+          </View>
+          <Text className="mt-2 text-lg font-semibold text-gray-800">Repeats</Text>
+        </View>
+        <ScrollView className="flex-1 px-4 py-3">
+          <Controller
+            control={form.control}
+            name="recurrenceFrequency"
+            render={({ field: { value, onChange } }) => (
+              <RecurrencePicker
+                value={value ?? "never"}
+                onSelect={(v) => {
+                  onChange(v);
+                  setShowRecurrencePicker(false);
+                }}
+              />
+            )}
+          />
+        </ScrollView>
+      </>
+    );
+  }
 
   if (showDatePicker) {
     return (
@@ -272,6 +317,26 @@ export function QuickAddExpenseModal({
                 {error?.message && (
                   <Text className="text-sm text-destructive">{error.message}</Text>
                 )}
+              </View>
+            )}
+          />
+
+          <Controller
+            control={form.control}
+            name="recurrenceFrequency"
+            render={({ field: { value } }) => (
+              <View className="gap-2">
+                <Label>Repeats</Label>
+                <Pressable
+                  onPress={() => setShowRecurrencePicker(true)}
+                  disabled={form.formState.isSubmitting}
+                  className="flex-row items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+                >
+                  <Text className="text-gray-800">
+                    {RECURRENCE_OPTIONS.find((o) => o.value === value)?.label ?? "Never"}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                </Pressable>
               </View>
             )}
           />

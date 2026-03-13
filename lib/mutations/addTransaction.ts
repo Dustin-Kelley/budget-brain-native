@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { getMonthAndYearNumberFromDate } from '@/lib/utils';
+import { getMonthAndYearNumberFromDate, computeNextRecurringDate } from '@/lib/utils';
 
 export async function addTransaction({
   amount,
@@ -10,6 +10,7 @@ export async function addTransaction({
   householdId,
   userId,
   monthKey,
+  recurrenceFrequency = 'never',
 }: {
   amount: number;
   description?: string;
@@ -19,8 +20,10 @@ export async function addTransaction({
   householdId: string;
   userId: string;
   monthKey: string;
+  recurrenceFrequency?: string;
 }): Promise<{ error: Error | null }> {
   const { monthNumber, yearNumber } = getMonthAndYearNumberFromDate(monthKey);
+  const recurringNextDate = computeNextRecurringDate(dateOfTransaction, recurrenceFrequency);
 
   const { error } = await supabase.from('transactions').insert({
     amount,
@@ -32,6 +35,8 @@ export async function addTransaction({
     month: monthNumber,
     household_id: householdId,
     created_by: userId,
+    recurrence_frequency: recurrenceFrequency,
+    recurring_next_date: recurringNextDate,
   });
 
   if (error) {

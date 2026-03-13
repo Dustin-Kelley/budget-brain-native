@@ -1,11 +1,13 @@
 import { BackButton } from "@/components/BackButton";
 import { CalendarPicker } from "@/components/CalendarPicker";
+import { RecurrencePicker } from "@/components/RecurrencePicker";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/contexts/theme-context";
 import { useAddTransaction } from "@/hooks/useAddTransaction";
+import { RECURRENCE_OPTIONS } from "@/lib/constants";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import { addExpenseSchema, type AddExpenseFormData } from "@/lib/validations";
@@ -58,6 +60,7 @@ export function AddExpenseForm({
   const [visible, setVisible] = useState(false);
   const [showLineItemPicker, setShowLineItemPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
 
   const lineItems = flattenLineItems(categories);
 
@@ -69,6 +72,7 @@ export function AddExpenseForm({
       lineItemId: "",
       date: new Date().toISOString().split("T")[0],
       note: "",
+      recurrenceFrequency: "never",
     },
     mode: "onBlur",
   });
@@ -80,12 +84,14 @@ export function AddExpenseForm({
     setVisible(false);
     setShowLineItemPicker(false);
     setShowDatePicker(false);
+    setShowRecurrencePicker(false);
     form.reset({
       amount: "",
       description: "",
       lineItemId: "",
       date: new Date().toISOString().split("T")[0],
       note: "",
+      recurrenceFrequency: "never",
     });
   };
 
@@ -100,6 +106,7 @@ export function AddExpenseForm({
         householdId,
         userId,
         monthKey,
+        recurrenceFrequency: data.recurrenceFrequency,
       });
       onSuccess();
       handleClose();
@@ -130,7 +137,40 @@ export function AddExpenseForm({
       >
         <View className="flex-1 justify-end bg-black/50">
           <View className="h-[90%] flex flex-col rounded-t-2xl bg-white shadow-none">
-            {showDatePicker ? (
+            {showRecurrencePicker ? (
+              <>
+                <View className="shrink-0 border-b border-gray-200 px-4 py-3">
+                  <View className="flex-row items-center justify-between">
+                    <BackButton onPress={() => setShowRecurrencePicker(false)} />
+                    <Pressable
+                      onPress={handleClose}
+                      hitSlop={8}
+                      className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+                    >
+                      <Ionicons name="close" size={20} color="#6B7280" />
+                    </Pressable>
+                  </View>
+                  <Text className="mt-2 text-lg font-semibold text-gray-900">
+                    Repeats
+                  </Text>
+                </View>
+                <ScrollView className="flex-1 px-4 py-3">
+                  <Controller
+                    control={form.control}
+                    name="recurrenceFrequency"
+                    render={({ field: { value, onChange } }) => (
+                      <RecurrencePicker
+                        value={value ?? "never"}
+                        onSelect={(v) => {
+                          onChange(v);
+                          setShowRecurrencePicker(false);
+                        }}
+                      />
+                    )}
+                  />
+                </ScrollView>
+              </>
+            ) : showDatePicker ? (
               <>
                 <View className="shrink-0 border-b border-gray-200 px-4 py-3">
                   <View className="flex-row items-center justify-between">
@@ -315,6 +355,26 @@ export function AddExpenseForm({
                           {error?.message && (
                             <Text className="text-sm text-destructive">{error.message}</Text>
                           )}
+                        </View>
+                      )}
+                    />
+
+                    <Controller
+                      control={form.control}
+                      name="recurrenceFrequency"
+                      render={({ field: { value } }) => (
+                        <View className="gap-2">
+                          <Label>Repeats</Label>
+                          <Pressable
+                            onPress={() => setShowRecurrencePicker(true)}
+                            disabled={form.formState.isSubmitting}
+                            className="flex-row items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+                          >
+                            <Text className="text-gray-900">
+                              {RECURRENCE_OPTIONS.find((o) => o.value === value)?.label ?? "Never"}
+                            </Text>
+                            <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                          </Pressable>
                         </View>
                       )}
                     />

@@ -4,6 +4,7 @@ import { CalendarPicker } from "@/components/CalendarPicker";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { RECURRENCE_OPTIONS } from "@/lib/constants";
 import { useDeleteTransaction } from "@/hooks/useDeleteTransaction";
 import { useUpdateTransaction } from "@/hooks/useUpdateTransaction";
 import { editTransactionSchema, type EditTransactionFormData } from "@/lib/validations";
@@ -30,6 +31,7 @@ type TransactionItem = {
   note?: string | null;
   line_item_id?: string | null;
   line_items?: { name?: string | null } | null;
+  recurrence_frequency?: string | null;
 };
 
 function flattenLineItems(
@@ -326,6 +328,17 @@ export function EditTransactionForm({
                   </View>
                 )}
               />
+
+              {transaction.recurrence_frequency && transaction.recurrence_frequency !== 'never' && (
+                <View className="gap-2">
+                  <Label>Repeats</Label>
+                  <View className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-3">
+                    <Text className="text-gray-500">
+                      {RECURRENCE_OPTIONS.find((o) => o.value === transaction.recurrence_frequency)?.label ?? transaction.recurrence_frequency}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
           </ScrollView>
 

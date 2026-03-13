@@ -71,6 +71,29 @@ export function getMonthYearString(month: number, year: number) {
   return name ? `${name}-${year}` : `${year}`;
 }
 
+/** Compute the next recurring date by adding the appropriate interval. Returns null for 'never'. */
+export function computeNextRecurringDate(date: string, frequency: string): string | null {
+  if (frequency === 'never') return null;
+  const d = new Date(date + 'T12:00:00');
+  switch (frequency) {
+    case 'weekly':
+      d.setDate(d.getDate() + 7);
+      break;
+    case 'biweekly':
+      d.setDate(d.getDate() + 14);
+      break;
+    case 'monthly':
+      d.setMonth(d.getMonth() + 1);
+      break;
+    case 'yearly':
+      d.setFullYear(d.getFullYear() + 1);
+      break;
+    default:
+      return null;
+  }
+  return d.toISOString().split('T')[0];
+}
+
 /** Current month as "January-2025". */
 export function getCurrentMonthYearString() {
   const now = new Date();

@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { CalendarPicker } from "@/components/CalendarPicker";
 import { FormField } from "@/components/ui/form-field";
+import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { RECURRENCE_OPTIONS } from "@/lib/constants";
 import { useUpdateIncomeTransaction } from "@/hooks/useUpdateIncomeTransaction";
 import { useDeleteIncomeTransaction } from "@/hooks/useDeleteIncomeTransaction";
 import { editIncomeTransactionSchema, type EditIncomeTransactionFormData } from "@/lib/validations";
@@ -25,6 +27,7 @@ type EditIncomeTransactionFormProps = {
     amount: number;
     date: string | null;
     description: string | null;
+    recurrence_frequency?: string | null;
   };
   visible: boolean;
   onClose: () => void;
@@ -161,6 +164,17 @@ export function EditIncomeTransactionForm({
                   </Text>
                 )}
               </View>
+
+              {transaction.recurrence_frequency && transaction.recurrence_frequency !== 'never' && (
+                <View className="gap-2">
+                  <Label>Repeats</Label>
+                  <View className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-3">
+                    <Text className="text-gray-500">
+                      {RECURRENCE_OPTIONS.find((o) => o.value === transaction.recurrence_frequency)?.label ?? transaction.recurrence_frequency}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
           </ScrollView>
 

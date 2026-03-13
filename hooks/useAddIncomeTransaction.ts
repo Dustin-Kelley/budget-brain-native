@@ -15,6 +15,7 @@ export function useAddIncomeTransaction() {
       householdId: string;
       userId: string;
       monthKey: string;
+      recurrenceFrequency?: string;
     }) => {
       const { error } = await addIncomeTransaction(params);
       if (error) throw error;

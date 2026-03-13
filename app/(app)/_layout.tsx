@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
+import { useGenerateRecurringTransactions } from "@/hooks/useGenerateRecurringTransactions";
 import { getAppTheme } from "@/lib/themes";
 import { blendHex } from "@/lib/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -18,6 +19,7 @@ export default function AppLayout() {
   const { user, isLoading } = useAuth();
   const { appTheme } = useTheme();
   const theme = getAppTheme(appTheme);
+  useGenerateRecurringTransactions();
 
   if (isLoading) {
     return null;
