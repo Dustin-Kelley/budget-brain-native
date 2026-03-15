@@ -64,6 +64,12 @@
         "projectId": "bb1ccf1b-f4c2-4573-8425-50f5d85e6220"
       }
     },
-    "owner": "budget-brain"
+    "owner": "budget-brain",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bb1ccf1b-f4c2-4573-8425-50f5d85e6220"
+    }
   }
 }
